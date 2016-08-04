@@ -237,7 +237,7 @@ void trainParallelStochasticGradientDescent2(
         1,
         1);
 
-    const size_t shared_memory_size = block_size.x * sizeof(FeatureType) * LABEL_CLASS;
+    const size_t shared_memory_size = block_size.x * sizeof(FeatureType);
 
     // check that the resulting grid and block dimensions
     // dont' violate device limits
