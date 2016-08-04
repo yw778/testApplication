@@ -7,8 +7,8 @@
 #include "cpp/sgd_baseline.h"
 #include "cpp/batch_baseline.h"
 #include "cpp/minibatch_baseline.h"
-// #include "mbgd_1.h"
-// #include "mbgd_2.h"
+#include "mbgd_1.h"
+#include "mbgd_2.h"
 // #include "sgd_cublas.h"
 #include "sgd_single_point.h"
 
