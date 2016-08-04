@@ -74,6 +74,12 @@ bool checkDeviceProps(
     dim3 block_size,
     dim3 grid_size);
 
+__device__ void d_memset(
+    FeatureType* array,
+    float value,
+    size_t num_elements,
+    size_t threads_per_mini_batch);
+
 // void p_updateParameters(
 //      cublasHandle_t handle,
 //      FeatureType* d_theta,
@@ -82,6 +88,14 @@ bool checkDeviceProps(
 //      float step_size,
 //      bool revert = false);
 
+// updates the parameters using atomics 
+__device__ void d_updateParameters(
+    FeatureType* gradient,
+    FeatureType* parameter_vector,
+    size_t num_features,
+    size_t threads_per_mini_batch,
+    double step_size);
+
 // void p_add_vectors(cublasHandle_t handle, float* a, float* b, const size_t size, const float scale_for_a = 1);
 
 // void addVectors(float* a, float* b, const size_t size, const float scale_for_b);
@@ -89,6 +103,18 @@ bool checkDeviceProps(
 // float p_dotProduct(cublasHandle_t handle, float* a, float* b, float* d_a, float* d_b, const size_t size);
 
 // void p_MatrixVectorMultiply(cublasHandle_t handle, float* matrix, float* vect, float scalar, size_t num_data_points, size_t num_features, float* result);
+
+// Parallel implementation of matrix vector multiplication. Each thread goes
+// a certain number of features and strides by the number of threads in the 
+// whole mini batch.
+__device__ void d_matrixVectorMultiply(
+    FeatureType* matrix,
+    FeatureType* vect,
+    float scalar,
+    size_t batch_size,
+    size_t num_features,
+    size_t threads_per_mini_batch,
+    FeatureType* result);
 
 // double p_logisticFunction(cublasHandle_t handle, FeatureType* d_theta, FeatureType* d_x_i, const size_t num_features);
 __device__ float d_logisticFunction(float exponent);

@@ -34,6 +34,63 @@
 //  }
 
 
+// Parallel implementation of matrix vector multiplication. Each thread goes
+// a certain number of features and strides by the number of threads in the 
+// whole mini batch.
+__device__ void d_matrixVectorMultiply(
+    FeatureType* matrix,
+    FeatureType* vect,
+    float scalar,
+    size_t batch_size,
+    size_t num_features,
+    size_t threads_per_mini_batch,
+    FeatureType* result) {
+
+    size_t tidx = threadIdx.x;
+    size_t bidx = blockIdx.x;
+    for (int j = 0; j < batch_size; j++) {
+        for (int i = tidx; i < num_features; i += threads_per_mini_batch) {
+            // index of the point with respect to the whole dataset
+            size_t point_idx = bidx * batch_size + j;
+            // index of the feature with respect to all features in the dataset
+            size_t feature_idx = point_idx * num_features + i;
+            result[i] += matrix[feature_idx] * vect[j] * scalar;
+        }
+    }
+}
+
+
+// updates the parameters using atomics
+__device__ void d_updateParameters(
+    FeatureType* gradient,
+    FeatureType* parameter_vector,
+    size_t num_features,
+    size_t threads_per_mini_batch,
+    double step_size) {
+
+    size_t tidx = threadIdx.x;
+    
+    for (size_t i = tidx; i < num_features; i += threads_per_mini_batch) {
+        FeatureType gradient_times_step_size = gradient[i] * step_size;
+        atomicAdd(&parameter_vector[i], -gradient_times_step_size);
+    }
+}
+
+
+// initializes all values in array to a certain value
+__device__ void d_memset(
+    FeatureType* array,
+    float value,
+    size_t num_elements,
+    size_t threads_per_mini_batch) {
+
+    size_t tidx = threadIdx.x;
+    for (size_t i = tidx; i < num_elements; i += threads_per_mini_batch) {
+        array[i] = value;
+    }
+}
+
+
 // computes logistic function for a given parameter vector (theta) and a data point (x_i)
 // double p_logisticFunction(FeatureType* d_theta, FeatureType* d_x_i, const size_t num_features) {
 //      return logisticFunction(p_dotProduct(d_theta, d_x_i, num_features));
