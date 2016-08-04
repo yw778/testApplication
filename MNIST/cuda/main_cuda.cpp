@@ -234,7 +234,7 @@ void runConvergenceTime(
                 trainParallelStochasticGradientDescent2,
                 "CUDA SGD",
                 data_set,
-                training_options,`
+                training_options,
                 benchmark_options);
         }
     }
