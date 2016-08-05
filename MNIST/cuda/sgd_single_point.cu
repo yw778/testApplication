@@ -160,7 +160,7 @@ static __global__ void p_SgdWithSharedParameterVector(
         }
     }
 
-    for(i=0; i<blockDim.x;i++){
+    for(size_t i=0; i<blockDim.x;i++){
         printf("shared memory is %f\n", shared_memory[i]);
     }    
 
