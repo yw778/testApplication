@@ -179,12 +179,12 @@ static __global__ void p_SgdWithSharedParameterVector(
                  point_idx_in_shmem,relative_tidx,
                     point_idx_in_block, LABEL_CLASS);
         //calculate step_size_times_prob_i_minus_label_i, store in the same position
-        if(relative_tidx < num_label){
+        if(relative_tidx < LABEL_CLASS){
             if(labels[point_idx]==relative_tidx){
-                probabilities_of_each[point_idx_in_block * num_label+relative_tidx]-=1;
-                probabilities_of_each[point_idx_in_block * num_label+relative_tidx]*=step_size;
+                probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]-=1;
+                probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
             }else{
-                probabilities_of_each[point_idx_in_block * num_label+relative_tidx]*=step_size;
+                probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
             }
         }
 
