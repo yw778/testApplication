@@ -92,20 +92,23 @@ static __device__ void d_updateParameters(
     FeatureType* parameter_vector,
     size_t num_features,
     size_t threads_per_datapoint,
-    FeatureType step_size_times_prob_i_minus_label_i) {
+    size_t point_idx_in_block,
+    size_t relative_tidx,
+    FeatureType* step_size_times_prob_i_minus_label_i) {
 
-    size_t thread_offset = threadIdx.x % threads_per_datapoint;
+    // size_t thread_offset = threadIdx.x % threads_per_datapoint;
 
     // finishes computation of gradient and updates shared parameter_vector
-    for (size_t j = thread_offset; j < num_features; j+=threads_per_datapoint) {
+    for(size_t i=0;i<LABEL_CLASS;i++){
+        for (size_t j = relative_tidx; j < num_features; j += threads_per_datapoint){
 
-        // the gradient is: x * (pi - y)
-        FeatureType gradient_times_step_size =
-                data_point_i[j] * step_size_times_prob_i_minus_label_i;
+            // the gradient is: x * (pi - y)
+            FeatureType gradient_times_step_size = data_point_i[j] 
+                * step_size_times_prob_i_minus_label_i[point_idx_in_block * num_label+i];
 
-        atomicAdd(&parameter_vector[j], - gradient_times_step_size);
+            atomicAdd(&parameter_vector[j+LABEL_CLASS * num_features], - gradient_times_step_size);
+        }
     }
-
 }
 
 // Kernel for Parallel Stochastic Gradient Descent in CUDA using
@@ -120,6 +123,9 @@ static __global__ void p_SgdWithSharedParameterVector(
     double step_size) {
 
     extern __shared__ FeatureType shared_memory[];
+    float *probabilities_of_each = (float*)&shared_memory[blockDim.x 
+            * LABEL_CLASS];
+
 
     // computes several indexes, offsets and strides to simplify further code
     size_t tidx = threadIdx.x;
@@ -129,6 +135,10 @@ static __global__ void p_SgdWithSharedParameterVector(
     // index relative to the datapoint instead of the block
     size_t relative_tidx = tidx % threads_per_datapoint;
     size_t point_idx_in_shmem = tidx - relative_tidx;
+    size_t point_idx_in_block = tid / threads_per_datapoint;
+
+    // float *probabilities_of_sum = (float*)&probabilities_of_each[LABEL_CLASS 
+        // * points_per_block];
 
     FeatureType* data_point_i = NULL;
 
@@ -153,29 +163,44 @@ static __global__ void p_SgdWithSharedParameterVector(
     __syncthreads();
 
     // sum-reduce the results of partial dot product to get final result
-    for (size_t s = threads_per_datapoint / 2; s > 0; s>>=1) {
-        if (relative_tidx < s) {
-            shared_memory[tidx] += shared_memory[tidx + s];
+    for(size_t i=0 ; i<LABEL_CLASS ;i++){    
+        for (size_t s = threads_per_datapoint / 2; s > 0; s>>=1) {
+            if (relative_tidx < s) {
+                shared_memory[tidx+i*blockDim.x] += shared_memory[tidx+s+i*blockDim.x];
+            }
+            __syncthreads();
         }
-        __syncthreads();
     }
-
     // make sure the threads don't go out of bounds
     if (point_idx < num_data_points) {
+        // double probability_of_positive =
+        //     d_softMaxFunction(shared_memory[point_idx_in_shmem]);
+        d_softMaxFunction(shared_memory,probabilities_of_each,
+                 point_idx_in_shmem,relative_tidx,
+                    point_idx_in_block, LABEL_CLASS);
+        //calculate step_size_times_prob_i_minus_label_i, store in the same position
+        if(relative_tidx < num_label){
+            if(labels[point_idx]==relative_tidx){
+                posibility_each[point_idx_in_block * num_label+relative_tidx]-=1;
+                posibility_each[point_idx_in_block * num_label+relative_tidx]*=step_size;
+            }else{
+                posibility_each[point_idx_in_block * num_label+relative_tidx]*=step_size;
+            }
+        }
 
-        double probability_of_positive =
-            d_logisticFunction(shared_memory[point_idx_in_shmem]);
-
-        double step_size_times_prob_i_minus_label_i =
-            (probability_of_positive - labels[point_idx]) * step_size;
+        // double step_size_times_prob_i_minus_label_i =
+        //     (probability_of_positive - labels[point_idx]) * step_size;
+        __syncthreads();
 
         d_updateParameters(
             data_point_i,
             parameter_vector,
             num_features,
             threads_per_datapoint,
-            step_size_times_prob_i_minus_label_i);
-    }
+            point_idx_in_block,
+            relative_tidx,
+            posibility_each);
+    }   
 
 }
 
@@ -237,7 +262,9 @@ void trainParallelStochasticGradientDescent2(
         1,
         1);
 
-    const size_t shared_memory_size = block_size.x * sizeof(FeatureType);
+    const size_t shared_memory_size = block_size.x * sizeof(FeatureType) * LABEL_CLASS
+        + datapoints_per_block * sizeof(FeatureType) * LABEL_CLASS ;
+        // + datapoints_per_block * sizeof(FeatureType);
 
     // check that the resulting grid and block dimensions
     // dont' violate device limits

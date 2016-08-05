@@ -31,6 +31,13 @@ void runTrainAndTest(
         training_options,
         benchmark_options);
 
+    trainAndTest(
+        trainMiniBatchGradientDescent,
+        "MBGD",
+        data_set,
+        training_options,
+        benchmark_options);
+
     for (size_t threads_per_datapoint = 128;
         threads_per_datapoint <= 512;
         threads_per_datapoint*=2) {
@@ -123,6 +130,14 @@ void runConvergenceRate(
         training_options,
         benchmark_options);
 
+    convergenceRate(
+        trainMiniBatchGradientDescent,
+        "MBGD",
+        data_set,
+        training_options,
+        benchmark_options);
+    
+
     for (size_t threads_per_datapoint = 128;
         threads_per_datapoint <= 512;
         threads_per_datapoint*=2) {
@@ -214,9 +229,17 @@ void runConvergenceTime(
     //     training_options,
     //     benchmark_options);
 
-    printf("enter convergence time for parralell sgd");
 
-    for (size_t threads_per_datapoint = 128;
+    // convergenceTime(
+    //     trainMiniBatchGradientDescent,
+    //     "MBGD",
+    //     data_set,
+    //     training_options,
+    //     benchmark_options);
+
+    printf("enter convergence time for parralell sgd \n");
+    //threads_per_datapoint must be bigger than 10
+    for (size_t threads_per_datapoint = 32;
         threads_per_datapoint <= 512;
         threads_per_datapoint*=2) {
 
