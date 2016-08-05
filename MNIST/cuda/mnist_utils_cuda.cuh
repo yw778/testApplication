@@ -119,4 +119,12 @@ __device__ void d_matrixVectorMultiply(
 // double p_logisticFunction(cublasHandle_t handle, FeatureType* d_theta, FeatureType* d_x_i, const size_t num_features);
 __device__ float d_logisticFunction(float exponent);
 
+
+__device__ float d_softMaxFunction(FeatureType* shared_memory, 
+    FeatureType* posibility_each,
+    size_t point_idx_in_shmem,
+    size_t relative_tidx,
+    size_t point_idx_in_block,
+    size_t num_label);
+
 #endif

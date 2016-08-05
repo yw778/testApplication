@@ -104,7 +104,7 @@ static __device__ void d_updateParameters(
 
             // the gradient is: x * (pi - y)
             FeatureType gradient_times_step_size = data_point_i[j] 
-                * step_size_times_prob_i_minus_label_i[point_idx_in_block * num_label+i];
+                * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i];
 
             atomicAdd(&parameter_vector[j+LABEL_CLASS * num_features], - gradient_times_step_size);
         }
@@ -135,7 +135,7 @@ static __global__ void p_SgdWithSharedParameterVector(
     // index relative to the datapoint instead of the block
     size_t relative_tidx = tidx % threads_per_datapoint;
     size_t point_idx_in_shmem = tidx - relative_tidx;
-    size_t point_idx_in_block = tid / threads_per_datapoint;
+    size_t point_idx_in_block = tidx / threads_per_datapoint;
 
     // float *probabilities_of_sum = (float*)&probabilities_of_each[LABEL_CLASS 
         // * points_per_block];
@@ -181,10 +181,10 @@ static __global__ void p_SgdWithSharedParameterVector(
         //calculate step_size_times_prob_i_minus_label_i, store in the same position
         if(relative_tidx < num_label){
             if(labels[point_idx]==relative_tidx){
-                posibility_each[point_idx_in_block * num_label+relative_tidx]-=1;
-                posibility_each[point_idx_in_block * num_label+relative_tidx]*=step_size;
+                probabilities_of_each[point_idx_in_block * num_label+relative_tidx]-=1;
+                probabilities_of_each[point_idx_in_block * num_label+relative_tidx]*=step_size;
             }else{
-                posibility_each[point_idx_in_block * num_label+relative_tidx]*=step_size;
+                probabilities_of_each[point_idx_in_block * num_label+relative_tidx]*=step_size;
             }
         }
 
@@ -199,7 +199,7 @@ static __global__ void p_SgdWithSharedParameterVector(
             threads_per_datapoint,
             point_idx_in_block,
             relative_tidx,
-            posibility_each);
+            probabilities_of_each);
     }   
 
 }
