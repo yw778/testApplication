@@ -121,19 +121,19 @@ static __device__ void d_updateParameters(
 
             atomicAdd(&parameter_vector[j+i * num_features], - gradient_times_step_size);
             // // //debug use
-            // if(relative_tidx==0&&blockIdx.x==0){
-            //     printf("gradient is  %f\n",parameter_vector[j+i* num_features]);
-            // }
+            if(relative_tidx==0&&blockIdx.x==0){
+                printf("gradient is  %f\n",parameter_vector[j+i* num_features]);
+            }
         }
     }
 
      //debug use
-    if(relative_tidx==0&&blockIdx.x==0){
-        for(size_t i=0; i<num_features;i++){
-            printf("p-%f--", parameter_vector[i]);
-        }   
-    } 
-    asm("trap;"); 
+    // if(relative_tidx==0&&blockIdx.x==0){
+    //     for(size_t i=0; i<num_features;i++){
+    //         printf("p-%f--", parameter_vector[i]);
+    //     }   
+    // } 
+    // asm("trap;"); 
 }
 
 // Kernel for Parallel Stochastic Gradient Descent in CUDA using
