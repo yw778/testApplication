@@ -259,7 +259,7 @@ static __global__ void p_SgdWithSharedParameterVector(
                 printf("after parameter is factored %f\n", probabilities_of_each[i]);
             }   
         } 
-        asm("trap;")
+        asm("trap;");
 
         //debug use
         // printf("before update parameters \n");
