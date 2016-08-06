@@ -250,11 +250,11 @@ static __global__ void p_SgdWithSharedParameterVector(
             relative_tidx,
             probabilities_of_each);
         // debug use
-        if(relative_tidx==0&&blockIdx.x==0){
-            for(size_t i=0; i<PARAMETER_SIZE;i++){
-                printf("p-%f--\n", parameter_vector[i]);
-            }   
-        } 
+        // if(relative_tidx==0&&blockIdx.x==0){
+        //     for(size_t i=0; i<PARAMETER_SIZE;i++){
+        //         printf("p-%f--\n", parameter_vector[i]);
+        //     }   
+        // } 
     }   
 
 }
