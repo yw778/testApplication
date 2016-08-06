@@ -129,7 +129,7 @@ static __device__ void d_updateParameters(
             if(relative_tidx==0&&blockIdx.x==0){
                 printf("before add is  %f\n",parameter_vector[j+i * num_features]);
             } 
-            asm("trap;"); 
+            // asm("trap;"); 
             atomicAdd(&parameter_vector[j+i * num_features], - gradient_times_step_size);
             // // //debug use
             // if(relative_tidx==0&&blockIdx.x==0){
