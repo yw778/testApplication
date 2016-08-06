@@ -219,8 +219,9 @@ static __global__ void p_SgdWithSharedParameterVector(
             }else{                   
                 if(relative_tidx==0&&blockIdx.x==0){
                     printf("before inupdating..%f\n",probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]);
+                     printf("step size is %f\n",step_size);
                 }
-                printf("step size is %f\n",step_size);
+
                 probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
                 if(relative_tidx==0&&blockIdx.x==0){
                     printf("inupdating..%f\n",probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]);
