@@ -166,7 +166,7 @@ static __global__ void p_SgdWithSharedParameterVector(
     }   
 
     printf("block size is %d\n",blockDim.x);
-    exit(1); 
+     
 
     __syncthreads();
 
