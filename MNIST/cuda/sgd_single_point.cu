@@ -121,7 +121,7 @@ static __device__ void d_updateParameters(
             if(relative_tidx==0&&blockIdx.x==0){
                 printf("gradient_times_step_size is  %f\n",gradient_times_step_size);
                 printf("data_point_i[j] is  %f\n",data_point_i[j]);
-                printf("step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]
+                printf("step_size_times_prob_i_minus_label_i
                      is  %f\n",step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
 
             }
