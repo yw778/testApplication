@@ -279,11 +279,11 @@ void trainParallelStochasticGradientDescent2(
     TrainingOptions training_options) {
 
     // shuffle datapoints in order to add more stochasticity
-    shuffleKeyValue(
-        training_set.data_points,
-        training_set.labels,
-        training_set.num_data_points,
-        training_set.num_features);
+    // shuffleKeyValue(
+    //     training_set.data_points,
+    //     training_set.labels,
+    //     training_set.num_data_points,
+    //     training_set.num_features);
 
     // allocate device memory
     setCudaVariables(
