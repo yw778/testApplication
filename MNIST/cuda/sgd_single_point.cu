@@ -122,7 +122,7 @@ static __device__ void d_updateParameters(
             atomicAdd(&parameter_vector[j+LABEL_CLASS * num_features], - gradient_times_step_size);
             //debug use
             // if(relative_tidx==0&&blockIdx.x==0){
-                printf("gradient is  %f\n",parameter_vector[j+LABEL_CLASS * num_features]);
+            printf("gradient is  %f\n",parameter_vector[j+LABEL_CLASS * num_features]);
             // }
         }
     }
@@ -249,12 +249,12 @@ static __global__ void p_SgdWithSharedParameterVector(
             point_idx_in_block,
             relative_tidx,
             probabilities_of_each);
-        //debug use
-        // if(relative_tidx==0&&blockIdx.x==0){
-        //     for(size_t i=0; i<PARAMETER_SIZE;i++){
-        //         printf("p-%f--\n", parameter_vector[i]);
-        //     }   
-        // } 
+        // debug use
+        if(relative_tidx==0&&blockIdx.x==0){
+            for(size_t i=0; i<PARAMETER_SIZE;i++){
+                printf("p-%f--\n", parameter_vector[i]);
+            }   
+        } 
     }   
 
 }
