@@ -109,7 +109,7 @@ static __device__ void d_updateParameters(
             printf("gradient-%f--\n", step_size_times_prob_i_minus_label_i[i]);
         }   
     } 
-    asm("trap;"); 
+    // asm("trap;"); 
 
     for(size_t i=0;i<LABEL_CLASS;i++){
         for (size_t j = relative_tidx; j < num_features; j += threads_per_datapoint){
