@@ -187,11 +187,11 @@ static __global__ void p_SgdWithSharedParameterVector(
                  point_idx_in_shmem,relative_tidx,
                     point_idx_in_block, LABEL_CLASS);
         
-        if(relative_tidx==0&&blockIdx.x==0){
-            for(size_t i=0; i<10;i++){
-                printf("shared memory is %f\n", probabilities_of_each[i]);
-            }   
-        } 
+        // if(relative_tidx==0&&blockIdx.x==0){
+        //     for(size_t i=0; i<10;i++){
+        //         printf("shared memory is %f\n", probabilities_of_each[i]);
+        //     }   
+        // } 
         // asm("trap;");  
         //calculate step_size_times_prob_i_minus_label_i, store in the same position
         if(relative_tidx < LABEL_CLASS){
@@ -203,11 +203,11 @@ static __global__ void p_SgdWithSharedParameterVector(
             }
         }
         //debug use
-        // if(relative_tidx==0&&blockIdx.x==0){
-        //     for(size_t i=0; i<10;i++){
-        //         printf("shared memory is %f\n", probabilities_of_each[i]);
-        //     }   
-        // } 
+        if(relative_tidx==0&&blockIdx.x==0){
+            for(size_t i=0; i<10;i++){
+                printf("shared memory is %f\n", probabilities_of_each[i]);
+            }   
+        } 
         // asm("trap;");  
 
         // double step_size_times_prob_i_minus_label_i =
