@@ -119,10 +119,10 @@ static __device__ void d_updateParameters(
                 * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i];
 
 
-            atomicAdd(&parameter_vector[j+LABEL_CLASS * num_features], - gradient_times_step_size);
+            atomicAdd(&parameter_vector[j+i * num_features], - gradient_times_step_size);
             // // //debug use
             // if(relative_tidx==0&&blockIdx.x==0){
-            //     printf("gradient is  %f\n",parameter_vector[j+LABEL_CLASS * num_features]);
+            //     printf("gradient is  %f\n",parameter_vector[j+i* num_features]);
             // }
         }
     }
