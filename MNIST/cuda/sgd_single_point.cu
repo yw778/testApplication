@@ -270,8 +270,8 @@ void trainParallelStochasticGradientDescent2(
         + datapoints_per_block * sizeof(FeatureType) * LABEL_CLASS ;
         // + datapoints_per_block * sizeof(FeatureType);
 
-    printf("memosize is %d",shared_memory_size);
-    exit(1);
+    // printf("memosize is %d",shared_memory_size);
+    // exit(1);
 
     // check that the resulting grid and block dimensions
     // dont' violate device limits
@@ -287,6 +287,7 @@ void trainParallelStochasticGradientDescent2(
                                        * training_set.num_data_points
                                        / characteristic_time));
             curr_num_epochs++;
+            printf("before kernal is launched\n");
 
             // call kernel and check for errors
             p_SgdWithSharedParameterVector
