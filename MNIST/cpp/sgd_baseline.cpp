@@ -43,7 +43,7 @@ static void softmaxGradientForSinglePoint(
     memset(gradient, 0, LABEL_CLASS * num_features * sizeof(FeatureType));
 
     for(size_t i=0; i<LABEL_CLASS; i++){
-        printf("first label is %d\n",label);
+        printf("first label is %f\n",label);
         exit(1);
         //case one parameter with the same label
         if(label==i){

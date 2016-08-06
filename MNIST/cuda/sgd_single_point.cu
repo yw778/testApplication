@@ -233,7 +233,7 @@ static __global__ void p_SgdWithSharedParameterVector(
         __syncthreads();
         //debug use
            if(relative_tidx==0&&blockIdx.x==0){
-            printf("point_index is %d\n",labels[point_idx]);
+            printf("point_index is %f\n",labels[point_idx]);
             for(size_t i=0; i<10;i++){
                 printf("after parameter is factored %f\n", probabilities_of_each[i]);
             }   
