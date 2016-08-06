@@ -116,28 +116,29 @@ void runConvergenceRate(
     TrainingOptions training_options,
     BenchmarkOptions benchmark_options) {
 
-    convergenceRate(
-        trainStochasticGradientDescent,
-        "SGD",
-        data_set,
-        training_options,
-        benchmark_options);
+    // convergenceRate(
+    //     trainStochasticGradientDescent,
+    //     "SGD",
+    //     data_set,
+    //     training_options,
+    //     benchmark_options);
 
-    convergenceRate(
-        trainBatchGradientDescent,
-        "BGD",
-        data_set,
-        training_options,
-        benchmark_options);
+    // convergenceRate(
+    //     trainBatchGradientDescent,
+    //     "BGD",
+    //     data_set,
+    //     training_options,
+    //     benchmark_options);
 
-    convergenceRate(
-        trainMiniBatchGradientDescent,
-        "MBGD",
-        data_set,
-        training_options,
-        benchmark_options);
+    // convergenceRate(
+    //     trainMiniBatchGradientDescent,
+    //     "MBGD",
+    //     data_set,
+    //     training_options,
+    //     benchmark_options);
     
-
+    printf("in run convergecneRate in cuda\n");
+    
     for (size_t threads_per_datapoint = 128;
         threads_per_datapoint <= 512;
         threads_per_datapoint*=2) {
