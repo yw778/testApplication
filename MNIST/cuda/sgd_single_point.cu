@@ -263,7 +263,7 @@ static __global__ void p_SgdWithSharedParameterVector(
         // asm("trap;");
 
         // debug use
-        printf("before update parameters \n");
+        // printf("before update parameters \n");
         if(relative_tidx==0&&blockIdx.x==0){
             for(size_t i=0; i<PARAMETER_SIZE;i++){
                 printf("p+%f--\n", parameter_vector[i]);
