@@ -201,7 +201,7 @@ static __global__ void p_SgdWithSharedParameterVector(
                 probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
             }
         }
-        if(relative_tidx==0){
+        if(relative_tidx==0&&blockIdx.x==0){
             for(size_t i=0; i<10;i++){
                 printf("shared memory is %f\n", probabilities_of_each[i]);
             }   
