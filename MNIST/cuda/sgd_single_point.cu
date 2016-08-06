@@ -123,7 +123,7 @@ static __device__ void d_updateParameters(
                 printf("data_point_i[j] is  %f\n",data_point_i[j]);
                 printf("minus is  %f\n",step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
             }
-            asm("trap;"); 
+            // asm("trap;"); 
             atomicAdd(&parameter_vector[j+i * num_features], - gradient_times_step_size);
             // // //debug use
             // if(relative_tidx==0&&blockIdx.x==0){
