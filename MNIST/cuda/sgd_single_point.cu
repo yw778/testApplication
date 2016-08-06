@@ -196,6 +196,7 @@ static __global__ void p_SgdWithSharedParameterVector(
             __syncthreads();
         }
     }
+    //__syncthreads();
     // make sure the threads don't go out of bounds
     if (point_idx < num_data_points) {
         // double probability_of_positive =
@@ -225,11 +226,19 @@ static __global__ void p_SgdWithSharedParameterVector(
         //         printf("after parameter is factored %f\n", probabilities_of_each[i]);
         //     }   
         // } 
-        // asm("trap;");  ß
+        // asm("trap;");  
 
         // double step_size_times_prob_i_minus_label_i =
         //     (probability_of_positive - labels[point_idx]) * step_size;
         __syncthreads();
+        //debug use
+           if(relative_tidx==0&&blockIdx.x==0){
+            for(size_t i=0; i<10;i++){
+                printf("after parameter is factored %f\n", probabilities_of_each[i]);
+            }   
+        } 
+        asm("trap;"); 
+
         //debug use
         // printf("before update parameters \n");
         // if(relative_tidx==0&&blockIdx.x==0){
@@ -250,11 +259,11 @@ static __global__ void p_SgdWithSharedParameterVector(
             relative_tidx,
             probabilities_of_each);
         // debug use
-        if(relative_tidx==0&&blockIdx.x==0){
-            for(size_t i=0; i<PARAMETER_SIZE;i++){
-                printf("p-%f--\n", parameter_vector[i]);
-            }   
-        } 
+        // if(relative_tidx==0&&blockIdx.x==0){
+        //     for(size_t i=0; i<PARAMETER_SIZE;i++){
+        //         printf("p-%f--\n", parameter_vector[i]);
+        //     }   
+        // } 
     }   
 
 }
