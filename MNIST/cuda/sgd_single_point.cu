@@ -125,6 +125,7 @@ static __global__ void p_SgdWithSharedParameterVector(
     extern __shared__ FeatureType shared_memory[];
     float *probabilities_of_each = (float*)&shared_memory[blockDim.x 
             * LABEL_CLASS];
+    printf("in the kernal \n");
 
 
     // computes several indexes, offsets and strides to simplify further code
