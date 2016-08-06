@@ -117,13 +117,16 @@ static __device__ void d_updateParameters(
             // the gradient is: x * (pi - y)
             FeatureType gradient_times_step_size = data_point_i[j] 
                 * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i];
-
-
+               // // //debug use
+            if(relative_tidx==0&&blockIdx.x==0){
+                printf("gradient_times_step_size is  %f\n",gradient_times_step_size);
+                printf("data_point_i[j] is  %f\n",data_point_i[j]);
+            }
             atomicAdd(&parameter_vector[j+i * num_features], - gradient_times_step_size);
             // // //debug use
-            if(relative_tidx==0&&blockIdx.x==0){
-                printf("gradient is  %f\n",parameter_vector[j+i* num_features]);
-            }
+            // if(relative_tidx==0&&blockIdx.x==0){
+            //     printf("gradient is  %f\n",parameter_vector[j+i* num_features]);
+            // }
         }
     }
 
