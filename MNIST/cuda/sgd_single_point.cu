@@ -73,7 +73,7 @@ static __device__ void d_partialDotProduct(
     size_t num_features,
     size_t threads_per_datapoint,
     size_t position) {
-
+    //memset to 0
     FeatureType partial_dot = 0;
 
     size_t thread_offset = threadIdx.x % threads_per_datapoint;
@@ -218,7 +218,11 @@ static __global__ void p_SgdWithSharedParameterVector(
                 probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
             }else{
                 probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
-            }
+                if(relative_tidx==0&&blockIdx.x==0){
+       
+                    printf("in upadating is  %f\n", probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]);
+    
+                }
         }
         //debug use
         // if(relative_tidx==0&&blockIdx.x==0){
