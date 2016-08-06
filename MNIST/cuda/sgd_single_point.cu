@@ -126,6 +126,14 @@ static __device__ void d_updateParameters(
             // }
         }
     }
+
+     //debug use
+    if(relative_tidx==0&&blockIdx.x==0){
+        for(size_t i=0; i<PARAMETER_SIZE;i++){
+            printf("p-%f--", parameter_vector[i]);
+        }   
+    } 
+    asm("trap;"); 
 }
 
 // Kernel for Parallel Stochastic Gradient Descent in CUDA using
@@ -205,11 +213,11 @@ static __global__ void p_SgdWithSharedParameterVector(
                  point_idx_in_shmem,relative_tidx,
                     point_idx_in_block, LABEL_CLASS);
         //debug use
-        if(relative_tidx==0&&blockIdx.x==0){
-            for(size_t i=0; i<10;i++){
-                printf("shared memory is %f\n", probabilities_of_each[i]);
-            }   
-        } 
+        // if(relative_tidx==0&&blockIdx.x==0){
+        //     for(size_t i=0; i<10;i++){
+        //         printf("shared memory is %f\n", probabilities_of_each[i]);
+        //     }   
+        // } 
         // asm("trap;");  
         //calculate step_size_times_prob_i_minus_label_i, store in the same position
         if(relative_tidx < LABEL_CLASS){
@@ -217,15 +225,15 @@ static __global__ void p_SgdWithSharedParameterVector(
                 probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]-=1;
                 probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
             }else{                   
-                if(relative_tidx==0&&blockIdx.x==0){
-                    printf("before inupdating..%f\n",probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]);
-                     printf("step size is %f\n",step_size);
-                }
+                // if(relative_tidx==0&&blockIdx.x==0){
+                //     printf("before inupdating..%f\n",probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]);
+                //      printf("step size is %f\n",step_size);
+                // }
 
                 probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
-                if(relative_tidx==0&&blockIdx.x==0){
-                    printf("inupdating..%f\n",probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]);
-                }
+                // if(relative_tidx==0&&blockIdx.x==0){
+                //     printf("inupdating..%f\n",probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]);
+                // }
             }
         }
         //debug use
@@ -240,13 +248,13 @@ static __global__ void p_SgdWithSharedParameterVector(
         //     (probability_of_positive - labels[point_idx]) * step_size;
         __syncthreads();
         //debug use
-           if(relative_tidx==0&&blockIdx.x==0){
-            // printf("blockIdx.x is %d--tid is %d\n",blockIdx.x,threadIdx.x);
-            // printf("point_index is %d----%f\n",point_idx,labels[point_idx]);
-            for(size_t i=0; i<10;i++){
-                printf("after parameter is factored %f\n", probabilities_of_each[i]);
-            }   
-        } 
+        //    if(relative_tidx==0&&blockIdx.x==0){
+        //     // printf("blockIdx.x is %d--tid is %d\n",blockIdx.x,threadIdx.x);
+        //     // printf("point_index is %d----%f\n",point_idx,labels[point_idx]);
+        //     for(size_t i=0; i<10;i++){
+        //         printf("after parameter is factored %f\n", probabilities_of_each[i]);
+        //     }   
+        // } 
         // asm("trap;"); 
 
         //debug use
