@@ -127,7 +127,7 @@ static __device__ void d_updateParameters(
             // }
             // asm("trap;"); 
             if(relative_tidx==0&&blockIdx.x==0){
-                printf("before add is  %f\n",parameter_vector[j+i * num_features]);
+                printf("before add is %d %f\n",j+i * num_features, parameter_vector[j+i * num_features]);
             } 
             // asm("trap;"); 
             atomicAdd(&parameter_vector[j+i * num_features], - gradient_times_step_size);
@@ -136,7 +136,7 @@ static __device__ void d_updateParameters(
             //     printf("gradient is  %f\n",parameter_vector[j+i* num_features]);
             // }
             if(relative_tidx==0&&blockIdx.x==0){
-                printf("after add -- add is  %f\n",parameter_vector[j+i * num_features]);
+                printf("after add -- add is %d %f\n",j+i * num_features,parameter_vector[j+i * num_features]);
 
             } 
         }
