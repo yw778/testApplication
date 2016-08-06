@@ -96,6 +96,8 @@ static __device__ void d_updateParameters(
     size_t relative_tidx,
     FeatureType* step_size_times_prob_i_minus_label_i) {
 
+    printf("enter update parameters in sgd_single_point\n");
+
     // size_t thread_offset = threadIdx.x % threads_per_datapoint;
 
     // finishes computation of gradient and updates shared parameter_vector
@@ -214,14 +216,14 @@ static __global__ void p_SgdWithSharedParameterVector(
         //     (probability_of_positive - labels[point_idx]) * step_size;
         __syncthreads();
         //debug use
-        printf("before update parameters \n");
-        if(relative_tidx==0&&blockIdx.x==0){
-            for(size_t i=0; i<PARAMETER_SIZE;i++){
-                printf("p+%f--\n", parameter_vector[i]);
-            }   
+        // printf("before update parameters \n");
+        // if(relative_tidx==0&&blockIdx.x==0){
+        //     for(size_t i=0; i<PARAMETER_SIZE;i++){
+        //         printf("p+%f--\n", parameter_vector[i]);
+        //     }   
 
-            printf("\n\n\n\n\n\n\n\n");
-        } 
+        //     printf("\n\n\n\n\n\n\n\n");
+        // } 
 
 
         d_updateParameters(
@@ -233,11 +235,11 @@ static __global__ void p_SgdWithSharedParameterVector(
             relative_tidx,
             probabilities_of_each);
         //debug use
-        if(relative_tidx==0&&blockIdx.x==0){
-            for(size_t i=0; i<PARAMETER_SIZE;i++){
-                printf("p-%f--\n", parameter_vector[i]);
-            }   
-        } 
+        // if(relative_tidx==0&&blockIdx.x==0){
+        //     for(size_t i=0; i<PARAMETER_SIZE;i++){
+        //         printf("p-%f--\n", parameter_vector[i]);
+        //     }   
+        // } 
     }   
 
 }
