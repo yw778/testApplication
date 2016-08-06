@@ -125,7 +125,7 @@ static __global__ void p_SgdWithSharedParameterVector(
     extern __shared__ FeatureType shared_memory[];
     float *probabilities_of_each = (float*)&shared_memory[blockDim.x 
             * LABEL_CLASS];
-    printf("in the kernal \n");
+    // printf("in the kernal \n");
 
 
     // computes several indexes, offsets and strides to simplify further code
@@ -186,11 +186,12 @@ static __global__ void p_SgdWithSharedParameterVector(
         d_softMaxFunction(shared_memory,probabilities_of_each,
                  point_idx_in_shmem,relative_tidx,
                     point_idx_in_block, LABEL_CLASS);
-        if(relative_tidx==0){
-            for(size_t i=0; i<10;i++){
-                printf("shared memory is %f\n", probabilities_of_each[i]);
-            }   
-        }   
+        //debug
+        // if(relative_tidx==0){
+        //     for(size_t i=0; i<10;i++){
+        //         printf("shared memory is %f\n", probabilities_of_each[i]);
+        //     }   
+        // }   
         //calculate step_size_times_prob_i_minus_label_i, store in the same position
         if(relative_tidx < LABEL_CLASS){
             if(labels[point_idx]==relative_tidx){
@@ -200,6 +201,11 @@ static __global__ void p_SgdWithSharedParameterVector(
                 probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
             }
         }
+        if(relative_tidx==0){
+            for(size_t i=0; i<10;i++){
+                printf("shared memory is %f\n", probabilities_of_each[i]);
+            }   
+        }   
 
         // double step_size_times_prob_i_minus_label_i =
         //     (probability_of_positive - labels[point_idx]) * step_size;
