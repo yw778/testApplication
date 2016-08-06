@@ -216,13 +216,12 @@ static __global__ void p_SgdWithSharedParameterVector(
             if(labels[point_idx]==relative_tidx){
                 probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]-=1;
                 probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
-            }else{
+            }else{                   
                 probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
                 if(relative_tidx==0&&blockIdx.x==0){
-       
-                    printf("in upadating is  %f\n", probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]);
-    
+                    printf("inupdating..%f\n",probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]);
                 }
+            }
         }
         //debug use
         // if(relative_tidx==0&&blockIdx.x==0){
