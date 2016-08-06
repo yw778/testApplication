@@ -120,7 +120,7 @@ __device__ void d_matrixVectorMultiply(
 __device__ float d_logisticFunction(float exponent);
 
 
-__device__ float d_softMaxFunction(FeatureType* shared_memory, 
+__device__ void  d_softMaxFunction(FeatureType* shared_memory, 
     FeatureType* posibility_each,
     size_t point_idx_in_shmem,
     size_t relative_tidx,
