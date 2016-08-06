@@ -205,7 +205,8 @@ static __global__ void p_SgdWithSharedParameterVector(
             for(size_t i=0; i<10;i++){
                 printf("shared memory is %f\n", probabilities_of_each[i]);
             }   
-        }   
+        } 
+        asm("trap;");  
 
         // double step_size_times_prob_i_minus_label_i =
         //     (probability_of_positive - labels[point_idx]) * step_size;
