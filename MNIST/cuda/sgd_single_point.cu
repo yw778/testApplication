@@ -160,13 +160,13 @@ static __global__ void p_SgdWithSharedParameterVector(
                 i*blockDim.x);
         }
     }
+    //debug use
+    // for(size_t i=0; i<blockDim.x;i++){
+    //     printf("shared memory is %f\n", shared_memory[i]);
+    // }   
 
-    for(size_t i=0; i<blockDim.x;i++){
-        printf("shared memory is %f\n", shared_memory[i]);
-    }   
+    // printf("block size is %d\n",blockDim.x);
 
-    printf("block size is %d\n",blockDim.x);
-     
 
     __syncthreads();
 
@@ -186,6 +186,11 @@ static __global__ void p_SgdWithSharedParameterVector(
         d_softMaxFunction(shared_memory,probabilities_of_each,
                  point_idx_in_shmem,relative_tidx,
                     point_idx_in_block, LABEL_CLASS);
+        if(relative_tidx==0){
+            for(size_t i=0; i<10;i++){
+                printf("shared memory is %f\n", probabilities_of_each[i]);
+            }   
+        }   
         //calculate step_size_times_prob_i_minus_label_i, store in the same position
         if(relative_tidx < LABEL_CLASS){
             if(labels[point_idx]==relative_tidx){
@@ -311,7 +316,7 @@ void trainParallelStochasticGradientDescent2(
         checkCudaErrors(cudaMemcpy(
             training_set.parameter_vector,
             d_parameter_vector,
-            LABEL_CLASS*training_set.num_features * sizeof(FeatureType),
+            LABEL_CLASS * training_set.num_features * sizeof(FeatureType),
             cudaMemcpyDeviceToHost));
 
     }
