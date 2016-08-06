@@ -382,7 +382,7 @@ void trainParallelStochasticGradientDescent2(
                                        * training_set.num_data_points
                                        / characteristic_time));
             curr_num_epochs++;
-            printf("before kernal is launched\n");
+            // printf("before kernal is launched\n");
 
             // for(size_t i=0 ;i<PARAMETER_SIZE;i++){
             //     printf("p%f--",training_set.parameter_vector[i]);
