@@ -103,12 +103,13 @@ static __device__ void d_updateParameters(
     // finishes computation of gradient and updates shared parameter_vector
 
     //debug use
-    if(relative_tidx==0&&blockIdx.x==0){
-        for(size_t i=0; i<LABEL_CLASS;i++){
-            printf("gradient-%f--\n", step_size_times_prob_i_minus_label_i[i]);
-        }   
-    } 
-    asm("trap;"); 
+
+    // if(relative_tidx==0&&blockIdx.x==0){
+    //     for(size_t i=0; i<LABEL_CLASS;i++){
+    //         printf("gradient-%f--\n", step_size_times_prob_i_minus_label_i[i]);
+    //     }   
+    // } 
+    // asm("trap;"); 
 
     for(size_t i=0;i<LABEL_CLASS;i++){
         for (size_t j = relative_tidx; j < num_features; j += threads_per_datapoint){
@@ -119,6 +120,10 @@ static __device__ void d_updateParameters(
 
 
             atomicAdd(&parameter_vector[j+LABEL_CLASS * num_features], - gradient_times_step_size);
+            //debug use
+            if(relative_tidx==0&&blockIdx.x==0){
+                printf("gradient is  %f\n",parameter_vector[j+LABEL_CLASS * num_features]);
+            }
         }
     }
 }
