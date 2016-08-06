@@ -129,7 +129,7 @@ static __device__ void d_updateParameters(
 
      //debug use
     if(relative_tidx==0&&blockIdx.x==0){
-        for(size_t i=0; i<PARAMETER_SIZE;i++){
+        for(size_t i=0; i<num_features;i++){
             printf("p-%f--", parameter_vector[i]);
         }   
     } 
