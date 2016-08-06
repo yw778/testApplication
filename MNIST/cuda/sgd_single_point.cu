@@ -124,12 +124,18 @@ static __device__ void d_updateParameters(
             //     printf("minus is  %f\n",step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
             // }
             // asm("trap;"); 
+            if(relative_tidx==0&&blockIdx.x==0){
+                printf("before add is  %f\n",parameter_vector[j+i * num_features]);
+
+            } 
+            // asm("trap;"); 
             atomicAdd(&parameter_vector[j+i * num_features], - gradient_times_step_size);
             // // //debug use
             // if(relative_tidx==0&&blockIdx.x==0){
             //     printf("gradient is  %f\n",parameter_vector[j+i* num_features]);
             // }
         }
+        asm("trap;"); 
     }
 
      // debug use
@@ -264,14 +270,14 @@ static __global__ void p_SgdWithSharedParameterVector(
 
         // debug use
         // printf("before update parameters \n");
-        if(relative_tidx==0&&blockIdx.x==0){
-            for(size_t i=0; i<PARAMETER_SIZE;i++){
-                printf("p+%f--\n", parameter_vector[i]);
-            }   
+        // if(relative_tidx==0&&blockIdx.x==0){
+        //     for(size_t i=0; i<PARAMETER_SIZE;i++){
+        //         printf("p+%f--\n", parameter_vector[i]);
+        //     }   
 
-            printf("\n\n\n\n\n\n\n\n");
-        } 
-        asm("trap;");
+        //     printf("\n\n\n\n\n\n\n\n");
+        // } 
+        // asm("trap;");
 
         d_updateParameters(
             data_point_i,
