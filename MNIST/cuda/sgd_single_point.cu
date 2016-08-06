@@ -213,6 +213,16 @@ static __global__ void p_SgdWithSharedParameterVector(
         // double step_size_times_prob_i_minus_label_i =
         //     (probability_of_positive - labels[point_idx]) * step_size;
         __syncthreads();
+        //debug use
+        printf("before update parameters \n");
+        if(relative_tidx==0&&blockIdx.x==0){
+            for(size_t i=0; i<PARAMETER_SIZE;i++){
+                printf("p+%f--\n", parameter_vector[i]);
+            }   
+
+            printf("\n\n\n\n\n\n\n\n");
+        } 
+
 
         d_updateParameters(
             data_point_i,
@@ -222,6 +232,12 @@ static __global__ void p_SgdWithSharedParameterVector(
             point_idx_in_block,
             relative_tidx,
             probabilities_of_each);
+        //debug use
+        if(relative_tidx==0&&blockIdx.x==0){
+            for(size_t i=0; i<PARAMETER_SIZE;i++){
+                printf("p-%f--\n", parameter_vector[i]);
+            }   
+        } 
     }   
 
 }
@@ -307,10 +323,10 @@ void trainParallelStochasticGradientDescent2(
             curr_num_epochs++;
             printf("before kernal is launched\n");
 
-            for(size_t i=0 ;i<PARAMETER_SIZE;i++){
-                printf("p%f--",training_set.parameter_vector[i]);
-            }
-            printf("\n\n");
+            // for(size_t i=0 ;i<PARAMETER_SIZE;i++){
+            //     printf("p%f--",training_set.parameter_vector[i]);
+            // }
+            // printf("\n\n");
 
             // call kernel and check for errors
             p_SgdWithSharedParameterVector
