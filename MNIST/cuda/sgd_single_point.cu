@@ -267,6 +267,7 @@ static __global__ void p_SgdWithSharedParameterVector(
             for(size_t i=10; i<20;i++){
                 printf("after parameter is factored %f\n", probabilities_of_each[i]);
             }   
+            printf("label is %f\n",labels[point_idx]);
         } 
         asm("trap;");  
 
