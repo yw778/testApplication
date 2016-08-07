@@ -136,8 +136,6 @@ static __device__ void d_updateParameters(
             // }
             if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
                 printf("-after add  %f\n",parameter_vector[j+i * num_features]);
-
-
             } 
         }
         asm("trap;"); 
