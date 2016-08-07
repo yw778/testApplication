@@ -140,7 +140,7 @@ static __device__ void d_updateParameters(
 
             } 
         }
-        asm("trap;"); 
+        // asm("trap;"); 
     }
 
      // debug use
