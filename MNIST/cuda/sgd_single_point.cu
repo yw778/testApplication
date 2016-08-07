@@ -134,7 +134,7 @@ static __device__ void d_updateParameters(
             //     printf("minus is  %f\n",step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
                 printf("-%d+%d+%f-",relative_tidx,(j+i * num_features),parameter_vector[j+i * num_features]);
             }
-            asm("trap;"); 
+            
             // if(relative_tidx==0&&blockIdx.x==0){
             //     printf("before add is %d %f\n",j+i * num_features, parameter_vector[j+i * num_features]);
             // } 
@@ -150,6 +150,7 @@ static __device__ void d_updateParameters(
         }
         // if(i==8)
         // asm("trap;"); 
+        asm("trap;"); 
     }
     // asm("trap;"); 
 
