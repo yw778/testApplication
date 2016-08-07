@@ -137,8 +137,7 @@ static __device__ void d_updateParameters(
             // if(relative_tidx==0&&blockIdx.x==0){
             //     printf("before add is %d %f\n",j+i * num_features, parameter_vector[j+i * num_features]);
             // } 
-            // asm("trap;"); 
-            __syncthreads();
+            // asm("trap;");
             atomicAdd(&parameter_vector[j+i * num_features], - gradient_times_step_size);
             // // //debug use
             // if(relative_tidx==0&&blockIdx.x==0){
@@ -148,7 +147,7 @@ static __device__ void d_updateParameters(
                 printf("-after add  %f\n",parameter_vector[j+i * num_features]);
             } 
         }
-        // asm("trap;"); 
+        asm("trap;"); 
     }
 
      // debug use
