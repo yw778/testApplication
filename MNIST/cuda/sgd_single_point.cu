@@ -163,13 +163,13 @@ static __device__ void d_updateParameters(
     // asm("trap;"); 
 
      // debug use
-    // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
-    //     for(size_t i=0; i<num_features;i++){
-    //         printf("p-%f--", parameter_vector[i]);
-    //     }
-    //     printf("\n\n\n");   
-    // } 
-    // asm("trap;"); 
+    if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
+        for(size_t i=0; i<num_features;i++){
+            printf("p-%f--", parameter_vector[i]);
+        }
+        printf("\n\n\n");   
+    } 
+    asm("trap;"); 
 }
 
 // Kernel for Parallel Stochastic Gradient Descent in CUDA using
