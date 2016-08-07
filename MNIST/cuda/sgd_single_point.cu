@@ -153,12 +153,13 @@ static __device__ void d_updateParameters(
                 // asm("trap;"); 
             } 
         }
-        __syncthreads();
+       
         // if(i==8)
-        asm("trap;"); 
+        // asm("trap;"); 
         
     }
-    // asm("trap;"); 
+     __syncthreads();
+    asm("trap;"); 
 
      // debug use
     // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
