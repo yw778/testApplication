@@ -130,11 +130,13 @@ static __device__ void d_updateParameters(
             FeatureType gradient_times_step_size = data_point_i[j] 
                 * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i];
                // // //debug use
-            if(blockIdx.x==0&&point_idx_in_block==1&&i==8){
+            if(blockIdx.x==0&&point_idx_in_block==1&&i==9){
                 printf("gradient_times_step_size is  %f\n",gradient_times_step_size);
             //     printf("data_point_i[j] is  %f\n",data_point_i[j]);
             //     printf("minus is  %f\n",step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
                 printf("-%dbf%f-",(j+i * num_features),parameter_vector[j+i * num_features]);
+                // __syncthreads();
+                asm("trap;"); 
             }
             
             // if(relative_tidx==0&&blockIdx.x==0){
@@ -151,8 +153,8 @@ static __device__ void d_updateParameters(
             } 
         }
         // __syncthreads();
-        if(i==8)
-        asm("trap;"); 
+        // if(i==8)
+        // asm("trap;"); 
         
     }
     // asm("trap;"); 
