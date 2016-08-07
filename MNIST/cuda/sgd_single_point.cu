@@ -125,7 +125,7 @@ static __device__ void d_updateParameters(
     size_t m=0;
 
     for(size_t i=0;i<LABEL_CLASS;i++){
-        for (size_t j = relative_tidx m=0; j < num_features; j += threads_per_datapoint,m++){
+        for (size_t j = relative_tidx,m=0; j < num_features; j += threads_per_datapoint,m++){
 
             // the gradient is: x * (pi - y)
             FeatureType gradient_times_step_size = data_point_i[j] 
