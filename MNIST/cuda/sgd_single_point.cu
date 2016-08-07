@@ -124,8 +124,8 @@ static __device__ void d_updateParameters(
      //    asm("trap;");
     // size_t m=0;
 
-    for(size_t i=0;i<9;i++){
-        for (size_t j = thread_offset; j < num_features; j += threads_per_datapoint){
+    for(size_t i=0;i<LABEL_CLASS;i++){
+        for (size_t j = thread_offset; j < num_features; j+=threads_per_datapoint){
 
             // the gradient is: x * (pi - y)
             FeatureType gradient_times_step_size = data_point_i[j] 
@@ -138,7 +138,7 @@ static __device__ void d_updateParameters(
             //     printf("-%dbf%f-",(j+i * num_features),parameter_vector[j+i * num_features]);
                 
             // }
-            
+             __syncthreads();
             // if(relative_tidx==0&&blockIdx.x==0){
             //     printf("before add is %d %f\n",j+i * num_features, parameter_vector[j+i * num_features]);
             // } 
@@ -150,7 +150,7 @@ static __device__ void d_updateParameters(
             // }
             // if(point_idx_in_block==1&&blockIdx.x==0&&i==9&&m==24){
             //     printf("-%daf%f-",(j+i * num_features),parameter_vector[j+i * num_features]);
-            //     __syncthreads();
+            __syncthreads();
             //     asm("trap;"); 
             // } 
         }
@@ -169,7 +169,7 @@ static __device__ void d_updateParameters(
         }
         printf("\n\n\n");   
     } 
-    // asm("trap;"); 
+    asm("trap;"); 
 }
 
 // Kernel for Parallel Stochastic Gradient Descent in CUDA using
@@ -186,7 +186,8 @@ static __global__ void p_SgdWithSharedParameterVector(
     extern __shared__ FeatureType shared_memory[];
     float *probabilities_of_each = (float*)&shared_memory[blockDim.x 
             * LABEL_CLASS];
-    // printf("in the kernal \n");
+    // printf("%d \n", blockDim.x 
+    //         * LABEL_CLASS);
 
 
     // computes several indexes, offsets and strides to simplify further code
