@@ -127,12 +127,12 @@ static __device__ void d_updateParameters(
             FeatureType gradient_times_step_size = data_point_i[j] 
                 * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i];
                // // //debug use
-            if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
-                printf("gradient_times_step_size is  %f\n",gradient_times_step_size);
-                printf("data_point_i[j] is  %f\n",data_point_i[j]);
-                printf("minus is  %f\n",step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
-                printf("+before add is %d--%f\n", (j+i * num_features),parameter_vector[j+i * num_features]);
-            }
+            // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
+            //     printf("gradient_times_step_size is  %f\n",gradient_times_step_size);
+            //     printf("data_point_i[j] is  %f\n",data_point_i[j]);
+            //     printf("minus is  %f\n",step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
+            //     printf("+before add is %d--%f\n", (j+i * num_features),parameter_vector[j+i * num_features]);
+            // }
             // asm("trap;"); 
             // if(relative_tidx==0&&blockIdx.x==0){
             //     printf("before add is %d %f\n",j+i * num_features, parameter_vector[j+i * num_features]);
@@ -143,22 +143,22 @@ static __device__ void d_updateParameters(
             // if(relative_tidx==0&&blockIdx.x==0){
             //     printf("gradient is  %f\n",parameter_vector[j+i* num_features]);
             // }
-            if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
-                printf("-after add %d--%f\n",(j+i * num_features),parameter_vector[j+i * num_features]);
-            } 
+            // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
+            //     printf("-after add %d--%f\n",(j+i * num_features),parameter_vector[j+i * num_features]);
+            // } 
         }
-        if(i==2)
-        asm("trap;"); 
+        // if(i==2)
+        // asm("trap;"); 
     }
 
      // debug use
-    // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
-    //     for(size_t i=0; i<num_features;i++){
-    //         printf("p-%f--", parameter_vector[i]);
-    //     }
-    //     printf("\n\n\n");   
-    // } 
-    // asm("trap;"); 
+    if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
+        for(size_t i=0; i<num_features;i++){
+            printf("p-%f--", parameter_vector[i]);
+        }
+        printf("\n\n\n");   
+    } 
+    asm("trap;"); 
 }
 
 // Kernel for Parallel Stochastic Gradient Descent in CUDA using
