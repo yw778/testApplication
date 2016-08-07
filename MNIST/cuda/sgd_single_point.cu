@@ -128,7 +128,7 @@ static __device__ void d_updateParameters(
             FeatureType gradient_times_step_size = data_point_i[j] 
                 * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i];
                // // //debug use
-            if(blockIdx.x==0&&point_idx_in_block==1){
+            if(blockIdx.x==0&&point_idx_in_block==1&&i==1){
             //     printf("gradient_times_step_size is  %f\n",gradient_times_step_size);
             //     printf("data_point_i[j] is  %f\n",data_point_i[j]);
             //     printf("minus is  %f\n",step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
