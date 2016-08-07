@@ -263,12 +263,12 @@ static __global__ void p_SgdWithSharedParameterVector(
             }
         }
         //debug use
-        // if(relative_tidx==0&&blockIdx.x==0){
-        //     for(size_t i=0; i<10;i++){
-        //         printf("after parameter is factored %f\n", probabilities_of_each[i]);
-        //     }   
-        // } 
-        // asm("trap;");  
+        if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
+            for(size_t i=10; i<20;i++){
+                printf("after parameter is factored %f\n", probabilities_of_each[i]);
+            }   
+        } 
+        asm("trap;");  
 
         // double step_size_times_prob_i_minus_label_i =
         //     (probability_of_positive - labels[point_idx]) * step_size;

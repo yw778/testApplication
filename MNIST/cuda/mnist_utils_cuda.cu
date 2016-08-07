@@ -120,7 +120,7 @@ __device__ void d_softMaxFunction(FeatureType* shared_memory,
     }
     __syncthreads();
 
-    //calculate sum each thread has a copy (++)
+    //calculate sum , each thread has a copy (++)
     float sum = 0;
     for (size_t i=0;i<num_label;i++){
         sum += posibility_each[point_idx_in_block * num_label + i];
