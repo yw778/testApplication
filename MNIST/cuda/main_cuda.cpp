@@ -247,10 +247,11 @@ void runConvergenceTime(
         training_options.config_params["threads_per_datapoint"]
         = threads_per_datapoint;
 
-        for (size_t datapoints_per_block = 2;
-            datapoints_per_block <= 8;
-            datapoints_per_block*=2) {
-
+        // for (size_t datapoints_per_block = 1;
+        //     datapoints_per_block <= 8;
+        //     datapoints_per_block*=2) {
+        size_t datapoints_per_block = 1;
+        
             training_options.config_params["datapoints_per_block"]
             = datapoints_per_block;
 
@@ -260,7 +261,7 @@ void runConvergenceTime(
                 data_set,
                 training_options,
                 benchmark_options);
-        }
+        // }
     }
 
     // size_t batch_sizes[10] = {1, 2, 4, 10, 20, 30, 45, 50, 60, 100};
