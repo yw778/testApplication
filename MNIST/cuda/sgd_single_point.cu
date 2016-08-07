@@ -125,7 +125,7 @@ static __device__ void d_updateParameters(
     // size_t m=0;
 
     for(size_t i=0;i<10;i++){
-        // i=9;
+        i=1;
         for (size_t j = thread_offset; j < num_features; j+=threads_per_datapoint){
 
             // the gradient is: x * (pi - y)
