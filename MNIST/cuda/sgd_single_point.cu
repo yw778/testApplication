@@ -123,7 +123,6 @@ static __device__ void d_updateParameters(
             //     printf("data_point_i[j] is  %f\n",data_point_i[j]);
             //     printf("minus is  %f\n",step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
             //     printf("+before add is %f\n", parameter_vector[j+i * num_features]);
-
             // }
             // asm("trap;"); 
             // if(relative_tidx==0&&blockIdx.x==0){
@@ -203,7 +202,7 @@ static __global__ void p_SgdWithSharedParameterVector(
         }
     }
     //debug use
-    // for(size_t i=0; i<blockDim.x;i++){
+    // for(size_t i=blockDim/2; i<blockDim.x;i++){
     //     printf("shared memory is %f\n", shared_memory[i]);
     // }   
 
@@ -230,12 +229,12 @@ static __global__ void p_SgdWithSharedParameterVector(
                  point_idx_in_shmem,relative_tidx,
                     point_idx_in_block, LABEL_CLASS);
         //debug use
-        // if(relative_tidx==0&&blockIdx.x==0){
-        //     for(size_t i=0; i<10;i++){
-        //         printf("shared memory is %f\n", probabilities_of_each[i]);
-        //     }   
-        // } 
-        // asm("trap;");  
+        if(relative_tidx==0&&blockIdx.x==0){
+            for(size_t i=10; i<20;i++){
+                printf("shared memory is %f\n", probabilities_of_each[i]);
+            }   
+        } 
+        asm("trap;");  
         //calculate step_size_times_prob_i_minus_label_i, store in the same position
         if(relative_tidx < LABEL_CLASS){
             if(labels[point_idx]==relative_tidx){
