@@ -116,7 +116,7 @@ __device__ void d_softMaxFunction(FeatureType* shared_memory,
     //copy (theta)T x and take fast exponential
     if(relative_tidx < num_label){
         posibility_each[point_idx_in_block * num_label+relative_tidx]
-            = __expf(shared_memory[relative_tidx * blockDim.x+ point_idx_in_shmem]-10000.0);
+            = __expf(shared_memory[relative_tidx * blockDim.x+ point_idx_in_shmem]);
     }
     __syncthreads();
 

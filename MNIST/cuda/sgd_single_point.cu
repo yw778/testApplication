@@ -104,11 +104,13 @@ static __device__ void d_updateParameters(
 
     //debug use
 
-    // if(relative_tidx==0&&blockIdx.x==0){
-    //     for(size_t i=0; i<LABEL_CLASS;i++){
-    //         printf("gradient-%f--\n", step_size_times_prob_i_minus_label_i[i]);
-    //     }   
-    // } 
+    if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
+        for(size_t i=0; i<20;i++){
+            printf("gradient-%f--\n", step_size_times_prob_i_minus_label_i[i]);
+        }   
+        printf("---------------------------\n");
+    } 
+    __syncthreads();
     // asm("trap;"); 
 
      // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
@@ -148,11 +150,11 @@ static __device__ void d_updateParameters(
                 printf("-%d_%f-",(j+i * num_features),parameter_vector[j+i * num_features]);
             } 
         }
-        if(i==9)
+        // if(i==9)
         asm("trap;"); 
         
     }
-    // asm("trap;"); 
+    asm("trap;"); 
 
      // debug use
     // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
