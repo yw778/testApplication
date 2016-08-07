@@ -128,18 +128,18 @@ static __device__ void d_updateParameters(
             FeatureType gradient_times_step_size = data_point_i[j] 
                 * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i];
                // // //debug use
-            // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1&&i==0){
+            if(blockIdx.x==0&&point_idx_in_block==1){
             //     printf("gradient_times_step_size is  %f\n",gradient_times_step_size);
             //     printf("data_point_i[j] is  %f\n",data_point_i[j]);
             //     printf("minus is  %f\n",step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
-            //     printf("+before add is %d -- %f\n",(j+i * num_features),parameter_vector[j+i * num_features]);
-            // }
+                printf("+before add is %d -- %f\n",(j+i * num_features),parameter_vector[j+i * num_features]);
+            }
             // asm("trap;"); 
             // if(relative_tidx==0&&blockIdx.x==0){
             //     printf("before add is %d %f\n",j+i * num_features, parameter_vector[j+i * num_features]);
             // } 
             // asm("trap;");
-            atomicAdd(&parameter_vector[j+i * num_features], - gradient_times_step_size);
+            atomicAdd(&parameter_vector[j+i*num_features], - gradient_times_step_size);
             // // //debug use
             // if(relative_tidx==0&&blockIdx.x==0){
             //     printf("gradient is  %f\n",parameter_vector[j+i* num_features]);
