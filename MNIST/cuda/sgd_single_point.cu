@@ -281,7 +281,7 @@ static __global__ void p_SgdWithSharedParameterVector(
 
             printf("\n\n\n\n\n\n\n\n");
         } 
-        // asm("trap;");
+        asm("trap;");
 
         d_updateParameters(
             data_point_i,
