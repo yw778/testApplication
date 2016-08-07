@@ -148,7 +148,7 @@ static __device__ void d_updateParameters(
                 printf("-%d_%f-",(j+i * num_features),parameter_vector[j+i * num_features]);
             } 
         }
-        if(i==1)
+        if(i==9)
         asm("trap;"); 
         
     }
