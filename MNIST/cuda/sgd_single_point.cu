@@ -147,7 +147,7 @@ static __device__ void d_updateParameters(
                 printf("-after add  %f\n",parameter_vector[j+i * num_features]);
             } 
         }
-        asm("trap;"); 
+        // asm("trap;"); 
     }
 
      // debug use
