@@ -274,7 +274,7 @@ static __global__ void p_SgdWithSharedParameterVector(
 
         // debug use
         // printf("before update parameters \n");
-        if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
+        if(relative_tidx==0&&blockIdx.x==0){
             for(size_t i=0; i<num_features;i++){
                 printf("p+%f--", parameter_vector[i]);
             }   
