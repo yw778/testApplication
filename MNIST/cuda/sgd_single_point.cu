@@ -230,7 +230,7 @@ static __global__ void p_SgdWithSharedParameterVector(
                     point_idx_in_block, LABEL_CLASS);
         //debug use
         if(relative_tidx==0&&blockIdx.x==0){
-            for(size_t i=10; i<20;i++){
+            for(size_t i=20; i<30;i++){
                 printf("shared memory is %f\n", probabilities_of_each[i]);
             }   
         } 
