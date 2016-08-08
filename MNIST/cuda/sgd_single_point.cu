@@ -155,7 +155,7 @@ static __device__ void d_updateParameters(
                 printf("-%daf%f-",(j+i * num_features),parameter_vector[j+i * num_features]);
             // __syncthreads();
             //     asm("trap;"); 
-            // } 
+            } 
         }
        
         // if(i==8)
