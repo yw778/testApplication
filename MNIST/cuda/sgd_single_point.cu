@@ -153,12 +153,12 @@ static __device__ void d_updateParameters(
             // }
 
             if(point_idx_in_block==1&&blockIdx.x==0){
-                printf("-%daf%f-",j+i * num_features,parameter_vector[j+i * num_features]);
+                // printf("-%daf%f-",j+i * num_features,parameter_vector[j+i * num_features]);
                 // printf("-%d %d %d-",j,i,j+i * num_features);
             } 
 
         }
-        __syncthreads();
+        // __syncthreads();
         // if(i==8)
         // asm("trap;"); 
         
