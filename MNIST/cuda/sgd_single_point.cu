@@ -129,22 +129,23 @@ static __device__ void d_updateParameters(
         for (size_t j = thread_offset; j < num_features; j+=threads_per_datapoint){
 
             // the gradient is: x * (pi - y)
-            FeatureType gradient_times_step_size = data_point_i[j] 
-                * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i];
+            // FeatureType gradient_times_step_size = data_point_i[j] 
+                // * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i];
                // // //debug use
-            if(blockIdx.x==0&&point_idx_in_block==1){
-                printf("gradient_times_step_size is  %f\n",gradient_times_step_size);
-            //     printf("data_point_i[j] is  %f\n",data_point_i[j]);
-                printf("minus is  %f\n",step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
-                printf("-%dbf%f-\n",(j+i * num_features),parameter_vector[j+i * num_features]);
+            // if(blockIdx.x==0&&point_idx_in_block==1){
+            //     printf("gradient_times_step_size is  %f\n",gradient_times_step_size);
+            // //     printf("data_point_i[j] is  %f\n",data_point_i[j]);
+            //     printf("minus is  %f\n",step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
+            //     printf("-%dbf%f-\n",(j+i * num_features),parameter_vector[j+i * num_features]);
                 
-            }
+            // }
              // __syncthreads();
             // if(relative_tidx==0&&blockIdx.x==0){
             //     printf("before add is %d %f\n",j+i * num_features, parameter_vector[j+i * num_features]);
             // } 
             // asm("trap;");
-            atomicAdd(&parameter_vector[j+i*num_features], - gradient_times_step_size);
+            atomicAdd(&parameter_vector[j+i*num_features], - data_point_i[j] 
+                * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
             // // //debug use
             // if(relative_tidx==0&&blockIdx.x==0){
             //     printf("gradient is  %f\n",parameter_vector[j+i* num_features]);
