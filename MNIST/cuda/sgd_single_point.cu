@@ -124,7 +124,7 @@ static __device__ void d_updateParameters(
     // asm("trap;");
     // size_t m=0;
 
-    for(int i= (LABEL_CLASS-1);i>=0;i--){
+    for(size_t i= 0;i<LABEL_CLASS;i++){
         // i=9;
         for (size_t j = thread_offset; j < num_features; j+=threads_per_datapoint){
 
@@ -151,6 +151,7 @@ static __device__ void d_updateParameters(
             // if(relative_tidx==0&&blockIdx.x==0){
             //     printf("gradient is  %f\n",parameter_vector[j+i* num_features]);
             // }
+            __syncthreads();
             if(point_idx_in_block==1&&blockIdx.x==0){
                 printf("-%daf%f-",j+i * num_features,parameter_vector[j+i * num_features]);
                 // printf("-%d %d %d-",j,i,j+i * num_features);
