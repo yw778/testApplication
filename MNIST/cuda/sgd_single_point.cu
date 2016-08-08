@@ -280,7 +280,7 @@ static __global__ void p_SgdWithSharedParameterVector(
             }
         }
         //debug use
-        if(relative_tidx==0){
+        if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
             for(size_t i=0; i<22;i++){
                 printf("after parameter is factored %f\n", probabilities_of_each[i]);
             }   
