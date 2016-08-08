@@ -124,7 +124,7 @@ static __device__ void d_updateParameters(
      //    asm("trap;");
     // size_t m=0;
 
-    for(size_t i=LABEL_CLASS-1;i>=0;i--){
+    for(size_t i= (LABEL_CLASS-1);i>=0;i--){
         // i=9;
         for (size_t j = thread_offset; j < num_features; j+=threads_per_datapoint){
 
