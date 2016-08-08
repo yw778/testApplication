@@ -163,12 +163,13 @@ static __device__ void d_updateParameters(
         // if(i==8)
         // asm("trap;"); 
         if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
+            printf("i is %d \n\n",i);
             for(size_t i=0; i<num_features;i++){
                 printf("p-%f--", parameter_vector[i]);
             }
             printf("\n\n\n");   
         } 
-        asm("trap;"); 
+        // asm("trap;"); 
         
     }
 
