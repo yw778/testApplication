@@ -503,7 +503,7 @@ void convergenceTime(
         // reset parameter vector to forget previous training
         resetParameters(training_set, training_options);
 
-        size_t total_epochs = 0;
+        // size_t total_epochs = 0;
 
         // shuffleKeyValue(data_points, labels, num_points_total, num_features);
         training_timer.start();
