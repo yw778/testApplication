@@ -379,7 +379,7 @@ void resetParameters(
     memset(
         data_set.parameter_vector,
         0,
-        data_set.num_features * sizeof(FeatureType));
+        LABEL_CLASS * data_set.num_features * sizeof(FeatureType));
 
     (*training_options.step_size) =
         training_options.config_params["initial_step_size"];
