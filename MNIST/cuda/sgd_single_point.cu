@@ -277,26 +277,26 @@ static __global__ void p_SgdWithSharedParameterVector(
             }
         }
         //debug use
-        // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
-        //     for(size_t i=10; i<20;i++){
-        //         printf("after parameter is factored %f\n", probabilities_of_each[i]);
-        //     }   
-        //     printf("label is %f\n",labels[point_idx]);
-        // } 
-        // asm("trap;");  
+        if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
+            for(size_t i=10; i<20;i++){
+                printf("after parameter is factored %f\n", probabilities_of_each[i]);
+            }   
+            printf("label is %f\n",labels[point_idx]);
+        } 
+        asm("trap;");  
 
         // double step_size_times_prob_i_minus_label_i =
         //     (probability_of_positive - labels[point_idx]) * step_size;
         __syncthreads();
         // debug use
-           if(relative_tidx==0&&blockIdx.x==0){
-            // printf("blockIdx.x is %d--tid is %d\n",blockIdx.x,threadIdx.x);
-            // printf("point_index is %d----%f\n",point_idx,labels[point_idx]);
-            for(size_t i=0; i<10;i++){
-                printf("after parameter is factored %f\n", probabilities_of_each[i]);
-            }   
-        } 
-        asm("trap;");
+        //    if(relative_tidx==0&&blockIdx.x==0){
+        //     // printf("blockIdx.x is %d--tid is %d\n",blockIdx.x,threadIdx.x);
+        //     // printf("point_index is %d----%f\n",point_idx,labels[point_idx]);
+        //     for(size_t i=0; i<10;i++){
+        //         printf("after parameter is factored %f\n", probabilities_of_each[i]);
+        //     }   
+        // } 
+        // asm("trap;");
 
         // debug use
         // printf("before update parameters \n");
