@@ -105,7 +105,7 @@ static __device__ void d_updateParameters(
     //debug use
 
     if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
-        for(size_t i=0; i<21;i++){
+        for(size_t i=0; i<20;i++){
             printf("gradient-%f--\n", step_size_times_prob_i_minus_label_i[i]);
         }   
         printf("---------------------------\n");
