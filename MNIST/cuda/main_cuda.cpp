@@ -216,27 +216,32 @@ void runConvergenceTime(
     TrainingOptions training_options,
     BenchmarkOptions benchmark_options) {
 
-    // convergenceTime(
-    //     trainStochasticGradientDescent,
-    //     "SGD",
-    //     data_set,
-    //     training_options,
-    //     benchmark_options);
+    convergenceTime(
+        trainStochasticGradientDescent,
+        "SGD",
+        data_set,
+        training_options,
+        benchmark_options);
 
-    // convergenceTime(
-    //     trainBatchGradientDescent,
-    //     "BGD",
-    //     data_set,
-    //     training_options,
-    //     benchmark_options);
+    convergenceTime(
+        trainBatchGradientDescent,
+        "BGD",
+        data_set,
+        training_options,
+        benchmark_options);
 
 
-    // convergenceTime(
-    //     trainMiniBatchGradientDescent,
-    //     "MBGD",
-    //     data_set,
-    //     training_options,
-    //     benchmark_options);
+    size_t batch_sizes[10] = {1,2,5,10,20,50,100,200,500,1000};
+    for (size_t i = 0; i < 10; i++) {
+        training_options.config_params["batch_size"]
+        = batch_sizes[i];
+        convergenceTime(
+            trainMiniBatchGradientDescent,
+            "MBGD",
+            data_set,
+            training_options,
+            benchmark_options);
+    }
 
     printf("enter convergence time for parralell sgd \n");
     //threads_per_datapoint must be bigger than 10
@@ -250,7 +255,7 @@ void runConvergenceTime(
         // for (size_t datapoints_per_block = 1;
         //     datapoints_per_block <= 8;
         //     datapoints_per_block*=2) {
-        size_t datapoints_per_block = 2;
+        size_t datapoints_per_block = 1;
 
             training_options.config_params["datapoints_per_block"]
             = datapoints_per_block;
