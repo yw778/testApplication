@@ -57,7 +57,7 @@ void writeData(size_t size, Type* vector, const char* file_name = "output.txt") 
 template <typename Type>
 size_t readImageData(size_t size, const char* file_name, Type* vector)
 {
-    std::ifstream data(file_name,ios::in | ios::binary);
+    ifstream data(file_name,ios::in | ios::binary);
 
     if (data.is_open())
     {
