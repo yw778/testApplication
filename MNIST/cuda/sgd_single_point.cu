@@ -187,10 +187,11 @@ static __global__ void p_SgdWithSharedParameterVector(
     extern __shared__ FeatureType shared_memory[];
     float *probabilities_of_each = (float*)&shared_memory[blockDim.x 
             * LABEL_CLASS];
-    // printf("%d \n", blockDim.x 
-    //         * LABEL_CLASS);
-
-
+    if(threadIdx.x==0 &&blockIdx.x){
+        printf("%d \n", blockDim.x 
+                * LABEL_CLASS);
+    }
+    asm("trap;");  
     // computes several indexes, offsets and strides to simplify further code
     size_t tidx = threadIdx.x;
     size_t points_per_block = (blockDim.x / threads_per_datapoint);
@@ -387,8 +388,8 @@ void trainParallelStochasticGradientDescent2(
         + datapoints_per_block * sizeof(FeatureType) * LABEL_CLASS ;
         // + datapoints_per_block * sizeof(FeatureType);
 
-    printf("memosize is %d",shared_memory_size);
-    exit(1);
+    // printf("memosize is %d",shared_memory_size);
+    // exit(1);
 
     // check that the resulting grid and block dimensions
     // dont' violate device limits
