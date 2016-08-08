@@ -387,8 +387,8 @@ void trainParallelStochasticGradientDescent2(
         + datapoints_per_block * sizeof(FeatureType) * LABEL_CLASS ;
         // + datapoints_per_block * sizeof(FeatureType);
 
-    // printf("memosize is %d",shared_memory_size);
-    // exit(1);
+    printf("memosize is %d",shared_memory_size);
+    exit(1);
 
     // check that the resulting grid and block dimensions
     // dont' violate device limits
