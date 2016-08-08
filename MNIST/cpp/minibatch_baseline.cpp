@@ -173,6 +173,7 @@ void trainMiniBatchGradientDescent(
     double step_size = *training_options.step_size;
 
 
+
     const double characteristic_time =
                 (fieldExists(training_options.config_params, "characteristic_time"))
                 ? training_options.config_params["characteristic_time"]
@@ -190,7 +191,8 @@ void trainMiniBatchGradientDescent(
     
     size_t num_mini_batches = training_set.num_data_points / batch_size;
 
-
+    
+    
     double annealed_step_size = step_size;
 
     for (int i = 0; i < training_options.num_epochs; i++){
@@ -200,7 +202,7 @@ void trainMiniBatchGradientDescent(
                                    * training_set.num_data_points
                                    / characteristic_time));
         curr_num_epochs++;
-
+        // printf("curr_num_epochs is %d\n",curr_num_epochs);
         for (int j = 0; j < num_mini_batches; j++){
             size_t idx = j * batch_size;
             // compute gradient

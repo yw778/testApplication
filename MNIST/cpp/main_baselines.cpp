@@ -26,13 +26,18 @@ void runTrainAndTest(
         data_set,
         training_options,
         benchmark_options);
-
-    trainAndTest(
-        trainMiniBatchGradientDescent,
-        "MBGD",
-        data_set,
-        training_options,
-        benchmark_options);
+    
+    size_t batch_sizes[10] = {1,2,5,10,20,50,100,200,500,1000};
+    for (size_t i = 0; i < 10; i++) {
+        training_options.config_params["batch_size"]
+        = batch_sizes[i];
+        trainAndTest(
+            trainMiniBatchGradientDescent,
+            "MBGD",
+            data_set,
+            training_options,
+            benchmark_options);
+    }
 
 }
 // runs the training n epochs at a time
@@ -57,9 +62,9 @@ void runConvergenceRate(
         training_options,
         benchmark_options);
 
-    size_t batch_sizes[5] = {2, 50, 100, 500, 1000};
+    size_t batch_sizes[10] = {1,2,5,10,20,50,100,200,500,1000};
     
-    for (size_t i = 0; i < 5; i++) {
+    for (size_t i = 0; i < 10; i++) {
         training_options.config_params["batch_size"]
         = batch_sizes[i];
         convergenceRate(
@@ -78,22 +83,22 @@ void runConvergenceTime(
     TrainingOptions training_options,
     BenchmarkOptions benchmark_options) {
 
-    convergenceTime(
-        trainStochasticGradientDescent,
-        "SGD",
-        data_set,
-        training_options,
-        benchmark_options);
+    // convergenceTime(
+    //     trainStochasticGradientDescent,
+    //     "SGD",
+    //     data_set,
+    //     training_options,
+    //     benchmark_options);
 
-    convergenceTime(
-        trainBatchGradientDescent,
-        "BGD",
-        data_set,
-        training_options,
-        benchmark_options);
-    
-    size_t batch_sizes[5] = {2, 50, 100, 500, 1000};
-    for (size_t i = 0; i < 5; i++) {
+    // convergenceTime(
+    //     trainBatchGradientDescent,
+    //     "BGD",
+    //     data_set,
+    //     training_options,
+    //     benchmark_options);
+    printf("enter batch\n");
+    size_t batch_sizes[10] = {1,2,5,10,20,50,100,200,500,1000};
+    for (size_t i = 0; i < 10; i++) {
         training_options.config_params["batch_size"]
         = batch_sizes[i];
         convergenceTime(

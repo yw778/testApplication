@@ -383,8 +383,17 @@ void resetParameters(
 
     (*training_options.step_size) =
         training_options.config_params["initial_step_size"];
+
+    // training_options.config_params["curr_num_epochs"] = 0;
+
+
 }
 
+void printParameter(DataSet data_set){
+    for(size_t i=0; i< PARAMETER_SIZE ;i++){
+        printf("--%f--",data_set.parameter_vector[i]);
+    }
+}
 
 // splits the data_set into training and testing sets
 void splitDataSet(
@@ -474,25 +483,48 @@ void convergenceTime(
     DataSet training_set, testing_set;
     splitDataSet(data_set, benchmark_options, &training_set, &testing_set);
 
+    // printf("error goal is %f\n",  benchmark_options.error_goal);
+
     // Ignore the first run to discard initialization overhead
-    training_function(training_set, training_options);
+    // training_function(training_set, training_options);
     // reset parameter vector to forget previous training
-    resetParameters(training_set, training_options);
+    // resetParameters(training_set, training_options);
 
     // find total number of epochs required to reach the accuracy goal
-    size_t total_epochs = 0;
+    size_t avg_num_epochs = 0;
+    for (size_t run = 0; run < benchmark_options.num_runs; run++) {
 
-    training_options.num_epochs = 1;
-    do {
-        training_function(training_set, training_options);
-        training_options.config_params["curr_num_epochs"] = total_epochs;
-        total_epochs++;
-    } while(computeSoftmaxErrorRate(training_set) > benchmark_options.error_goal
-            && total_epochs < benchmark_options.max_num_epochs);
+        resetParameters(training_set, training_options);
+
+        size_t total_epochs = 0;
+        training_options.num_epochs = 1;
+
+        do {
+            training_function(training_set, training_options);
+            training_options.config_params["curr_num_epochs"] = total_epochs;
+            total_epochs++;
+        } while(computeSoftmaxErrorRate(training_set) > benchmark_options.error_goal
+                && total_epochs < benchmark_options.max_num_epochs);
+
+        avg_num_epochs += total_epochs;
+    }
+
+     avg_num_epochs /= benchmark_options.num_runs;
+     training_options.num_epochs = avg_num_epochs;
+    // size_t total_epochs = 0;
+    // training_options.num_epochs = 1;
+    // do {
+    //     training_function(training_set, training_options);
+    //     training_options.config_params["curr_num_epochs"] = total_epochs;
+    //     total_epochs++;
+    //     printf("%d %f\n",total_epochs,computeSoftmaxErrorRate(training_set));
+    // } while(computeSoftmaxErrorRate(training_set) > benchmark_options.error_goal
+    //         && total_epochs < benchmark_options.max_num_epochs);
 
     printf("end finding maximum epochs \n");
+    // training_options.config_params["curr_num_epochs"]=0;
 
-    training_options.num_epochs = total_epochs;
+    // training_options.num_epochs = total_epochs;
 
     // measure time needed to execute the number of epochs found above
     Timer training_timer(name);
@@ -502,9 +534,10 @@ void convergenceTime(
 
         // reset parameter vector to forget previous training
         resetParameters(training_set, training_options);
-
+        // printParameter(training_set);
+        // printf("after find mamxmum epochs %d\n",training_options.config_params["curr_num_epochs"]);
         // size_t total_epochs = 0;
-
+        // printf("epochs is %d\n",training_options.num_epochs);
         // shuffleKeyValue(data_points, labels, num_points_total, num_features);
         training_timer.start();
         training_function(training_set, training_options);
@@ -529,7 +562,7 @@ void convergenceTime(
             name,
             configParamsToStr(training_options.config_params).c_str(),
             benchmark_options.num_runs,
-            total_epochs,
+            avg_num_epochs,
             training_time,
             // train_errors["tpr"],
             // train_errors["fpr"],

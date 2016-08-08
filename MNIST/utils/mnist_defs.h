@@ -20,8 +20,8 @@
 #define TOLERANCE         0.0001
 #define NUM_EPOCHS        30
 #define MAX_NUM_EPOCHS    100
-#define NUM_RUNS          30
-#define ERROR_GOAL        0.001
+#define NUM_RUNS          2
+#define ERROR_GOAL        0.07
 #define THREADS_PER_DATAPOINT    256
 #define DATAPOINTS_PER_BLOCK     2
 #define CHARACTERISTIC_TIME (MAX_NUM_EPOCHS * NUM_TRAINING / 3)
