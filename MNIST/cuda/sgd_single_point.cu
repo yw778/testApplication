@@ -151,11 +151,9 @@ static __device__ void d_updateParameters(
             // if(relative_tidx==0&&blockIdx.x==0){
             //     printf("gradient is  %f\n",parameter_vector[j+i* num_features]);
             // }
-            if(point_idx_in_block==1&&blockIdx.x==0){
-                printf("-%daf%f-",j+i * num_features,parameter_vector[j+i * num_features]);
-            // __syncthreads();
-            //     asm("trap;"); 
-            } 
+            // if(point_idx_in_block==1&&blockIdx.x==0){
+            //     printf("-%daf%f-",j+i * num_features,parameter_vector[j+i * num_features]);
+            // } 
         }
        
         // if(i==8)
@@ -164,7 +162,7 @@ static __device__ void d_updateParameters(
     }
 
     
-    asm("trap;"); 
+    // asm("trap;"); 
 
      // debug use
         // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
