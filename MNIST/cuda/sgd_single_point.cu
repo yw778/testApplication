@@ -145,15 +145,15 @@ static __device__ void d_updateParameters(
             // } 
             // asm("trap;");
 
-            // atomicAdd(&parameter_vector[j+i*num_features], - data_point_i[j] 
-            //     * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
+            atomicAdd(&parameter_vector[j+i*num_features], - data_point_i[j] 
+                * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
             // // //debug use
             // if(relative_tidx==0&&blockIdx.x==0){
             //     printf("gradient is  %f\n",parameter_vector[j+i* num_features]);
             // }
             if(point_idx_in_block==1&&blockIdx.x==0){
                 // printf("-%daf%f-",j+i * num_features,parameter_vector[j+i * num_features]);
-                printf("-%d-",j+i * num_features);
+                printf("-%d %d %d-",j,i,j+i * num_features);
             } 
         }
        
