@@ -104,7 +104,7 @@ static __device__ void d_updateParameters(
 
     //debug use
 
-    if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
+    if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==0){
         for(size_t i=0; i<20;i++){
             printf("gradient-%f--\n", step_size_times_prob_i_minus_label_i[i]);
         }   
@@ -121,7 +121,7 @@ static __device__ void d_updateParameters(
 
      //        printf("\n\n\n\n\n\n\n\n");  
      //    } 
-        // asm("trap;");
+    asm("trap;");
     // size_t m=0;
 
     for(size_t i= (LABEL_CLASS-1);i>=0;i--){
