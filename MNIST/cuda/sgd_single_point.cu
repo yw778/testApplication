@@ -124,7 +124,7 @@ static __device__ void d_updateParameters(
      //    asm("trap;");
     // size_t m=0;
 
-    for(size_t i=0;i<10;i++){
+    for(size_t i=0;i<LABEL_CLASS;i++){
         // i=9;
         for (size_t j = thread_offset; j < num_features; j+=threads_per_datapoint){
 
@@ -164,13 +164,13 @@ static __device__ void d_updateParameters(
     // asm("trap;"); 
 
      // debug use
-        // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
-        //     for(size_t i=0; i<PARAMETER_SIZE;i++){
-        //         printf("p-%f--", parameter_vector[i]);
-        //     }
-        //     printf("\n\n\n");   
-        // } 
-        // asm("trap;"); 
+        if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
+            for(size_t i=0; i<PARAMETER_SIZE;i++){
+                printf("p-%f--", parameter_vector[i]);
+            }
+            printf("\n\n\n");   
+        } 
+        asm("trap;"); 
     }   
 
 // Kernel for Parallel Stochastic Gradient Descent in CUDA using
@@ -187,11 +187,11 @@ static __global__ void p_SgdWithSharedParameterVector(
     extern __shared__ FeatureType shared_memory[];
     float *probabilities_of_each = (float*)&shared_memory[blockDim.x 
             * LABEL_CLASS];
-    if(threadIdx.x==0 &&blockIdx.x==0){
-        printf("%d \n", blockDim.x 
-                * LABEL_CLASS);
-    }
-    asm("trap;");  
+    // if(threadIdx.x==0 &&blockIdx.x==0){
+    //     printf("%d \n", blockDim.x 
+    //             * LABEL_CLASS);
+    // }
+    // asm("trap;");  
     // computes several indexes, offsets and strides to simplify further code
     size_t tidx = threadIdx.x;
     size_t points_per_block = (blockDim.x / threads_per_datapoint);
