@@ -111,7 +111,7 @@ static __device__ void d_updateParameters(
         printf("---------------------------\n");
     } 
     __syncthreads();
-    asm("trap;"); 
+    // asm("trap;"); 
 
      // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
      //        for(size_t i=8*num_features; i<PARAMETER_SIZE;i++){
