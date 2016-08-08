@@ -99,7 +99,7 @@ static __device__ void d_updateParameters(
     // printf("enter update parameters in sgd_single_point\n");
 
     size_t thread_offset = threadIdx.x % threads_per_datapoint;
-    __syncthreads();
+    // __syncthreads();
 
     // finishes computation of gradient and updates shared parameter_vector
 
@@ -162,13 +162,6 @@ static __device__ void d_updateParameters(
         // __syncthreads();
         // if(i==8)
         // asm("trap;"); 
-        
-    }
-
-    
-    // asm("trap;"); 
-
-     // debug use
         if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
             for(size_t i=0; i<num_features;i++){
                 printf("p-%f--", parameter_vector[i]);
@@ -176,6 +169,14 @@ static __device__ void d_updateParameters(
             printf("\n\n\n");   
         } 
         asm("trap;"); 
+        
+    }
+
+    
+    // asm("trap;"); 
+
+     // debug use
+        
 }   
 
 // Kernel for Parallel Stochastic Gradient Descent in CUDA using
