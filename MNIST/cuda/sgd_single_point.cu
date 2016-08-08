@@ -187,7 +187,7 @@ static __global__ void p_SgdWithSharedParameterVector(
     extern __shared__ FeatureType shared_memory[];
     float *probabilities_of_each = (float*)&shared_memory[blockDim.x 
             * LABEL_CLASS];
-    if(threadIdx.x==0 &&blockIdx.x){
+    if(threadIdx.x==0 &&blockIdx.x==0){
         printf("%d \n", blockDim.x 
                 * LABEL_CLASS);
     }
