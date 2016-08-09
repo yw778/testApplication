@@ -245,7 +245,7 @@ void runConvergenceTime(
 
     printf("enter convergence time for parralell sgd \n");
     //threads_per_datapoint must be bigger than 10
-    for (size_t threads_per_datapoint = 32;
+    for (size_t threads_per_datapoint = 64;
         threads_per_datapoint <= 512;
         threads_per_datapoint*=2) {
 
