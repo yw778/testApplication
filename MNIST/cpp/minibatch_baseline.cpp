@@ -1,4 +1,4 @@
-#include <stdio.h>
+// #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -202,7 +202,7 @@ void trainMiniBatchGradientDescent(
                                    * training_set.num_data_points
                                    / characteristic_time));
         curr_num_epochs++;
-        // printf("curr_num_epochs is %d\n",curr_num_epochs);
+        // printf("pochs %d,step size %f,error is %f\n",curr_num_epochs,annealed_step_size,computeSoftmaxErrorRate(training_set));
         for (int j = 0; j < num_mini_batches; j++){
             size_t idx = j * batch_size;
             // compute gradient
@@ -213,7 +213,7 @@ void trainMiniBatchGradientDescent(
 
             // update parameters
             updateParameters(training_set.parameter_vector, gradient, 
-                training_set.num_features, step_size);
+                training_set.num_features, annealed_step_size);
 
         }             
         // double previous_loss = softmaxLossFunction(training_set);

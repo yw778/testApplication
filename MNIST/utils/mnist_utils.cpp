@@ -384,7 +384,7 @@ void resetParameters(
     (*training_options.step_size) =
         training_options.config_params["initial_step_size"];
 
-    // training_options.config_params["curr_num_epochs"] = 0;
+    training_options.config_params["curr_num_epochs"] = 0;
 
 
 }
@@ -495,17 +495,17 @@ void convergenceTime(
     for (size_t run = 0; run < benchmark_options.num_runs; run++) {
 
         resetParameters(training_set, training_options);
-
+        training_options.config_params["curr_num_epochs"]=0;
         size_t total_epochs = 0;
         training_options.num_epochs = 1;
 
         do {
             training_function(training_set, training_options);
-            training_options.config_params["curr_num_epochs"] = total_epochs;
             total_epochs++;
+            training_options.config_params["curr_num_epochs"] = total_epochs;
         } while(computeSoftmaxErrorRate(training_set) > benchmark_options.error_goal
                 && total_epochs < benchmark_options.max_num_epochs);
-
+        
         avg_num_epochs += total_epochs;
     }
 
@@ -522,7 +522,7 @@ void convergenceTime(
     //         && total_epochs < benchmark_options.max_num_epochs);
 
     printf("end finding maximum epochs \n");
-    // training_options.config_params["curr_num_epochs"]=0;
+    
 
     // training_options.num_epochs = total_epochs;
 
@@ -533,9 +533,11 @@ void convergenceTime(
     for (size_t k = 0; k < benchmark_options.num_runs; k++) {
 
         // reset parameter vector to forget previous training
+        
         resetParameters(training_set, training_options);
+        training_options.config_params["curr_num_epochs"]=0;
         // printParameter(training_set);
-        // printf("after find mamxmum epochs %d\n",training_options.config_params["curr_num_epochs"]);
+        // printf("after find mamxmum epochs %f\n",training_options.config_params["curr_num_epochs"]);
         // size_t total_epochs = 0;
         // printf("epochs is %d\n",training_options.num_epochs);
         // shuffleKeyValue(data_points, labels, num_points_total, num_features);
