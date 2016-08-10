@@ -180,9 +180,9 @@ static __global__ void p_MiniBatchGradientDescent(
     d_memset(gradient, 0, LABEL_CLASS * num_features, threads_per_mini_batch);
     __syncthreads();
     //debug use
-   if(relative_tidx==0&&blockIdx.x==0){
+   if(threadIdx.x==0&&blockIdx.x==0){
         for(size_t i=0 ;i<PARAMETER_SIZE;i++){
-                printf("g%f--",training_set.parameter_vector[i]);
+                printf("g%f--",gradient[i]);
             }
             printf("\n\n");
    }
