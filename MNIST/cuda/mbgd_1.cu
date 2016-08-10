@@ -137,9 +137,18 @@ static __device__ void d_gradientForMiniBatch(
                 // probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
             }
         }
-
         __syncthreads();
 
+        //debug use
+        if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==0){
+            for(size_t i=0; i<21;i++){
+                printf("probabilities_of_each is %f\n", probabilities_of_each[i]);
+            }   
+        } 
+        // asm("trap;");  
+
+        
+        
 
         //transpose probability matrix to facilitate further computation
         d_matrixTranspose(probabilities_of_each,
@@ -180,12 +189,12 @@ static __global__ void p_MiniBatchGradientDescent(
     d_memset(gradient, 0, LABEL_CLASS * num_features, threads_per_mini_batch);
     __syncthreads();
     //debug use
-   if(threadIdx.x==0&&blockIdx.x==0){
-        for(size_t i=0 ;i<PARAMETER_SIZE;i++){
-                printf("g%f--",gradient[i]);
-            }
-            printf("\n\n");
-   }
+   // if(threadIdx.x==0&&blockIdx.x==0){
+   //      for(size_t i=0 ;i<PARAMETER_SIZE;i++){
+   //              printf("g%f--",gradient[i]);
+   //          }
+   //          printf("\n\n");
+   // }
 
     // Finds gradient for mini-batch   
     d_gradientForMiniBatch( data_points,
