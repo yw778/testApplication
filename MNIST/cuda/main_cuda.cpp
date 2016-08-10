@@ -233,12 +233,12 @@ void runConvergenceTime(
     //     training_options,
     //     benchmark_options);
 
-    convergenceTime(
-        trainBatchGradientDescent,
-        "BGD",
-        data_set,
-        training_options,
-        benchmark_options);
+    // convergenceTime(
+    //     trainBatchGradientDescent,
+    //     "BGD",
+    //     data_set,
+    //     training_options,
+    //     benchmark_options);
 
 
     // size_t batch_sizes[10] = {1,2,5,10,20,50,100,200,500,1000};
@@ -259,23 +259,25 @@ void runConvergenceTime(
     //     threads_per_datapoint <= 512;
     //     threads_per_datapoint*=2) {
 
-    //     training_options.config_params["threads_per_datapoint"]
-    //     = threads_per_datapoint;
+        // training_options.config_params["threads_per_datapoint"]
+        // = threads_per_datapoint;
 
-    //     for (size_t datapoints_per_block = 1;
-    //         datapoints_per_block <= 8;
-    //         datapoints_per_block*=2) {
-    //     // size_t datapoints_per_block = 2;
+        // for (size_t datapoints_per_block = 1;
+        //     datapoints_per_block <= 8;
+        //     datapoints_per_block*=2) {
+        // size_t datapoints_per_block = 2;
 
-    //         training_options.config_params["datapoints_per_block"]
-    //         = datapoints_per_block;
+            // training_options.config_params["datapoints_per_block"]
+            // = datapoints_per_block;
+            training_options.config_params["threads_per_datapoint"]=32;
+            training_options.config_params["datapoints_per_block"]=8;
 
-    //         convergenceTime(
-    //             trainParallelStochasticGradientDescent2,
-    //             "CUDA SGD",
-    //             data_set,
-    //             training_options,
-    //             benchmark_options);
+            convergenceTime(
+                trainParallelStochasticGradientDescent2,
+                "CUDA SGD",
+                data_set,
+                training_options,
+                benchmark_options);
     //     }
     // }
 
