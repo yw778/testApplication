@@ -204,6 +204,8 @@ void trainParallelMiniBatchGradientDescent(
     /* shuffleKeyValue( training_set.data_points, training_set.labels, 
                      training_set.num_data_points, training_set.num_features ); */
 
+
+
     setCudaVariables( training_set.num_features,
                       training_set.num_data_points,
                       training_set.data_points, 
@@ -232,6 +234,8 @@ void trainParallelMiniBatchGradientDescent(
             (fieldExists(training_options.config_params, "curr_num_epochs"))
             ? training_options.config_params["curr_num_epochs"]
             : 0;
+
+    printf("batch size is %f, threads_per_data is %f\n",batch_size,threads_per_datapoint);
 
     double annealed_step_size = step_size;
 
