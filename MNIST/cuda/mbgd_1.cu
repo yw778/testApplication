@@ -178,7 +178,16 @@ static __global__ void p_MiniBatchGradientDescent(
     
     // set all gradient values to 0
     d_memset(gradient, 0, LABEL_CLASS * num_features, threads_per_mini_batch);
-    // Finds gradient for mini-batch
+    __syncthreads();
+    //debug use
+   if(relative_tidx==0&&blockIdx.x==0){
+        for(size_t i=0 ;i<PARAMETER_SIZE;i++){
+                printf("g%f--",training_set.parameter_vector[i]);
+            }
+            printf("\n\n");
+   }
+
+    // Finds gradient for mini-batch   
     d_gradientForMiniBatch( data_points,
                             parameter_vector,
                             labels,
@@ -258,10 +267,10 @@ void trainParallelMiniBatchGradientDescent(
                                        * training_set.num_data_points
                                        / characteristic_time));
             curr_num_epochs++;
-
-            printf("before enter kernal\n");
-            printf("batch size is %f, threads_per_data is %f\n",batch_size,threads_per_datapoint);
-            printf("shared memory is %d\n",shared_memory_size);
+            //debug use
+            // printf("before enter kernal\n");
+            // printf("batch size is %f, threads_per_data is %f\n",batch_size,threads_per_datapoint);
+            // printf("shared memory is %d\n",shared_memory_size);
 
             // adjust step size with a modified version of simulated annealing
 
