@@ -132,9 +132,9 @@ static __device__ void d_gradientForMiniBatch(
         if(relative_tidx < LABEL_CLASS){
             if(labels[point_idx]==relative_tidx){
                 probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]-=1;
-                probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
+                // probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
             }else{                   
-                probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
+                // probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
             }
         }
 
