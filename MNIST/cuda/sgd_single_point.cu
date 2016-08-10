@@ -266,6 +266,7 @@ static __global__ void p_SgdWithSharedParameterVector(
         // } 
         // asm("trap;");  
         //calculate step_size_times_prob_i_minus_label_i, store in the same position
+        //calculate eta * {y(i)=k}−P(y(i)=k|x(i)
         if(relative_tidx < LABEL_CLASS){
             if(labels[point_idx]==relative_tidx){
                 probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]-=1;

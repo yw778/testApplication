@@ -59,6 +59,51 @@ __device__ void d_matrixVectorMultiply(
     }
 }
 
+//Grabdient = probility_matrix_transpose * datapoint_matrix
+__device__ void d_matrixMatrixMultiply(
+    FeatureType* probility_matrix,
+    FeatureType* datapoint_matrix,
+    float scalar,
+    size_t batch_size,
+    size_t num_features,
+    size_t threads_per_mini_batch,
+    FeatureType* result) {
+
+    size_t tidx = threadIdx.x;
+    size_t bidx = blockIdx.x;
+
+    for(int m = 0 ; m < LABEL_CLASS ; m++){
+        for (int j = 0; j < batch_size; j++) {
+            for (int i = tidx; i < num_features; i += threads_per_mini_batch) {
+                // index of the point with respect to the whole dataset
+                size_t point_idx = bidx * batch_size + j;
+                // index of the feature with respect to all features in the dataset
+                size_t feature_idx = point_idx * num_features + i;
+                //gradient result 
+                result[i+m*num_features] += datapoint_matrix[feature_idx] 
+                    * probility_matrix[j+m*batch_size] * scalar;
+            }
+        }
+    }
+}
+
+
+__device__ void d_matrixTranspose(
+    FeatureType* probility_matrix,
+    FeatureType* probility_transpose,
+    size_t batch_size,
+    size_t relative_tidx,
+    size_t point_idx_in_block){
+    
+    //transpose from batch * Label to Label * batch
+    if(relative_tidx < LABEL_CLASS){
+
+        probility_transpose[relative_tidx*batch_size+point_idx_in_block] =
+             probility_matrix[relative_tidx+point_idx_in_block*LABEL_CLASS];
+
+    }
+}
+
 
 // updates the parameters using atomics
 __device__ void d_updateParameters(
@@ -70,12 +115,11 @@ __device__ void d_updateParameters(
 
     size_t tidx = threadIdx.x;
     
-    for (size_t i = tidx; i < num_features; i += threads_per_mini_batch) {
+    for (size_t i = tidx; i < num_features * LABEL_CLASS; i += threads_per_mini_batch) {
         FeatureType gradient_times_step_size = gradient[i] * step_size;
         atomicAdd(&parameter_vector[i], -gradient_times_step_size);
     }
 }
-
 
 // initializes all values in array to a certain value
 __device__ void d_memset(

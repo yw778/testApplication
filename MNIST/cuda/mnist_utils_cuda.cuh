@@ -107,6 +107,27 @@ __device__ void d_updateParameters(
 // Parallel implementation of matrix vector multiplication. Each thread goes
 // a certain number of features and strides by the number of threads in the 
 // whole mini batch.
+__device__ void d_matrixTranspose(
+    FeatureType* probility_matrix,
+    FeatureType* probility_transpose,
+    size_t batch_size,
+    size_t relative_tidx,
+    size_t point_idx_in_block);
+
+
+
+
+__device__ void d_matrixMatrixMultiply(
+    FeatureType* probility_matrix,
+    FeatureType* datapoint_matrix,
+    float scalar,
+    size_t batch_size,
+    size_t num_features,
+    size_t threads_per_mini_batch,
+    FeatureType* result);
+
+
+
 __device__ void d_matrixVectorMultiply(
     FeatureType* matrix,
     FeatureType* vect,
