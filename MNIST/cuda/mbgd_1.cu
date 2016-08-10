@@ -235,8 +235,6 @@ void trainParallelMiniBatchGradientDescent(
             ? training_options.config_params["curr_num_epochs"]
             : 0;
 
-    printf("batch size is %f, threads_per_data is %f\n",batch_size,threads_per_datapoint);
-
     double annealed_step_size = step_size;
 
     const dim3 block_size(threads_per_datapoint * batch_size, 1, 1);
@@ -262,6 +260,8 @@ void trainParallelMiniBatchGradientDescent(
             curr_num_epochs++;
 
             printf("before enter kernal\n");
+            printf("batch size is %f, threads_per_data is %f\n",batch_size,threads_per_datapoint);
+
 
             // adjust step size with a modified version of simulated annealing
 
