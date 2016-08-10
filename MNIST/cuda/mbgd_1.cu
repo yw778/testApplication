@@ -257,6 +257,8 @@ void trainParallelMiniBatchGradientDescent(
                                        / characteristic_time));
             curr_num_epochs++;
 
+            printf("before enter kernal\n");
+
             // adjust step size with a modified version of simulated annealing
 
             // call kernel and check for errors
