@@ -61,8 +61,8 @@ __device__ void d_matrixVectorMultiply(
 
 //Grabdient = probility_matrix_transpose * datapoint_matrix
 __device__ void d_matrixMatrixMultiply(
-    FeatureType* probility_matrix,
     FeatureType* datapoint_matrix,
+    FeatureType* probility_matrix,
     float scalar,
     size_t batch_size,
     size_t num_features,
@@ -72,11 +72,11 @@ __device__ void d_matrixMatrixMultiply(
     size_t tidx = threadIdx.x;
     size_t bidx = blockIdx.x;
 
-     if(tidx==0&&bidx==0){
+     // if(tidx==0&&bidx==0){
            
-            printf("enter mateixmatrix multiplication\n");
+     //        printf("enter mateixmatrix multiplication\n");
   
-        } 
+     //    } 
 
 
     for(int m = 0 ; m < LABEL_CLASS ; m++){
