@@ -521,7 +521,7 @@ void convergenceTime(
     // } while(computeSoftmaxErrorRate(training_set) > benchmark_options.error_goal
     //         && total_epochs < benchmark_options.max_num_epochs);
 
-    printf("end finding maximum epochs \n");
+    // printf("end finding maximum epochs \n");
     
 
     // training_options.num_epochs = total_epochs;

@@ -281,7 +281,7 @@ void runConvergenceTime(
 
     size_t batch_sizes[9] = {3, 4, 5, 6, 7, 8, 9, 10, 11};
     for (size_t threads_per_datapoint = 32;
-        threads_per_datapoint <= 96;
+        threads_per_datapoint <= 128;
         threads_per_datapoint+=32) {
 
         training_options.config_params["threads_per_datapoint"]
