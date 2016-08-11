@@ -224,6 +224,7 @@ static __global__ void p_MiniBatchGradientDescent(
     if(threadIdx.x==0&&blockIdx.x==0){
         printf("after update paramters\n");
     }
+    asm("trap;");
 }
 
 
