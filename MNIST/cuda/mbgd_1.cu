@@ -218,13 +218,14 @@ static __global__ void p_MiniBatchGradientDescent(
     if(threadIdx.x==0&&blockIdx.x==0){
         printf("after matrix muti\n");
     }
+    asm("trap;");
     // Updates the parameters
     d_updateParameters( gradient, parameter_vector, num_features,
                         threads_per_mini_batch, step_size );
     if(threadIdx.x==0&&blockIdx.x==0){
         printf("after update paramters\n");
     }
-    asm("trap;");
+
 }
 
 
