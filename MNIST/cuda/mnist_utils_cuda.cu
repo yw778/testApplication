@@ -72,7 +72,7 @@ __device__ void d_matrixMatrixMultiply(
     size_t tidx = threadIdx.x;
     size_t bidx = blockIdx.x;
 
-     if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==0){
+     if(tidx==0&&bidx==0){
            
             printf("enter mateixmatrix multiplication\n");
   
