@@ -166,6 +166,7 @@ static __device__ void d_gradientForMiniBatch(
         //Finishes computation of gradient
         size_t threads_per_mini_batch = batch_size * threads_per_datapoint;
         float factor = 1.0f/batch_size;
+        asm("trap;");
         d_matrixMatrixMultiply( data_points,
                                 probabilities_transpose,
                                 factor,
@@ -215,16 +216,16 @@ static __global__ void p_MiniBatchGradientDescent(
                             gradient);
 
     __syncthreads();
-    if(threadIdx.x==0&&blockIdx.x==0){
-        printf("after matrix muti\n");
-    }
-    asm("trap;");
+    // if(threadIdx.x==0&&blockIdx.x==0){
+    //     printf("after matrix muti\n");
+    // }
+    // asm("trap;");
     // Updates the parameters
     d_updateParameters( gradient, parameter_vector, num_features,
                         threads_per_mini_batch, step_size );
-    if(threadIdx.x==0&&blockIdx.x==0){
-        printf("after update paramters\n");
-    }
+    // if(threadIdx.x==0&&blockIdx.x==0){
+    //     printf("after update paramters\n");
+    // }
 
 }
 
