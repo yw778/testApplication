@@ -173,6 +173,8 @@ static __device__ void d_gradientForMiniBatch(
                                 num_features,
                                 threads_per_mini_batch,
                                 gradient );
+        // __syncthreads();
+
     }
 }
 
@@ -213,6 +215,7 @@ static __global__ void p_MiniBatchGradientDescent(
                             gradient);
 
     __syncthreads();
+    printf("after matrix muti\n");
 
     // Updates the parameters
     d_updateParameters( gradient, parameter_vector, num_features,
