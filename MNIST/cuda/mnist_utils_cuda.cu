@@ -72,6 +72,13 @@ __device__ void d_matrixMatrixMultiply(
     size_t tidx = threadIdx.x;
     size_t bidx = blockIdx.x;
 
+     if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==0){
+           
+            printf("enter mateixmatrix multiplication\n");
+  
+        } 
+
+
     for(int m = 0 ; m < LABEL_CLASS ; m++){
         for (int j = 0; j < batch_size; j++) {
             for (int i = tidx; i < num_features; i += threads_per_mini_batch) {
