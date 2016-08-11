@@ -279,7 +279,7 @@ void runConvergenceTime(
     //     }
     // }
 
-    size_t batch_sizes[10] = {1, 2, 4, 8, 20, 30, 45, 50, 60, 100};
+    size_t batch_sizes[10] = {2, 2, 4, 8, 20, 30, 45, 50, 60, 100};
     for (size_t threads_per_datapoint = 32;
         threads_per_datapoint <= 512;
         threads_per_datapoint*=2) {

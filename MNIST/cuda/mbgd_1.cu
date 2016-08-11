@@ -140,11 +140,11 @@ static __device__ void d_gradientForMiniBatch(
         __syncthreads();
 
         //debug use
-        // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==0){
-        //     for(size_t i=0; i<10;i++){
-        //         printf("probabilities_of_each is %f\n", probabilities_of_each[i]);
-        //     }   
-        // } 
+        if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==0){
+            for(size_t i=0; i<10;i++){
+                printf("probabilities_of_each is %f\n", probabilities_of_each[i]);
+            }   
+        } 
         // asm("trap;");  
 
         
@@ -156,11 +156,11 @@ static __device__ void d_gradientForMiniBatch(
                             relative_tidx,
                             point_idx_in_block);
 
-        // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==0){
-        //     for(size_t i=0; i<10;i++){
-        //         printf("probabilities_transpose is %f\n", probabilities_transpose[i]);
-        //     }   
-        // } 
+        if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==0){
+            for(size_t i=0; i<10;i++){
+                printf("probabilities_transpose is %f\n", probabilities_transpose[i]);
+            }   
+        } 
          __syncthreads();
 
         //Finishes computation of gradient
@@ -210,7 +210,7 @@ static __global__ void p_MiniBatchGradientDescent(
                             num_data_points,
                             batch_size,
                             threads_per_datapoint,
-                            gradient );
+                            gradient);
 
     __syncthreads();
 
