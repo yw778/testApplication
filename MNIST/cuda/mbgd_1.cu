@@ -141,7 +141,7 @@ static __device__ void d_gradientForMiniBatch(
 
         //debug use
         if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==0){
-            for(size_t i=0; i<10;i++){
+            for(size_t i=0; i<20;i++){
                 printf("probabilities_of_each is %f\n", probabilities_of_each[i]);
             }   
         } 
@@ -157,7 +157,7 @@ static __device__ void d_gradientForMiniBatch(
                             point_idx_in_block);
 
         if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==0){
-            for(size_t i=0; i<10;i++){
+            for(size_t i=0; i<20;i++){
                 printf("probabilities_transpose is %f\n", probabilities_transpose[i]);
             }   
         } 
