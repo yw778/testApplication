@@ -126,7 +126,30 @@ __device__ void d_updateParameters(
         FeatureType gradient_times_step_size = gradient[i] * step_size;
         atomicAdd(&parameter_vector[i], -gradient_times_step_size);
     }
+
 }
+
+
+// static __device__ void d_updateParameters(
+//     FeatureType* gradient,
+//     FeatureType* parameter_vector,
+//     size_t num_features,
+//     size_t threads_per_datapoint,
+//     double step_size) {
+
+//     // printf("enter update parameters in sgd_single_point\n");
+
+//     size_t thread_offset = threadIdx.x % threads_per_datapoint;
+
+
+//     for(size_t i= 0;i<LABEL_CLASS;i++){
+      
+//         for (size_t j = thread_offset; j < num_features; j+=threads_per_datapoint){
+  
+//             atomicAdd(&parameter_vector[j+i*num_features], -gradient[j+i*num_features]*step_size);
+//         }        
+//     }        
+// }  
 
 // initializes all values in array to a certain value
 __device__ void d_memset(
