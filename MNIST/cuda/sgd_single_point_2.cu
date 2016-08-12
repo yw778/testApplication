@@ -111,29 +111,52 @@ static __device__ void d_partialMatrixVectorProduct(
 }
 
 // updates parameter vector in parallel when N threads are working on each point
+// static __device__ void d_updateParameters(
+//     FeatureType* data_point_i,
+//     FeatureType* parameter_vector,
+//     size_t num_features,
+//     size_t threads_per_datapoint,
+//     size_t point_idx_in_block,
+//     size_t relative_tidx,
+//     FeatureType* step_size_times_prob_i_minus_label_i) {
+
+//     // printf("enter update parameters in sgd_single_point\n");
+
+//     size_t thread_offset = threadIdx.x % threads_per_datapoint;
+
+
+//     for(size_t i= 0;i<LABEL_CLASS;i++){
+      
+//         for (size_t j = thread_offset; j < num_features; j+=threads_per_datapoint){
+  
+//             atomicAdd(&parameter_vector[j+i*num_features], - data_point_i[j] 
+//                 * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
+//         }        
+//     }        
+// }  
+
 static __device__ void d_updateParameters(
     FeatureType* data_point_i,
     FeatureType* parameter_vector,
     size_t num_features,
     size_t threads_per_datapoint,
     size_t point_idx_in_block,
-    size_t relative_tidx,
     FeatureType* step_size_times_prob_i_minus_label_i) {
-
-    // printf("enter update parameters in sgd_single_point\n");
+    //memset to 0
 
     size_t thread_offset = threadIdx.x % threads_per_datapoint;
+    size_t num_thread_each_label = threads_per_datapoint / LABEL_CLASS;
+    //index relative to each label(corresponding to 784 parameter) 
+    //Eg: 320 thread for 10 label -> each label 32 thread
+    size_t tidx_label =  thread_offset / num_thread_each_label;
+    size_t relative_tidx_label =  thread_offset % num_thread_each_label;
+    // strided calculation of element-wise vector reduce concurrently in 10 dimentions
+    for (size_t j = relative_tidx_label; j < num_features; j+= num_thread_each_label)
 
+        atomicAdd(&parameter_vector[j+tidx_label*num_features], - data_point_i[j] 
+                * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+tidx_label]);
 
-    for(size_t i= 0;i<LABEL_CLASS;i++){
-      
-        for (size_t j = thread_offset; j < num_features; j+=threads_per_datapoint){
-  
-            atomicAdd(&parameter_vector[j+i*num_features], - data_point_i[j] 
-                * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
-        }        
-    }        
-}  
+}
 
 //still have chance to be faster
 // static __device__ void d_updateParameters(
@@ -308,13 +331,22 @@ static __global__ void p_SgdWithSharedParameterVector(
         // asm("trap;");
 
         d_updateParameters(
-            data_point_i,
-            parameter_vector,
-            num_features,
-            threads_per_datapoint,
-            point_idx_in_block,
-            relative_tidx,
-            probabilities_of_each);
+             data_point_i,
+             parameter_vector,
+             num_features,
+             threads_per_datapoint,
+             point_idx_in_block,
+             probabilities_of_each);
+
+
+        // d_updateParameters(
+        //     data_point_i,
+        //     parameter_vector,
+        //     num_features,
+        //     threads_per_datapoint,
+        //     point_idx_in_block,
+        //     relative_tidx,
+        //     probabilities_of_each);
         // debug use
         // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block ==1){
         //     for(size_t i=0; i<PARAMETER_SIZE;i++){
