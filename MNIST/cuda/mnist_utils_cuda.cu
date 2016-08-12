@@ -130,7 +130,7 @@ __device__ void d_matrixTranspose(
 // }
 
 
-static __device__ void d_updateParameters(
+ __device__ void d_updateParameters(
     FeatureType* gradient,
     FeatureType* parameter_vector,
     size_t num_features,
