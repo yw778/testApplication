@@ -262,7 +262,7 @@ void runConvergenceTime(
         training_options.config_params["threads_per_datapoint"]
         = threads_per_datapoint;
 
-        for (size_t datapoints_per_block = 1;
+        for (size_t datapoints_per_block = 2;
             datapoints_per_block <= 2;
             datapoints_per_block*=2) {
         // size_t datapoints_per_block = 2;
