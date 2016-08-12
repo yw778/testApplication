@@ -255,7 +255,7 @@ void runConvergenceTime(
 
     
     //threads_per_datapoint must be bigger than 10
-    for (size_t threads_per_datapoint = 320;
+    for (size_t threads_per_datapoint = 64;
         threads_per_datapoint <= 960;
         threads_per_datapoint += 320) {
 
