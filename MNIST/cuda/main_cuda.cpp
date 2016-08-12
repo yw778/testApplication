@@ -10,8 +10,8 @@
 #include "mbgd_1.h"
 #include "mbgd_2.h"
 // #include "sgd_cublas.h"
-#include "sgd_single_point.h"
-
+#include "sgd_single_point_1.h"
+#include "sgd_single_point_2.h"
 void runTrainAndTest(
     DataSet data_set,
     TrainingOptions training_options,
@@ -253,11 +253,9 @@ void runConvergenceTime(
     //         benchmark_options);
     // }
 
-    
-    //threads_per_datapoint must be bigger than 10
-    for (size_t threads_per_datapoint = 80;
-        threads_per_datapoint <= 140;
-        threads_per_datapoint += 20) {
+    for (size_t threads_per_datapoint = 32;
+        threads_per_datapoint <= 512;
+        threads_per_datapoint *= 2) {
 
         training_options.config_params["threads_per_datapoint"]
         = threads_per_datapoint;
@@ -271,8 +269,35 @@ void runConvergenceTime(
             = datapoints_per_block;
 
             convergenceTime(
+                trainParallelStochasticGradientDescent1,
+                "CUDA SGD 1",
+                data_set,
+                training_options,
+                benchmark_options);
+        }
+    }
+    
+
+
+
+    for (size_t threads_per_datapoint = 160;
+        threads_per_datapoint <= 640;
+        threads_per_datapoint *= 2) {
+
+        training_options.config_params["threads_per_datapoint"]
+        = threads_per_datapoint;
+
+        for (size_t datapoints_per_block = 1;
+            datapoints_per_block <= 4;
+            datapoints_per_block*=2) {
+        // size_t datapoints_per_block = 2;
+
+            training_options.config_params["datapoints_per_block"]
+            = datapoints_per_block;
+
+            convergenceTime(
                 trainParallelStochasticGradientDescent2,
-                "CUDA SGD",
+                "CUDA SGD 2",
                 data_set,
                 training_options,
                 benchmark_options);

@@ -160,36 +160,36 @@ __device__ float d_logisticFunction(float exponent) {
 
 
 
-//one - way dimention parallel softmax function
-// __device__ void d_softMaxFunction(FeatureType* shared_memory, 
-//     FeatureType* posibility_each,
-//     size_t point_idx_in_shmem,
-//     size_t relative_tidx,
-//     size_t point_idx_in_block,
-//     size_t num_label) {
-//     //copy (theta)T x and take fast exponential
-//     if(relative_tidx < num_label){
-//         posibility_each[point_idx_in_block * num_label+relative_tidx]
-//             = __expf(shared_memory[relative_tidx * blockDim.x+ point_idx_in_shmem]);
-//     }
-//     __syncthreads();
+// one - way dimention parallel softmax function
+__device__ void d_softMaxFunction1(FeatureType* shared_memory, 
+    FeatureType* posibility_each,
+    size_t point_idx_in_shmem,
+    size_t relative_tidx,
+    size_t point_idx_in_block,
+    size_t num_label) {
+    //copy (theta)T x and take fast exponential
+    if(relative_tidx < num_label){
+        posibility_each[point_idx_in_block * num_label+relative_tidx]
+            = __expf(shared_memory[relative_tidx * blockDim.x+ point_idx_in_shmem]);
+    }
+    __syncthreads();
 
-//     //calculate sum , each thread has a copy (++)
-//     float sum = 0;
-//     for (size_t i=0;i<num_label;i++){
-//         sum += posibility_each[point_idx_in_block * num_label + i];
-//     }
-//     __syncthreads();
+    //calculate sum , each thread has a copy (++)
+    float sum = 0;
+    for (size_t i=0;i<num_label;i++){
+        sum += posibility_each[point_idx_in_block * num_label + i];
+    }
+    __syncthreads();
     
-//     //calculate final posibility for each point
-//     if(relative_tidx < num_label){
-//         posibility_each[point_idx_in_block * num_label+relative_tidx]/=sum;
-//     }
-//     __syncthreads();
-// }
+    //calculate final posibility for each point
+    if(relative_tidx < num_label){
+        posibility_each[point_idx_in_block * num_label+relative_tidx]/=sum;
+    }
+    __syncthreads();
+}
 
 //two - way dimention parallel softmax function
-__device__ void d_softMaxFunction(FeatureType* shared_memory, 
+__device__ void d_softMaxFunction2(FeatureType* shared_memory, 
     FeatureType* posibility_each,
     size_t point_idx_in_shmem,
     size_t relative_tidx,
