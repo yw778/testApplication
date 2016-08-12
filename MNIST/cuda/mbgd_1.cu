@@ -124,9 +124,9 @@ static __device__ void d_gradientForMiniBatch(
     if (point_idx < num_data_points) {
 
         //calculate softmax possibility
-        d_softMaxFunction(dot_product,probabilities_of_each,
+        d_softMaxFunction1(dot_product,probabilities_of_each,
                      point_idx_in_shmem,relative_tidx,
-                        point_idx_in_block, LABEL_CLASS,1);
+                        point_idx_in_block, LABEL_CLASS);
 
         //calculate {y(i)=k}−P(y(i)=k|x(i)
         if(relative_tidx < LABEL_CLASS){
