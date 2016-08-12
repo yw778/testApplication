@@ -146,6 +146,7 @@ __device__ void  d_softMaxFunction(FeatureType* shared_memory,
     size_t point_idx_in_shmem,
     size_t relative_tidx,
     size_t point_idx_in_block,
-    size_t num_label);
+    size_t num_label,
+    size_t num_thread_each_label);
 
 #endif
