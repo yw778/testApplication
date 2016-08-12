@@ -255,15 +255,15 @@ void runConvergenceTime(
 
     
     //threads_per_datapoint must be bigger than 10
-    for (size_t threads_per_datapoint = 320;
-        threads_per_datapoint <= 960;
-        threads_per_datapoint += 320) {
+    for (size_t threads_per_datapoint = 64;
+        threads_per_datapoint <= 512;
+        threads_per_datapoint *= 2) {
 
         training_options.config_params["threads_per_datapoint"]
         = threads_per_datapoint;
 
         for (size_t datapoints_per_block = 1;
-            datapoints_per_block <= 2;
+            datapoints_per_block <= 8;
             datapoints_per_block*=2) {
         // size_t datapoints_per_block = 2;
 
