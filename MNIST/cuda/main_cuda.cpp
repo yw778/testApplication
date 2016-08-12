@@ -263,7 +263,7 @@ void runConvergenceTime(
         = threads_per_datapoint;
 
         for (size_t datapoints_per_block = 1;
-            datapoints_per_block <= 8;
+            datapoints_per_block <= 2;
             datapoints_per_block*=2) {
         // size_t datapoints_per_block = 2;
 

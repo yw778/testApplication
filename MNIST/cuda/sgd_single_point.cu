@@ -193,7 +193,7 @@ static __global__ void p_SgdWithSharedParameterVector(
     //index relative to each label(corresponding to 784 parameter) 
     //Eg: 320 thread for 10 label -> each label 32 thread
     size_t num_thread_each_label = threads_per_datapoint / LABEL_CLASS;
-    size_t tidx_label =  relative_tidx / num_thread_each_label;
+    // size_t tidx_label =  relative_tidx / num_thread_each_label;
     size_t relative_tidx_label =  relative_tidx % num_thread_each_label;
 
     FeatureType* data_point_i = NULL;
@@ -392,7 +392,7 @@ void trainParallelStochasticGradientDescent2(
 
     // printf("memosize is %d",shared_memory_size);
     // exit(1);
-
+        
     // check that the resulting grid and block dimensions
     // dont' violate device limits
     if(checkDeviceProps(shared_memory_size, block_size, grid_size)) {
