@@ -111,6 +111,7 @@ static __device__ void d_partialMatrixVectorProduct(
 }
 
 // updates parameter vector in parallel when N threads are working on each point
+// vesion 1
 // static __device__ void d_updateParameters(
 //     FeatureType* data_point_i,
 //     FeatureType* parameter_vector,
@@ -135,6 +136,8 @@ static __device__ void d_partialMatrixVectorProduct(
 //     }        
 // }  
 
+//two dimentional parallelism to update 
+//version 2 speed nearly same as version1
 static __device__ void d_updateParameters(
     FeatureType* data_point_i,
     FeatureType* parameter_vector,
@@ -158,32 +161,6 @@ static __device__ void d_updateParameters(
 
 }
 
-//still have chance to be faster
-// static __device__ void d_updateParameters(
-//     FeatureType* data_point_i,
-//     FeatureType* parameter_vector,
-//     size_t num_features,
-//     size_t threads_per_datapoint,
-//     size_t point_idx_in_block,
-//     size_t relative_tidx,
-//     FeatureType* step_size_times_prob_i_minus_label_i) {
-
-//     // printf("enter update parameters in sgd_single_point\n");
-
-//     size_t thread_offset = threadIdx.x % threads_per_datapoint;
-//     // size_t labels_count =  thread_offset / LABEL_CLASS;
-
-//     // for(size_t i= 0;i<LABEL_CLASS;i++){
-      
-//         for (size_t j = thread_offset; j < num_features * LABEL_CLASS; j+= threads_per_datapoint){
-
-//             size_t labels_count = j / num_features ;
-  
-//             atomicAdd(&parameter_vector[j], - data_point_i[j%num_features] 
-//                 * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+labels_count]);
-//         }        
-//     // }        
-// }   
 
 // Kernel for Parallel Stochastic Gradient Descent in CUDA using
 // shared parameter vector
@@ -329,7 +306,7 @@ static __global__ void p_SgdWithSharedParameterVector(
         //     printf("\n\n\n\n\n\n\n\n");
         // } 
         // asm("trap;");
-
+        //version 2 
         d_updateParameters(
              data_point_i,
              parameter_vector,
@@ -338,7 +315,7 @@ static __global__ void p_SgdWithSharedParameterVector(
              point_idx_in_block,
              probabilities_of_each);
 
-
+        //version 1
         // d_updateParameters(
         //     data_point_i,
         //     parameter_vector,
