@@ -88,7 +88,9 @@ __device__ void d_matrixMatrixMultiply(
     size_t relative_tidx_label =  tidx % num_thread_each_label;
 
     if(tidx == 314 && blockIdx.x ==0){
-        printf("%d -- %d\n",tidx_label,relative_tidx_label);
+        printf("thread/label is %d \n",num_thread_each_label);
+        printf("tidx_label is %d\n",tidx_label);
+        printf("relative_tidx_label is %d\n",relative_tidx_label);
     }
     // asm("trap;");
     // strided sum of element-wise products concurrently in 10 dimentions
