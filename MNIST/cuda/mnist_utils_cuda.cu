@@ -60,7 +60,7 @@ __device__ void d_matrixVectorMultiply(
 }
 
 // Grabdient = probility_matrix_transpose * datapoint_matrix
-// version 2 more faster
+// version 2 more faster but thraeds number is limited
 __device__ void d_matrixMatrixMultiply(
     FeatureType* datapoint_matrix,
     FeatureType* probility_matrix,
