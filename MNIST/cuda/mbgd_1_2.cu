@@ -327,6 +327,8 @@ void trainParallelMiniBatchGradientDescent12(
             + LABEL_CLASS * batch_size * sizeof(float)
             + threads_per_batch * sizeof(FeatureType) 
             + LABEL_CLASS * training_set.num_features * sizeof(FeatureType);
+
+    printf("block size is %d",block_size.x);
  
     if (checkDeviceProps(shared_memory_size, block_size, grid_size)) {
         // iterate if dimensions are okay
