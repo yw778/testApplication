@@ -60,6 +60,7 @@ __device__ void d_matrixVectorMultiply(
 }
 
 //Grabdient = probility_matrix_transpose * datapoint_matrix
+//still needs to be faster
 __device__ void d_matrixMatrixMultiply(
     FeatureType* datapoint_matrix,
     FeatureType* probility_matrix,
@@ -129,7 +130,8 @@ __device__ void d_updateParameters(
 
 }
 
-
+// posibilily another way..
+// speed almost the same
 //  __device__ void d_updateParameters(
 //     FeatureType* gradient,
 //     FeatureType* parameter_vector,

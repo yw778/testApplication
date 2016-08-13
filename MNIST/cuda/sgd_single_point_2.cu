@@ -87,6 +87,7 @@ static __device__ void d_partialDotProduct(
 }
 
 // two - dimentional parallelism dot product
+// work for threads that are multiple of both 10 and 32
 static __device__ void d_partialMatrixVectorProduct(
     FeatureType* data_point_i,
     FeatureType* parameter_vector,
@@ -232,7 +233,7 @@ static __global__ void p_SgdWithSharedParameterVector(
 
     __syncthreads();
 
-    // sum-reduce the results of partial dot product to get final result
+    // sum-reduce the results of partial matrix-vector product to get final result
     // for(size_t i=0 ; i<LABEL_CLASS ;i++){    
     for (size_t s = num_thread_each_label / 2; s > 0; s>>=1) {
         if (relative_tidx_label < s) {

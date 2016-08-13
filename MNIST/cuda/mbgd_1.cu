@@ -86,9 +86,10 @@ static __device__ void d_gradientForMiniBatch(
 
     // array probabilities_of_each in shared_memory of size batch_size * LABEL_CLASS
     float *probabilities_of_each = (float*)&gradient[num_features * LABEL_CLASS];
-    // array of groundthruth matrix
+    // array of transpose of probabilities matrix
+    // Eg: [1 2 3 4 5 6 7 8 9 10 1 2 3 4 5 6 7 8 9 10] -> [1 1 2 2 3 3 4 4 5 5 6 6 7 7 8 8 9 9 10 10] 
     float *probabilities_transpose = (float*)&probabilities_of_each[batch_size * LABEL_CLASS];
-    // array dot_product in shared_memory of size threads_per_datapoint * batch_size * LABEL_CLASS
+    // array dot_product in shared_memory of size threads_per_datapoint * batch_size
     float *dot_product = (float*)&probabilities_transpose[batch_size * LABEL_CLASS];
     
     size_t tidx = threadIdx.x;
@@ -98,7 +99,7 @@ static __device__ void d_gradientForMiniBatch(
     size_t relative_tidx = threadIdx.x % threads_per_datapoint; 
     size_t point_idx_in_shmem = tidx - relative_tidx;
     size_t point_idx_in_block = tidx / threads_per_datapoint;
-    // computes logistic function for each data point in the mini batch
+    // computes softmax function for each data point in the mini batch
     // size_t starting_point = point_idx * num_features;
     if (point_idx < num_data_points){
         for(size_t i = 0; i<LABEL_CLASS;i++){
@@ -277,10 +278,10 @@ void trainParallelMiniBatchGradientDescent(
     const dim3 grid_size(num_blocks, 1, 1);
 
     FeatureType threads_per_batch = threads_per_datapoint * batch_size;
-    //shared Memory for posibility, posibility transpose, shared memory and gradient
+    //shared Memory for posibility, posibility transpose, dot product and gradient
     const size_t shared_memory_size = LABEL_CLASS * batch_size * sizeof(float) 
             + LABEL_CLASS * batch_size * sizeof(float)
-            + LABEL_CLASS * (threads_per_batch) * sizeof(FeatureType) 
+            + (threads_per_batch) * sizeof(FeatureType) 
             + LABEL_CLASS * training_set.num_features * sizeof(FeatureType);
  
     if (checkDeviceProps(shared_memory_size, block_size, grid_size)) {

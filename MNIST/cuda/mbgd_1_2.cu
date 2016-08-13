@@ -72,6 +72,32 @@ static __device__ void d_partialDotProduct(
 }
 
 
+// two - dimentional parallelism dot product
+// work for threads that are multiple of both 10 and 32
+static __device__ void d_partialMatrixVectorProduct(
+    FeatureType* data_point_i,
+    FeatureType* parameter_vector,
+    FeatureType* shared_memory,
+    size_t num_features,
+    size_t threads_per_datapoint) {
+    //memset to 0
+    FeatureType partial_dot = 0;
+
+    size_t thread_offset = threadIdx.x % threads_per_datapoint;
+    size_t num_thread_each_label = threads_per_datapoint / LABEL_CLASS;
+    //index relative to each label(corresponding to 784 parameter) 
+    //Eg: 320 thread for 10 label -> each label 32 thread
+    size_t tidx_label =  thread_offset / num_thread_each_label;
+    size_t relative_tidx_label =  thread_offset % num_thread_each_label;
+    // strided sum of element-wise products concurrently in 10 dimentions
+    for (size_t j = relative_tidx_label; j < num_features; j+= num_thread_each_label)
+        partial_dot += data_point_i[j] * parameter_vector[j + tidx_label * num_features];
+
+    // result of the partial dot product is stored in shared memory
+    shared_memory[threadIdx.x] = partial_dot;
+}
+
+
 // computes gradient for a mini-batch of size batch_size in the training_set
 // from starting_point
 static __device__ void d_gradientForMiniBatch(
@@ -86,9 +112,10 @@ static __device__ void d_gradientForMiniBatch(
 
     // array probabilities_of_each in shared_memory of size batch_size * LABEL_CLASS
     float *probabilities_of_each = (float*)&gradient[num_features * LABEL_CLASS];
-    // array of groundthruth matrix
+    // array of transpose of probabilities matrix
+    //Eg: [1 2 3 4 5 6 7 8 9 10 1 2 3 4 5 6 7 8 9 10] -> [1 1 2 2 3 3 4 4 5 5 6 6 7 7 8 8 9 9 10 10] 
     float *probabilities_transpose = (float*)&probabilities_of_each[batch_size * LABEL_CLASS];
-    // array dot_product in shared_memory of size threads_per_datapoint * batch_size * LABEL_CLASS
+    // array dot_product in shared_memory of size threads_per_datapoint * batch_size
     float *dot_product = (float*)&probabilities_transpose[batch_size * LABEL_CLASS];
     
     size_t tidx = threadIdx.x;
@@ -98,35 +125,53 @@ static __device__ void d_gradientForMiniBatch(
     size_t relative_tidx = threadIdx.x % threads_per_datapoint; 
     size_t point_idx_in_shmem = tidx - relative_tidx;
     size_t point_idx_in_block = tidx / threads_per_datapoint;
-    // computes logistic function for each data point in the mini batch
+
+    //index relative to each label(corresponding to 784 parameter) 
+    //Eg: 320 thread for 10 label -> each label 32 thread
+    size_t num_thread_each_label = threads_per_datapoint / LABEL_CLASS;
+    // size_t tidx_label =  relative_tidx / num_thread_each_label;
+    size_t relative_tidx_label =  relative_tidx % num_thread_each_label;
+
+    // computes softmax function for each data point in the mini batch
     // size_t starting_point = point_idx * num_features;
     if (point_idx < num_data_points){
-        for(size_t i = 0; i<LABEL_CLASS;i++){
-            d_partialDotProduct( &data_points[point_idx * num_features], 
-                                    &parameter_vector[i * num_features],
-                                    dot_product, num_features, 
-                                    threads_per_datapoint,
-                                    i*blockDim.x);
-        }
+        // for(size_t i = 0; i<LABEL_CLASS;i++){
+        // d_partialDotProduct( &data_points[point_idx * num_features], 
+        //                         &parameter_vector[i * num_features],
+        //                         dot_product, num_features, 
+        //                         threads_per_datapoint,
+        //                         i*blockDim.x);
+        // }
+        d_partialMatrixVectorProduct(
+                &data_points[point_idx * num_features], 
+                parameter_vector,
+                dot_product,
+                num_features,
+                threads_per_datapoint);
+        
     }
     __syncthreads();
 
 
-    for(size_t i=0 ; i<LABEL_CLASS ;i++){  
-        for (size_t s = threads_per_datapoint / 2; s > 0; s>>=1) {
-            if (relative_tidx < s) {
-                dot_product[tidx+i*blockDim.x] += dot_product[tidx+s+i*blockDim.x];
-            }
-            __syncthreads();
+    // sum-reduce the results of partial matrix-vector product to get final result
+    // for(size_t i=0 ; i<LABEL_CLASS ;i++){  
+    for (size_t s = num_thread_each_label / 2; s > 0; s>>=1) {
+        if (relative_tidx_label < s) {
+            dot_product[tidx] += dot_product[tidx+s];
         }
+        __syncthreads();
     }
+    // }
 
     if (point_idx < num_data_points) {
 
         //calculate softmax possibility
-        d_softMaxFunction1(dot_product,probabilities_of_each,
-                     point_idx_in_shmem,relative_tidx,
-                        point_idx_in_block, LABEL_CLASS);
+        // d_softMaxFunction1(dot_product,probabilities_of_each,
+        //              point_idx_in_shmem,relative_tidx,
+        //                 point_idx_in_block, LABEL_CLASS);
+        d_softMaxFunction2(dot_product,probabilities_of_each,
+                point_idx_in_shmem,relative_tidx, point_idx_in_block,
+                LABEL_CLASS, num_thread_each_label);
 
         //calculate {y(i)=k}−P(y(i)=k|x(i)
         if(relative_tidx < LABEL_CLASS){
@@ -244,7 +289,7 @@ void trainParallelMiniBatchGradientDescent12(
                       training_set.num_data_points,
                       training_set.data_points, 
                       training_set.labels, 
-                      training_set.parameter_vector );
+                      training_set.parameter_vector);
     
     // read configuration parameters and initialize grid and block dimensions
     double step_size = *training_options.step_size;
@@ -277,10 +322,10 @@ void trainParallelMiniBatchGradientDescent12(
     const dim3 grid_size(num_blocks, 1, 1);
 
     FeatureType threads_per_batch = threads_per_datapoint * batch_size;
-    //shared Memory for posibility, posibility transpose, shared memory and gradient
+    //shared Memory for posibility, posibility transpose, dot product and gradient
     const size_t shared_memory_size = LABEL_CLASS * batch_size * sizeof(float) 
             + LABEL_CLASS * batch_size * sizeof(float)
-            + LABEL_CLASS * (threads_per_batch) * sizeof(FeatureType) 
+            + threads_per_batch * sizeof(FeatureType) 
             + LABEL_CLASS * training_set.num_features * sizeof(FeatureType);
  
     if (checkDeviceProps(shared_memory_size, block_size, grid_size)) {
