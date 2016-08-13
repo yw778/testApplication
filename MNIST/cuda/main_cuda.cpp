@@ -325,7 +325,7 @@ void runConvergenceTime(
     //     }
     // }
 
-    size_t batch_sizes[10] = {4, 5, 6, 7, 4, 10, 8, 9, 10, 11};
+    size_t batch_sizes[10] = {3, 4, 5, 6, 7, 4, 10, 8, 9, 10, 11};
     for (size_t threads_per_datapoint = 160;
         threads_per_datapoint <= 640;
         threads_per_datapoint *= 2) {
