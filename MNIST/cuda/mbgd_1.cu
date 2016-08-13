@@ -281,7 +281,7 @@ void trainParallelMiniBatchGradientDescent(
     //shared Memory for posibility, posibility transpose, dot product and gradient
     const size_t shared_memory_size = LABEL_CLASS * batch_size * sizeof(float) 
             + LABEL_CLASS * batch_size * sizeof(float)
-            + (threads_per_batch) * sizeof(FeatureType) 
+            + LABEL_CLASS * (threads_per_batch) * sizeof(FeatureType) 
             + LABEL_CLASS * training_set.num_features * sizeof(FeatureType);
  
     if (checkDeviceProps(shared_memory_size, block_size, grid_size)) {
