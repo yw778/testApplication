@@ -219,25 +219,24 @@ __device__ void d_softMaxFunction2(FeatureType* shared_memory,
     size_t point_idx_in_shmem,
     size_t relative_tidx,
     size_t point_idx_in_block,
-    size_t num_label,
     size_t num_thread_each_label) {
     //copy (theta)T x and take fast exponential
-    if(relative_tidx < num_label){
-        posibility_each[point_idx_in_block * num_label+relative_tidx]
+    if(relative_tidx < LABEL_CLASS){
+        posibility_each[point_idx_in_block * LABEL_CLASS+relative_tidx]
             = __expf(shared_memory[relative_tidx * num_thread_each_label + point_idx_in_shmem]);
     }
     __syncthreads();
 
     //calculate sum , each thread has a copy (++)
     float sum = 0;
-    for (size_t i=0;i<num_label;i++){
-        sum += posibility_each[point_idx_in_block * num_label + i];
+    for (size_t i=0;i<LABEL_CLASS;i++){
+        sum += posibility_each[point_idx_in_block * LABEL_CLASS + i];
     }
     __syncthreads();
     
     //calculate final posibility for each point
-    if(relative_tidx < num_label){
-        posibility_each[point_idx_in_block * num_label+relative_tidx]/=sum;
+    if(relative_tidx < LABEL_CLASS){
+        posibility_each[point_idx_in_block * LABEL_CLASS+relative_tidx]/=sum;
     }
     __syncthreads();
 }

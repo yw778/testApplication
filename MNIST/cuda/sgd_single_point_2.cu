@@ -249,7 +249,7 @@ static __global__ void p_SgdWithSharedParameterVector(
         //     d_softMaxFunction(shared_memory[point_idx_in_shmem]);
         d_softMaxFunction2(shared_memory,probabilities_of_each,
                 point_idx_in_shmem,relative_tidx, point_idx_in_block,
-                LABEL_CLASS, num_thread_each_label);
+                num_thread_each_label);
         // debug use
         // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
         //     for(size_t i=1; i<21;i++){

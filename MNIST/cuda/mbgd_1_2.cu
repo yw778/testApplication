@@ -171,7 +171,7 @@ static __device__ void d_gradientForMiniBatch(
         //                 point_idx_in_block, LABEL_CLASS);
         d_softMaxFunction2(dot_product,probabilities_of_each,
                 point_idx_in_shmem,relative_tidx, point_idx_in_block,
-                LABEL_CLASS, num_thread_each_label);
+                num_thread_each_label);
 
         //calculate {y(i)=k}−P(y(i)=k|x(i)
         if(relative_tidx < LABEL_CLASS){
@@ -328,7 +328,6 @@ void trainParallelMiniBatchGradientDescent12(
             + threads_per_batch * sizeof(FeatureType) 
             + LABEL_CLASS * training_set.num_features * sizeof(FeatureType);
 
-    printf("block size is %d",block_size.x);
  
     if (checkDeviceProps(shared_memory_size, block_size, grid_size)) {
         // iterate if dimensions are okay
