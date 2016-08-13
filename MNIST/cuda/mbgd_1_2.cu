@@ -79,16 +79,19 @@ static __device__ void d_partialMatrixVectorProduct(
     FeatureType* parameter_vector,
     FeatureType* shared_memory,
     size_t num_features,
-    size_t threads_per_datapoint) {
+    // size_t threads_per_datapoint,
+    size_t num_thread_each_label,
+    size_t tidx_label,
+    size_t relative_tidx_label) {
     //memset to 0
     FeatureType partial_dot = 0;
 
-    size_t thread_offset = threadIdx.x % threads_per_datapoint;
-    size_t num_thread_each_label = threads_per_datapoint / LABEL_CLASS;
+    // size_t thread_offset = threadIdx.x % threads_per_datapoint;
+    // size_t num_thread_each_label = threads_per_datapoint / LABEL_CLASS;
     //index relative to each label(corresponding to 784 parameter) 
     //Eg: 320 thread for 10 label -> each label 32 thread
-    size_t tidx_label =  thread_offset / num_thread_each_label;
-    size_t relative_tidx_label =  thread_offset % num_thread_each_label;
+    // size_t tidx_label =  thread_offset / num_thread_each_label;
+    // size_t relative_tidx_label =  thread_offset % num_thread_each_label;
     // strided sum of element-wise products concurrently in 10 dimentions
     for (size_t j = relative_tidx_label; j < num_features; j+= num_thread_each_label)
         partial_dot += data_point_i[j] * parameter_vector[j + tidx_label * num_features];
