@@ -59,7 +59,7 @@ __device__ void d_matrixVectorMultiply(
     }
 }
 
-Grabdient = probility_matrix_transpose * datapoint_matrix
+// Grabdient = probility_matrix_transpose * datapoint_matrix
 __device__ void d_matrixMatrixMultiply(
     FeatureType* datapoint_matrix,
     FeatureType* probility_matrix,
