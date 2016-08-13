@@ -61,39 +61,6 @@ __device__ void d_matrixVectorMultiply(
 
 // Grabdient = probility_matrix_transpose * datapoint_matrix
 // version 2 more faster
-__device__ void d_matrixMatrixMultiply(
-    FeatureType* datapoint_matrix,
-    FeatureType* probility_matrix,
-    float scalar,
-    size_t batch_size,
-    size_t num_features,
-    size_t threads_per_mini_batch,
-    FeatureType* result) {
-
-    size_t tidx = threadIdx.x;
-    size_t bidx = blockIdx.x;
-
-    // size_t thread_offset = threadIdx.x % threads_per_datapoint;
-    size_t num_thread_each_label = threads_per_mini_batch / LABEL_CLASS;
-    //index relative to each label(corresponding to 784 parameter) 
-    //Eg: 320 thread for 10 label -> each label 32 thread
-    size_t tidx_label =  tidx / num_thread_each_label;
-    size_t relative_tidx_label =  tidx % num_thread_each_label;
- 
-    for (int j = 0; j < batch_size; j++) {
-        for (int i = relative_tidx_label; i < num_features; i += num_thread_each_label) {
-            // index of the point with respect to the whole dataset
-            size_t point_idx = bidx * batch_size + j;
-            // index of the feature with respect to all features in the dataset
-            size_t feature_idx = point_idx * num_features + i;
-            //gradient result 
-            result[i+tidx_label*num_features] += datapoint_matrix[feature_idx] 
-                * probility_matrix[j+tidx_label*batch_size] * scalar;
-        }
-    }    
-}
-
-// version 1 nested loops slower
 // __device__ void d_matrixMatrixMultiply(
 //     FeatureType* datapoint_matrix,
 //     FeatureType* probility_matrix,
@@ -106,21 +73,54 @@ __device__ void d_matrixMatrixMultiply(
 //     size_t tidx = threadIdx.x;
 //     size_t bidx = blockIdx.x;
 
-
-//     for(int m = 0 ; m < LABEL_CLASS ; m++){
-//         for (int j = 0; j < batch_size; j++) {
-//             for (int i = tidx; i < num_features; i += threads_per_mini_batch) {
-//                 // index of the point with respect to the whole dataset
-//                 size_t point_idx = bidx * batch_size + j;
-//                 // index of the feature with respect to all features in the dataset
-//                 size_t feature_idx = point_idx * num_features + i;
-//                 //gradient result 
-//                 result[i+m*num_features] += datapoint_matrix[feature_idx] 
-//                     * probility_matrix[j+m*batch_size] * scalar;
-//             }
+//     // size_t thread_offset = threadIdx.x % threads_per_datapoint;
+//     size_t num_thread_each_label = threads_per_mini_batch / LABEL_CLASS;
+//     //index relative to each label(corresponding to 784 parameter) 
+//     //Eg: 320 thread for 10 label -> each label 32 thread
+//     size_t tidx_label =  tidx / num_thread_each_label;
+//     size_t relative_tidx_label =  tidx % num_thread_each_label;
+ 
+//     for (int j = 0; j < batch_size; j++) {
+//         for (int i = relative_tidx_label; i < num_features; i += num_thread_each_label) {
+//             // index of the point with respect to the whole dataset
+//             size_t point_idx = bidx * batch_size + j;
+//             // index of the feature with respect to all features in the dataset
+//             size_t feature_idx = point_idx * num_features + i;
+//             //gradient result 
+//             result[i+tidx_label*num_features] += datapoint_matrix[feature_idx] 
+//                 * probility_matrix[j+tidx_label*batch_size] * scalar;
 //         }
-//     }
+//     }    
 // }
+
+// version 1 nested loops slower
+__device__ void d_matrixMatrixMultiply(
+    FeatureType* datapoint_matrix,
+    FeatureType* probility_matrix,
+    float scalar,
+    size_t batch_size,
+    size_t num_features,
+    size_t threads_per_mini_batch,
+    FeatureType* result) {
+
+    size_t tidx = threadIdx.x;
+    size_t bidx = blockIdx.x;
+
+
+    for(int m = 0 ; m < LABEL_CLASS ; m++){
+        for (int j = 0; j < batch_size; j++) {
+            for (int i = tidx; i < num_features; i += threads_per_mini_batch) {
+                // index of the point with respect to the whole dataset
+                size_t point_idx = bidx * batch_size + j;
+                // index of the feature with respect to all features in the dataset
+                size_t feature_idx = point_idx * num_features + i;
+                //gradient result 
+                result[i+m*num_features] += datapoint_matrix[feature_idx] 
+                    * probility_matrix[j+m*batch_size] * scalar;
+            }
+        }
+    }
+}
 
 
 
