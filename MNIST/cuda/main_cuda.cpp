@@ -334,7 +334,7 @@ void runConvergenceTime(
         = threads_per_datapoint;
 
         for (size_t i = 0;
-            i < 3;
+            i < 4;
             i++) {
             
             training_options.config_params["batch_size"]
