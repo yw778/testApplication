@@ -59,58 +59,7 @@ __device__ void d_matrixVectorMultiply(
     }
 }
 
-//Grabdient = probility_matrix_transpose * datapoint_matrix
-// __device__ void d_matrixMatrixMultiply(
-//     FeatureType* datapoint_matrix,
-//     FeatureType* probility_matrix,
-//     float scalar,
-//     size_t batch_size,
-//     size_t num_features,
-//     size_t threads_per_mini_batch,
-//     FeatureType* result) {
-
-//     size_t tidx = threadIdx.x;
-//     size_t bidx = blockIdx.x;
-
-//      // if(tidx==0&&bidx==0){
-           
-//      //        printf("enter mateixmatrix multiplication\n");
-  
-//      //    } 
-
-
-
-//     // size_t thread_offset = threadIdx.x % threads_per_datapoint;
-//     size_t num_thread_each_label = threads_per_mini_batch / LABEL_CLASS;
-//     //index relative to each label(corresponding to 784 parameter) 
-//     //Eg: 320 thread for 10 label -> each label 32 thread
-//     size_t tidx_label =  tidx / num_thread_each_label;
-//     size_t relative_tidx_label =  tidx % num_thread_each_label;
-//     // strided sum of element-wise products concurrently in 10 dimentions
-//     // for (size_t j = relative_tidx_label; j < num_features; j+= num_thread_each_label)
-//     //     partial_dot += data_point_i[j] * parameter_vector[j + tidx_label * num_features];
-
-//     // result of the partial dot product is stored in shared memory
-//     // shared_memory[threadIdx.x] = partial_dot;
-
-
-
-//     // for(int m = 0 ; m < LABEL_CLASS ; m++){
-//         for (int j = 0; j < batch_size; j++) {
-//             for (int i = relative_tidx_label; i < num_features; i += threads_per_mini_batch) {
-//                 // index of the point with respect to the whole dataset
-//                 size_t point_idx = bidx * batch_size + j;
-//                 // index of the feature with respect to all features in the dataset
-//                 size_t feature_idx = point_idx * num_features + i;
-//                 //gradient result 
-//                 result[i+tidx_label*num_features] += datapoint_matrix[feature_idx] 
-//                     * probility_matrix[j+tidx_label*batch_size] * scalar;
-//             }
-//         }
-//     // }
-// }
-
-
+Grabdient = probility_matrix_transpose * datapoint_matrix
 __device__ void d_matrixMatrixMultiply(
     FeatureType* datapoint_matrix,
     FeatureType* probility_matrix,
@@ -128,20 +77,76 @@ __device__ void d_matrixMatrixMultiply(
      //        printf("enter mateixmatrix multiplication\n");
   
      //    } 
-    for(int m = 0 ; m < LABEL_CLASS ; m++){
+
+
+
+    // size_t thread_offset = threadIdx.x % threads_per_datapoint;
+    size_t num_thread_each_label = threads_per_mini_batch / LABEL_CLASS;
+    //index relative to each label(corresponding to 784 parameter) 
+    //Eg: 320 thread for 10 label -> each label 32 thread
+    size_t tidx_label =  tidx / num_thread_each_label;
+    size_t relative_tidx_label =  tidx % num_thread_each_label;
+
+    if(tidx == 314 && blockIdx.x ==0){
+        printf("%d -- %d\n",tidx_label,relative_tidx_label);
+    }
+    asm("trap;");
+    // strided sum of element-wise products concurrently in 10 dimentions
+    // for (size_t j = relative_tidx_label; j < num_features; j+= num_thread_each_label)
+    //     partial_dot += data_point_i[j] * parameter_vector[j + tidx_label * num_features];
+
+    // result of the partial dot product is stored in shared memory
+    // shared_memory[threadIdx.x] = partial_dot;
+
+
+
+    // for(int m = 0 ; m < LABEL_CLASS ; m++){
         for (int j = 0; j < batch_size; j++) {
-            for (int i = tidx; i < num_features; i += threads_per_mini_batch) {
+            for (int i = relative_tidx_label; i < num_features; i += threads_per_mini_batch) {
                 // index of the point with respect to the whole dataset
                 size_t point_idx = bidx * batch_size + j;
                 // index of the feature with respect to all features in the dataset
                 size_t feature_idx = point_idx * num_features + i;
                 //gradient result 
-                result[i+m*num_features] += datapoint_matrix[feature_idx] 
-                    * probility_matrix[j+m*batch_size] * scalar;
+                result[i+tidx_label*num_features] += datapoint_matrix[feature_idx] 
+                    * probility_matrix[j+tidx_label*batch_size] * scalar;
             }
         }
-    }
+    // }
 }
+
+
+// __device__ void d_matrixMatrixMultiply(
+//     FeatureType* datapoint_matrix,
+//     FeatureType* probility_matrix,
+//     float scalar,
+//     size_t batch_size,
+//     size_t num_features,
+//     size_t threads_per_mini_batch,
+//     FeatureType* result) {
+
+//     size_t tidx = threadIdx.x;
+//     size_t bidx = blockIdx.x;
+
+//      // if(tidx==0&&bidx==0){
+           
+//      //        printf("enter mateixmatrix multiplication\n");
+  
+//      //    } 
+//     for(int m = 0 ; m < LABEL_CLASS ; m++){
+//         for (int j = 0; j < batch_size; j++) {
+//             for (int i = tidx; i < num_features; i += threads_per_mini_batch) {
+//                 // index of the point with respect to the whole dataset
+//                 size_t point_idx = bidx * batch_size + j;
+//                 // index of the feature with respect to all features in the dataset
+//                 size_t feature_idx = point_idx * num_features + i;
+//                 //gradient result 
+//                 result[i+m*num_features] += datapoint_matrix[feature_idx] 
+//                     * probility_matrix[j+m*batch_size] * scalar;
+//             }
+//         }
+//     }
+// }
 
 
 
