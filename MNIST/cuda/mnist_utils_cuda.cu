@@ -87,11 +87,11 @@ __device__ void d_matrixMatrixMultiply(
     size_t tidx_label =  tidx / num_thread_each_label;
     size_t relative_tidx_label =  tidx % num_thread_each_label;
 
-    if(tidx == 314 && blockIdx.x ==0){
-        printf("thread/label is %d \n",num_thread_each_label);
-        printf("tidx_label is %d\n",tidx_label);
-        printf("relative_tidx_label is %d\n",relative_tidx_label);
-    }
+    // if(tidx == 314 && blockIdx.x ==0){
+    //     printf("thread/label is %d \n",num_thread_each_label);
+    //     printf("tidx_label is %d\n",tidx_label);
+    //     printf("relative_tidx_label is %d\n",relative_tidx_label);
+    // }
     // asm("trap;");
     // strided sum of element-wise products concurrently in 10 dimentions
     // for (size_t j = relative_tidx_label; j < num_features; j+= num_thread_each_label)
@@ -104,7 +104,7 @@ __device__ void d_matrixMatrixMultiply(
 
     // for(int m = 0 ; m < LABEL_CLASS ; m++){
         for (int j = 0; j < batch_size; j++) {
-            for (int i = relative_tidx_label; i < num_features; i += threads_per_mini_batch) {
+            for (int i = relative_tidx_label; i < num_features; i += num_thread_each_label) {
                 // index of the point with respect to the whole dataset
                 size_t point_idx = bidx * batch_size + j;
                 // index of the feature with respect to all features in the dataset
