@@ -132,7 +132,7 @@ static __device__ void d_gradientForMiniBatch(
     //index relative to each label(corresponding to 784 parameter) 
     //Eg: 320 thread for 10 label -> each label 32 thread
     size_t num_thread_each_label = threads_per_datapoint / LABEL_CLASS;
-    // size_t tidx_label =  relative_tidx / num_thread_each_label;
+    size_t tidx_label =  relative_tidx / num_thread_each_label;
     size_t relative_tidx_label =  relative_tidx % num_thread_each_label;
 
     // computes softmax function for each data point in the mini batch
@@ -145,12 +145,22 @@ static __device__ void d_gradientForMiniBatch(
         //                         threads_per_datapoint,
         //                         i*blockDim.x);
         // }
+        // d_partialMatrixVectorProduct(
+        //         &data_points[point_idx * num_features], 
+        //         parameter_vector,
+        //         dot_product,
+        //         num_features,
+        //         threads_per_datapoint);
+
         d_partialMatrixVectorProduct(
                 &data_points[point_idx * num_features], 
                 parameter_vector,
                 dot_product,
                 num_features,
-                threads_per_datapoint);
+                // size_t threads_per_datapoint,
+                num_thread_each_label,
+                tidx_label,
+                relative_tidx_label);
         
     }
     __syncthreads();
