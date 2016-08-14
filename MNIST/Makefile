@@ -34,7 +34,7 @@ SDACCEL_FLAGS :=
 
 COMMON_DEPS := sgd_baseline.o batch_baseline.o minibatch_baseline.o mnist_timer.o mnist_utils.o
 BASELINE_DEPS := main_baselines.o $(COMMON_DEPS)
-CUDA_DEPS := main_cuda.o sgd_single_point_1.o sgd_single_point_2.o mbgd_1.o mbgd_1_2.o mbgd_2.o mnist_utils_cuda.o $(COMMON_DEPS)
+CUDA_DEPS := main_cuda.o sgd_single_point_1.o sgd_single_point_2.o mbgd_1.o mbgd_1_2.o mbgd_2.o mbgd_2_2.o mnist_utils_cuda.o $(COMMON_DEPS)
 
 
 VPATH = $(MODULES)
@@ -85,6 +85,10 @@ mbgd_1_2.o: mbgd_1_2.cu
 
 mbgd_2.o: mbgd_2.cu
 	$(CUDA_COMPILER) -c $< $(CUDA_FLAGS) $(CUDA_SEPARATE_COMPILATION_FLAGS)
+
+mbgd_2_2.o: mbgd_2_2.cu
+	$(CUDA_COMPILER) -c $< $(CUDA_FLAGS) $(CUDA_SEPARATE_COMPILATION_FLAGS)
+
 
 # utilities
 mnist_timer.o: mnist_timer.cpp

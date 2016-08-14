@@ -10,6 +10,7 @@
 #include "mbgd_1.h"
 #include "mbgd_1_2.h"
 #include "mbgd_2.h"
+#include "mbgd_2_2.h"
 // #include "sgd_cublas.h"
 #include "sgd_single_point_1.h"
 #include "sgd_single_point_2.h"
@@ -349,9 +350,9 @@ void runConvergenceTime(
     //     }
     // }
 
-    size_t batch_sizes[10] = {1, 2, 3, 20, 40, 50, 128, 256, 512};
-    for (size_t  threads_per_mini_batch = 32;
-             threads_per_mini_batch <= 32;
+    size_t batch_sizes[10] = {2, 4, 6, 20, 40, 50, 128, 256, 512};
+    for (size_t  threads_per_mini_batch = 64;
+             threads_per_mini_batch <= 64;
              threads_per_mini_batch *= 2) {
     
         training_options.config_params["threads_per_mini_batch"]
@@ -372,6 +373,31 @@ void runConvergenceTime(
                 benchmark_options);
         }
     }
+
+
+    // size_t batch_sizes[10] = {1, 2, 3, 4, 20, 40, 50, 128, 256, 512};
+    // for (size_t  threads_per_mini_batch = 160;
+    //          threads_per_mini_batch <= 640;
+    //          threads_per_mini_batch *= 2) {
+    
+    //     training_options.config_params["threads_per_mini_batch"]
+    //     =  threads_per_mini_batch;
+    
+    //     for (size_t i = 0;
+    //         i < 3;
+    //         i++) {
+            
+    //         training_options.config_params["batch_size"]
+    //         = batch_sizes[i];
+    
+    //         convergenceTime(
+    //             trainParallelMiniBatchGradientDescent22,
+    //             "CUDA MBGD 2-2",
+    //             data_set,
+    //             training_options,
+    //             benchmark_options);
+    //     }
+    // }
 }
 
 int main(int argc, char *argv[]) {
