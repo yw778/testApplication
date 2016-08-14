@@ -202,12 +202,12 @@ static __device__ void d_gradientForMiniBatch2 (
 
     }
 
-    if(tidx==0&&blockIdx.x==0){
-            for (int i = 0; i < 21; ++i)
-            {
-                printf("p is %f\n",probabilities_of_each[i]);
-            }
-    } 
+    // if(tidx==0&&blockIdx.x==0){
+    //         for (int i = 0; i < 21; ++i)
+    //         {
+    //             printf("p is %f\n",probabilities_of_each[i]);
+    //         }
+    // } 
     // asm("trap;");
 
 
@@ -225,13 +225,13 @@ static __device__ void d_gradientForMiniBatch2 (
                             batch_size);
 
 
-    if(tidx==0&&blockIdx.x==0){
-            for (int i = 0; i < 21; ++i)
-            {
-                printf(" after p is %f\n",probabilities_transpose[i]);
-            }
-    } 
-    asm("trap;");
+    // if(tidx==0&&blockIdx.x==0){
+    //         for (int i = 0; i < 21; ++i)
+    //         {
+    //             printf(" after p is %f\n",probabilities_transpose[i]);
+    //         }
+    // } 
+    // asm("trap;");
     float factor = 1.0f / batch_size;
     // finish computation of gradient
     // d_matrixVectorMultiply( data_points,
@@ -256,6 +256,13 @@ static __device__ void d_gradientForMiniBatch2 (
                                 num_features,
                                 threads_per_mini_batch,
                                 gradient );
+    if(tidx==0&&blockIdx.x==0){
+            for (int i = 0; i < PARAMETER_SIZE; ++i)
+            {
+                printf(" after p is %f\n",gradient[i]);
+            }
+    } 
+
 }
 
 
