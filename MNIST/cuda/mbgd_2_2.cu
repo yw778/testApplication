@@ -227,7 +227,7 @@ static __global__ void p_MiniBatchGradientDescent2(
 }
 
 
-void trainParallelMiniBatchGradientDescent2( 
+void trainParallelMiniBatchGradientDescent22( 
     DataSet training_set,
     TrainingOptions training_options ) {
 
