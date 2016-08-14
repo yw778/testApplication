@@ -105,9 +105,9 @@ static __device__ void d_gradientForMiniBatch2 (
     size_t point_idx_in_block = tidx / threads_per_datapoint;
     FeatureType* data_point_i;
     // computes softmax function for each data point in the mini batch
-    for (size_t i = 0; i < batch_size; i++) {
+    for (size_t j = 0; j < batch_size; j++) {
         // index of the point with respect to the whole dataset
-        size_t point_idx = bidx * batch_size + i;
+        size_t point_idx = bidx * batch_size + j;
         data_point_i = (FeatureType*)&data_points[point_idx * num_features];
         // d_partialDotProduct( data_point_i, 
         //                         parameter_vector,
@@ -143,7 +143,7 @@ static __device__ void d_gradientForMiniBatch2 (
         }
        
         d_softMaxFunction3(dot_product, probabilities_of_each,
-                      tidx, i, LABEL_CLASS);
+                      tidx, j, LABEL_CLASS);
 
         if(tidx < LABEL_CLASS){
             if(labels[point_idx]==tidx){
