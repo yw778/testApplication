@@ -131,14 +131,14 @@ __device__ void d_matrixMatrixMultiply(
 
 
 
-__device__ void d_matrixVectorMultiply(
-    FeatureType* matrix,
-    FeatureType* vect,
-    float scalar,
-    size_t batch_size,
-    size_t num_features,
-    size_t threads_per_mini_batch,
-    FeatureType* result);
+// __device__ void d_matrixVectorMultiply(
+//     FeatureType* matrix,
+//     FeatureType* vect,
+//     float scalar,
+//     size_t batch_size,
+//     size_t num_features,
+//     size_t threads_per_mini_batch,
+//     FeatureType* result);
 
 // double p_logisticFunction(cublasHandle_t handle, FeatureType* d_theta, FeatureType* d_x_i, const size_t num_features);
 __device__ float d_logisticFunction(float exponent);

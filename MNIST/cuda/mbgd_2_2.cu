@@ -201,6 +201,17 @@ static __device__ void d_gradientForMiniBatch2 (
         //          - labels[bidx * batch_size + i];
 
     }
+
+    if(tidx==0&&blockIdx.x==0){
+            for (int i = 0; i < 21; ++i)
+            {
+                printf("p is %f\n",probabilities_of_each[i]);
+            }
+    } 
+    asm("trap;");
+
+
+
     
 
     // d_matrixTranspose(probabilities_of_each,
