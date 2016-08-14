@@ -114,7 +114,10 @@ __device__ void d_matrixTranspose(
     size_t relative_tidx,
     size_t point_idx_in_block);
 
-
+__device__ void d_matrixTranspose2(
+    FeatureType* probility_matrix,
+    FeatureType* probility_transpose,
+    size_t batch_size);
 
 
 __device__ void d_matrixMatrixMultiply(

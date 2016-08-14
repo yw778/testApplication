@@ -100,9 +100,9 @@ static __device__ void d_gradientForMiniBatch2 (
     // relative_idx of the whole batch
     // size_t relative_tidx = threadIdx.x % threads_per_mini_batch; 
     // variables used to calculate matrix transpose
-    size_t threads_per_datapoint = threads_per_mini_batch / batch_size;
-    size_t relative_tidx = tidx % threads_per_datapoint; 
-    size_t point_idx_in_block = tidx / threads_per_datapoint;
+    // size_t threads_per_datapoint = threads_per_mini_batch / batch_size;
+    // size_t relative_tidx = tidx % threads_per_datapoint; 
+    // size_t point_idx_in_block = tidx / threads_per_datapoint;
     FeatureType* data_point_i;
     // computes softmax function for each data point in the mini batch
     for (size_t j = 0; j < batch_size; j++) {
@@ -162,11 +162,16 @@ static __device__ void d_gradientForMiniBatch2 (
     }
     
 
-    d_matrixTranspose(probabilities_of_each,
+    // d_matrixTranspose(probabilities_of_each,
+    //                         probabilities_transpose,
+    //                         batch_size,
+    //                         relative_tidx,
+    //                         point_idx_in_block);
+
+    d_matrixTranspose2(probabilities_of_each,
                             probabilities_transpose,
-                            batch_size,
-                            relative_tidx,
-                            point_idx_in_block);
+                            batch_size);
+
 
     float factor = 1.0f / batch_size;
     // finish computation of gradient

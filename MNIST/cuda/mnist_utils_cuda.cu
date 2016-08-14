@@ -124,6 +124,7 @@ __device__ void d_matrixMatrixMultiply(
 
 
 //parallel implemetation of matrixTranspose
+// v1 use tidx 0 - tidx 10 every point
 __device__ void d_matrixTranspose(
     FeatureType* probility_matrix,
     FeatureType* probility_transpose,
@@ -136,6 +137,30 @@ __device__ void d_matrixTranspose(
 
         probility_transpose[relative_tidx*batch_size+point_idx_in_block] =
              probility_matrix[relative_tidx+point_idx_in_block*LABEL_CLASS];
+
+    }
+}
+
+//parallel implementation of matrix transpose
+// different from v1 use tidx 0 - threads_per_mini_batch
+__device__ void d_matrixTranspose2(
+    FeatureType* probility_matrix,
+    FeatureType* probility_transpose,
+    size_t batch_size){
+
+    // size_t threads_per_datapoint = threads_per_mini_batch / batch_size;
+    // size_t relative_tidx = threadIdx.x % threads_per_datapoint;
+    
+    
+    //transpose from batch * Label to Label * batch
+    if(threadIdx.x < (LABEL_CLASS * batch_size)){
+        //calcuate the first  LABEL_CLASS * batch_size thread
+        // idx relative to the label
+        size_t tidx_label = threadIdx.x / LABEL_CLASS;
+        size_t relative_tidx_label = threadIdx.x % LABEL_CLASS;
+
+        probility_transpose[relative_tidx_label*batch_size+tidx_label] =
+             probility_matrix[relative_tidx_label+tidx_label*LABEL_CLASS];
 
     }
 }
