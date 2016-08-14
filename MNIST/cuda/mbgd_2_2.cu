@@ -224,6 +224,8 @@ static __device__ void d_gradientForMiniBatch2 (
                             probabilities_transpose,
                             batch_size);
 
+    __syncthreads();
+
 
     // if(tidx==0&&blockIdx.x==0){
     //         for (int i = 0; i < 21; ++i)
@@ -257,14 +259,14 @@ static __device__ void d_gradientForMiniBatch2 (
                                 threads_per_mini_batch,
                                 gradient );
 
-    
-    if(tidx==0&&blockIdx.x==0){
-            for (int i = 0; i < PARAMETER_SIZE; ++i)
-            {
-                printf(" gradient is %f\n",gradient[i]);
-            }
-    } 
-    asm("trap;");
+
+    // if(tidx==0&&blockIdx.x==0){
+    //         for (int i = 0; i < PARAMETER_SIZE; ++i)
+    //         {
+    //             printf(" gradient is %f\n",gradient[i]);
+    //         }
+    // } 
+    // asm("trap;");
 
 }
 
