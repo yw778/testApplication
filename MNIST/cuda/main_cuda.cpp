@@ -345,11 +345,11 @@ void runConvergenceTime(
     //             "CUDA MBGD 1-2",
     //             data_set,
     //             training_options,
-    //             benchmark_options);
+    //             benchmark_options)
     //     }
     // }
 
-    size_t batch_sizes[10] = {3, 4, 5, 6, 7, 4, 10, 8, 9, 10};
+    size_t batch_sizes[10] = {2, 4, 8, 16, 32, 64, 128, 256, 512};
     for (size_t  threads_per_mini_batch = 128;
              threads_per_mini_batch <= 512;
              threads_per_mini_batch *= 2) {
@@ -358,7 +358,7 @@ void runConvergenceTime(
         =  threads_per_mini_batch;
     
         for (size_t i = 0;
-            i < 10;
+            i < 9;
             i++) {
             
             training_options.config_params["batch_size"]
