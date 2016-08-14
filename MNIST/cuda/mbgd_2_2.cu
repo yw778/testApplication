@@ -228,7 +228,7 @@ static __device__ void d_gradientForMiniBatch2 (
     if(tidx==0&&blockIdx.x==0){
             for (int i = 0; i < 21; ++i)
             {
-                printf(" after p is %f\n",probabilities_of_each[i]);
+                printf(" after p is %f\n",probabilities_transpose[i]);
             }
     } 
     asm("trap;");
