@@ -376,8 +376,8 @@ void runConvergenceTime(
 
 
     size_t batch_sizes[10] = {2, 5, 10, 4, 20, 40, 50, 128, 256, 512};
-    for (size_t  threads_per_mini_batch = 160;
-             threads_per_mini_batch <= 640;
+    for (size_t  threads_per_mini_batch = 960;
+             threads_per_mini_batch <= 960;
              threads_per_mini_batch *= 2) {
     
         training_options.config_params["threads_per_mini_batch"]
