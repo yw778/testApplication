@@ -211,7 +211,7 @@ static __device__ void d_gradientForMiniBatch(
         //Finishes computation of gradient
         size_t threads_per_mini_batch = batch_size * threads_per_datapoint;
         float factor = 1.0f/batch_size;
-        d_matrixMatrixMultiply( data_points,
+        d_matrixMatrixMultiply2( data_points,
                                 probabilities_transpose,
                                 factor,
                                 batch_size,

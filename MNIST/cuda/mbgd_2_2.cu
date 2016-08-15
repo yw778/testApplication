@@ -266,7 +266,7 @@ static __device__ void d_gradientForMiniBatch2 (
     //                             num_features,
     //                             threads_per_mini_batch,
     //                             gradient );
-    d_matrixMatrixMultiply( data_points,
+    d_matrixMatrixMultiply2( data_points,
                                 probabilities_transpose,
                                 factor,
                                 batch_size,
