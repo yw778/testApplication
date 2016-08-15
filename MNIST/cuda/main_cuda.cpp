@@ -375,7 +375,7 @@ void runConvergenceTime(
     // }
 
 
-    size_t batch_sizes[10] = {2, 2, 3, 4, 20, 40, 50, 128, 256, 512};
+    size_t batch_sizes[10] = {2, 12, 14, 4, 20, 40, 50, 128, 256, 512};
     for (size_t  threads_per_mini_batch = 160;
              threads_per_mini_batch <= 640;
              threads_per_mini_batch *= 2) {

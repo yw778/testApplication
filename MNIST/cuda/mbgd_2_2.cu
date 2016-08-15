@@ -202,13 +202,14 @@ static __device__ void d_gradientForMiniBatch2 (
 
     }
 
-    // if(tidx==0&&blockIdx.x==0){
-    //         for (int i = 0; i < 21; ++i)
-    //         {
-    //             printf("p is %f\n",probabilities_of_each[i]);
-    //         }
-    // } 
-    // asm("trap;");
+    if(tidx==0&&blockIdx.x==0){
+            for (int i = 0; i < 20; ++i)
+            {
+                printf("p is %f\n",probabilities_of_each[i]);
+            }
+            printf("\n\n");
+    } 
+   // asm("trap;");
 
 
 
@@ -292,14 +293,14 @@ static __global__ void p_MiniBatchGradientDescent2(
                             gradient );
 
     __syncthreads();
-    
-    if(threadIdx.x==0&&blockIdx.x==0){
-            for (int i = 0; i < PARAMETER_SIZE; ++i)
-            {
-                printf(" parameters is %f\n",gradient[i]);
-            }
-    } 
-    asm("trap;");
+
+    // if(threadIdx.x==0&&blockIdx.x==0){
+    //         for (int i = 0; i < PARAMETER_SIZE; ++i)
+    //         {
+    //             printf(" parameters is %f\n",gradient[i]);
+    //         }
+    // } 
+    // asm("trap;");
 
     // Updates the parameters
     d_updateParameters( gradient, parameter_vector, num_features,
