@@ -297,7 +297,7 @@ static __global__ void p_MiniBatchGradientDescent2(
     d_updateParameters( gradient, parameter_vector, num_features,
                         threads_per_mini_batch, step_size );
 
-    if(tidx==0&&blockIdx.x==0){
+    if(threadIdx.x==0&&blockIdx.x==0){
             for (int i = 0; i < PARAMETER_SIZE; ++i)
             {
                 printf(" parameters is %f\n",parameter_vector[i]);
