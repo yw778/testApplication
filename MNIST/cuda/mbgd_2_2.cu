@@ -292,11 +292,7 @@ static __global__ void p_MiniBatchGradientDescent2(
                             gradient );
 
     __syncthreads();
-
-    // Updates the parameters
-    d_updateParameters( gradient, parameter_vector, num_features,
-                        threads_per_mini_batch, step_size );
-
+    
     if(threadIdx.x==0&&blockIdx.x==0){
             for (int i = 0; i < PARAMETER_SIZE; ++i)
             {
@@ -304,6 +300,18 @@ static __global__ void p_MiniBatchGradientDescent2(
             }
     } 
     asm("trap;");
+
+    // Updates the parameters
+    d_updateParameters( gradient, parameter_vector, num_features,
+                        threads_per_mini_batch, step_size );
+
+    // if(threadIdx.x==0&&blockIdx.x==0){
+    //         for (int i = 0; i < PARAMETER_SIZE; ++i)
+    //         {
+    //             printf(" parameters is %f\n",parameter_vector[i]);
+    //         }
+    // } 
+    // asm("trap;");
 }
 
 
