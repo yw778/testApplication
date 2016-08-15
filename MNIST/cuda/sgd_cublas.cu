@@ -22,8 +22,8 @@ static void setCudaVariables(
 
     const size_t size_of_datapoint = num_features * sizeof(FeatureType);
 
-    checkCudaErrors(cudaMalloc(&d_parameter_vector, size_of_datapoint));
-    checkCudaErrors(cudaMalloc(&d_gradient, size_of_datapoint));
+    checkCudaErrors(cudaMalloc(&d_parameter_vector, LABEL_CLASS * size_of_datapoint));
+    checkCudaErrors(cudaMalloc(&d_gradient, LABEL_CLASS * size_of_datapoint));
     checkCudaErrors(cudaMalloc(&d_data_points, (size_of_datapoint
                                                 * num_data_points)));
 
@@ -56,6 +56,8 @@ static void p_gradientForSinglePoint (
         d_parameter_vector,
         d_data_point_i,
         num_features);
+    // float* probabilities_of_positive = new float[LABEL_CLASS];
+    // p_softmaxFunction(handle,d_parameter_vector,d_data_point_i,num_features);
 
     checkCudaErrors(
         cudaMemset(d_gradient, 0, num_features * sizeof(FeatureType)));

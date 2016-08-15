@@ -225,6 +225,14 @@ __device__ void d_memset(
 //      return logisticFunction(p_dotProduct(d_theta, d_x_i, num_features));
 // }
 
+// void p_softmaxFunction(FeatureType* d_theta, 
+//     FeatureType* d_x_i, 
+//     const size_t num_features,
+//     FeatureType* result){
+        
+
+// }
+
 
 // double logisticFunction(FeatureType* d_theta, FeatureType* d_x_i, const size_t num_features) {
     // return d_logisticFunction(dotProduct(d_theta, d_x_i, num_features));
