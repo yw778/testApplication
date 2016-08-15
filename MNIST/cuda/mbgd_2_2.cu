@@ -186,19 +186,33 @@ static __device__ void d_gradientForMiniBatch2 (
                           tidx, j, num_thread_each_label);
 
 
-            if(tidx < LABEL_CLASS){
-                if(labels[point_idx]==tidx){
-                    probabilities_of_each[j * LABEL_CLASS+tidx]-=1;
-                    // probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
-                }else{                   
-                    // probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
-                }
-            }
-            __syncthreads();
+            // if(tidx < LABEL_CLASS){
+            //     if(labels[point_idx]==tidx){
+            //         probabilities_of_each[j * LABEL_CLASS+tidx]-=1;
+            //         // probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
+            //     }else{                   
+            //         // probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
+            //     }
+            // }
+            // __syncthreads();
         }    
 
         // probabilities_of_positive[i] = d_logisticFunction(*dot_product)
         //          - labels[bidx * batch_size + i];
+
+    }
+    // use the first LABEL_CLASS * batch_size thread to update
+    // the probability matrix
+    // the result is p=p-groundtruth
+    if(threadIdx.x < (LABEL_CLASS * batch_size)){
+        //calcuate the first  LABEL_CLASS * batch_size thread
+        // idx relative to the label
+        size_t tidx_class = threadIdx.x / LABEL_CLASS;
+        size_t relative_tidx_class = threadIdx.x % LABEL_CLASS;
+
+        if(labels[point_idx]==relative_tidx_class){
+                probabilities_of_each[tidx_class * LABEL_CLASS+relative_tidx_class]-=1;
+            }   
 
     }
 
