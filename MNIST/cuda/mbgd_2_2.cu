@@ -294,7 +294,7 @@ static __global__ void p_MiniBatchGradientDescent2(
     __syncthreads();
     
     if(threadIdx.x==0&&blockIdx.x==0){
-            for (int i = 0; i < gradient; ++i)
+            for (int i = 0; i < PARAMETER_SIZE; ++i)
             {
                 printf(" parameters is %f\n",gradient[i]);
             }
