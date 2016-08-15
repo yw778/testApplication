@@ -183,7 +183,7 @@ static __device__ void d_gradientForMiniBatch2 (
         //               tidx, j, LABEL_CLASS);
         if (point_idx < num_data_points) {
             d_softMaxFunction4(dot_product, probabilities_of_each,
-                          tidx, j, LABEL_CLASS);
+                          tidx, j, num_thread_each_label);
 
 
             if(tidx < LABEL_CLASS){
@@ -202,13 +202,13 @@ static __device__ void d_gradientForMiniBatch2 (
 
     }
 
-    if(tidx==0&&blockIdx.x==0){
-            for (int i = 0; i < 20; ++i)
-            {
-                printf("p is %f\n",probabilities_of_each[i]);
-            }
-            printf("\n\n");
-    } 
+    // if(tidx==0&&blockIdx.x==0){
+    //         for (int i = 0; i < 20; ++i)
+    //         {
+    //             printf("p is %f\n",probabilities_of_each[i]);
+    //         }
+    //         printf("\n\n");
+    // } 
    // asm("trap;");
 
 
