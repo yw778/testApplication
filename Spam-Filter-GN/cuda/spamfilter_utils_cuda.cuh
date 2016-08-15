@@ -33,7 +33,7 @@ void check(ErrType err, const char* const func, const char* const file, const in
         exit(1);
     }
 }
-check and output CuBLAS errors
+// check and output CuBLAS errors
 template <typename ErrType>
 void checkBlas(ErrType err, const char* const func, const char* const file, const int line) {
     if (err != CUBLAS_STATUS_SUCCESS) {
