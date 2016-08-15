@@ -4,7 +4,7 @@
 #include "utils/spamfilter_timer.h"
 
 // adds two device vectors with CuBLAS and stores the results in the first one
-void p_addVectors(float* a, float* b, const size_t size, const float scale_for_b) {
+void p_add_vectors(cublasHandle_t handle, float* a, float* b, const size_t size, const float scale_for_a = 1){
      cublasSaxpy(handle, size, &scale_for_a, b, 1, a, 1);
 }
 
@@ -16,7 +16,7 @@ void p_addVectors(float* a, float* b, const size_t size, const float scale_for_b
 // }
 
 // computes dot product with CuBLAS for two given vectors a and b
-float p_dotProduct(float* d_a, float* d_b, const size_t num_elems) {
+float p_dotProduct(cublasHandle_t handle, float* a, float* b, float* d_a, float* d_b, const size_t size) {
 
      float result[1];
      cublasSdot (handle, num_elems, d_a, 1, d_b, 1, result);
