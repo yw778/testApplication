@@ -346,7 +346,7 @@ void runConvergenceTime(
                 "CUDA MBGD 1-2",
                 data_set,
                 training_options,
-                benchmark_options)
+                benchmark_options);
         }
     }
 
