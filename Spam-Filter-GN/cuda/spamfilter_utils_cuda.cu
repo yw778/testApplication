@@ -4,10 +4,9 @@
 #include "utils/spamfilter_timer.h"
 
 // adds two device vectors with CuBLAS and stores the results in the first one
-// void p_addVectors(float* a, float* b, const size_t size, const float scale_for_b) {
-     // cublasSaxpy(handle, size, &scale_for_a, b, 1, a, 1);
-//     }
-// }
+void p_addVectors(float* a, float* b, const size_t size, const float scale_for_b) {
+     cublasSaxpy(handle, size, &scale_for_a, b, 1, a, 1);
+}
 
 
 // void addVectors(float* a, float* b, const size_t size, const float scale_for_b) {
@@ -17,13 +16,13 @@
 // }
 
 // computes dot product with CuBLAS for two given vectors a and b
-// float p_dotProduct(float* d_a, float* d_b, const size_t num_elems) {
+float p_dotProduct(float* d_a, float* d_b, const size_t num_elems) {
 
-     // float result[1];
-     // cublasSdot (handle, num_elems, d_a, 1, d_b, 1, result);
-     // cudaDeviceSynchronize();
-     // return *result;
- // }
+     float result[1];
+     cublasSdot (handle, num_elems, d_a, 1, d_b, 1, result);
+     cudaDeviceSynchronize();
+     return *result;
+ }
 
 // float dotProduct(float* d_a, float* d_b, const size_t num_elems) {
 //      float result = 0;
@@ -92,9 +91,9 @@ __device__ void d_memset(
 
 
 // computes logistic function for a given parameter vector (theta) and a data point (x_i)
-// double p_logisticFunction(FeatureType* d_theta, FeatureType* d_x_i, const size_t num_features) {
-//      return logisticFunction(p_dotProduct(d_theta, d_x_i, num_features));
-// }
+double p_logisticFunction(FeatureType* d_theta, FeatureType* d_x_i, const size_t num_features) {
+     return logisticFunction(p_dotProduct(d_theta, d_x_i, num_features));
+}
 
 
 // double logisticFunction(FeatureType* d_theta, FeatureType* d_x_i, const size_t num_features) {
@@ -139,9 +138,9 @@ bool checkDeviceProps(
 }
 
 // updates the parameters (theta)
-// void p_updateParameters(FeatureType* d_theta, FeatureType* d_gradient, size_t num_features, float step_size, bool revert) {
-     // float sign = revert ? 1 : -1;
-     // step_size *= sign;
-     // addVectors(d_theta, d_gradient, num_features, step_size);
-     // cublasSaxpy(handle, num_features, &step_size, d_gradient, 1, d_theta, 1);
-//}
+void p_updateParameters(FeatureType* d_theta, FeatureType* d_gradient, size_t num_features, float step_size, bool revert) {
+     float sign = revert ? 1 : -1;
+     step_size *= sign;
+     addVectors(d_theta, d_gradient, num_features, step_size);
+     cublasSaxpy(handle, num_features, &step_size, d_gradient, 1, d_theta, 1);
+}

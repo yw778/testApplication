@@ -16,7 +16,7 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
-// #include "cublas_v2.h"
+#include "cublas_v2.h"
 
 #define IDX2C(i,j,ld) (((j)*(ld))+(i))
 #define checkCudaErrors(val) check( (val), #val, __FILE__, __LINE__)
@@ -33,14 +33,14 @@ void check(ErrType err, const char* const func, const char* const file, const in
         exit(1);
     }
 }
-// check and output CuBLAS errors
-// template <typename ErrType>
-// void checkBlas(ErrType err, const char* const func, const char* const file, const int line) {
-//     if (err != CUBLAS_STATUS_SUCCESS) {
-//         printf("CuBLAS error %d at %s:%d:%s\n", err, file, line, func);
-//         exit(1);
-//     }
-// }
+check and output CuBLAS errors
+template <typename ErrType>
+void checkBlas(ErrType err, const char* const func, const char* const file, const int line) {
+    if (err != CUBLAS_STATUS_SUCCESS) {
+        printf("CuBLAS error %d at %s:%d:%s\n", err, file, line, func);
+        exit(1);
+    }
+}
 
 //loads the contents of a global memory vector into shared memory
 template <typename Type>
@@ -80,13 +80,13 @@ __device__ void d_memset(
     size_t num_elements,
     size_t threads_per_mini_batch);
 
-// void p_updateParameters(
-//      cublasHandle_t handle,
-//      FeatureType* d_theta,
-//      FeatureType* d_gradient,
-//      size_t num_features,
-//      float step_size,
-//      bool revert = false);
+void p_updateParameters(
+     cublasHandle_t handle,
+     FeatureType* d_theta,
+     FeatureType* d_gradient,
+     size_t num_features,
+     float step_size,
+     bool revert = false);
 
 // updates the parameters using atomics
 __device__ void d_updateParameters(
@@ -96,13 +96,13 @@ __device__ void d_updateParameters(
     size_t threads_per_mini_batch,
     double step_size);
 
-// void p_add_vectors(cublasHandle_t handle, float* a, float* b, const size_t size, const float scale_for_a = 1);
+void p_add_vectors(cublasHandle_t handle, float* a, float* b, const size_t size, const float scale_for_a = 1);
 
 // void addVectors(float* a, float* b, const size_t size, const float scale_for_b);
 
-// float p_dotProduct(cublasHandle_t handle, float* a, float* b, float* d_a, float* d_b, const size_t size);
+float p_dotProduct(cublasHandle_t handle, float* a, float* b, float* d_a, float* d_b, const size_t size);
 
-// void p_MatrixVectorMultiply(cublasHandle_t handle, float* matrix, float* vect, float scalar, size_t num_data_points, size_t num_features, float* result);
+void p_MatrixVectorMultiply(cublasHandle_t handle, float* matrix, float* vect, float scalar, size_t num_data_points, size_t num_features, float* result);
 
 // Parallel implementation of matrix vector multiplication. Each thread goes
 // a certain number of features and strides by the number of threads in the 
@@ -116,7 +116,7 @@ __device__ void d_matrixVectorMultiply(
     size_t threads_per_mini_batch,
     FeatureType* result);
 
-// double p_logisticFunction(cublasHandle_t handle, FeatureType* d_theta, FeatureType* d_x_i, const size_t num_features);
+double p_logisticFunction(cublasHandle_t handle, FeatureType* d_theta, FeatureType* d_x_i, const size_t num_features);
 __device__ float d_logisticFunction(float exponent);
 
 #endif
