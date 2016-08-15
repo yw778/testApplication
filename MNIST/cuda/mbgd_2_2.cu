@@ -299,7 +299,7 @@ static __global__ void p_MiniBatchGradientDescent2(
                 printf(" parameters is %f\n",gradient[i]);
             }
     } 
-    // asm("trap;");
+    asm("trap;");
 
     // Updates the parameters
     d_updateParameters( gradient, parameter_vector, num_features,
