@@ -39,6 +39,8 @@ static void setCudaVariables(
                                parameter_vector,
                                LABEL_CLASS * num_features * sizeof(FeatureType),
                                 cudaMemcpyHostToDevice));
+
+    printf("after copy parameter..\n");
 //
  }
 
