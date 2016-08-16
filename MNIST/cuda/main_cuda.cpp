@@ -150,7 +150,7 @@ void runConvergenceRate(
     
     // printf("in run convergecneRate in cuda\n");
 
-     convergenceTime(
+     runConvergenceRate(
         trainStochasticGradientDescent3,
         "Cublas SGD",
         data_set,
