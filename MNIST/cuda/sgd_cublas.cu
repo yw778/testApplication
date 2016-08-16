@@ -31,11 +31,13 @@ static void setCudaVariables(
                                data_points,
                                (size_of_datapoint * num_data_points),
                                cudaMemcpyHostToDevice));
+
 //     checkCudaErrors(cudaMemcpy(d_parameter_vector, 
 //                                parameter_vector,
 //                                LABEL_CLASS * num_features * sizeof(FeatureType),
 //                                 cudaMemcpyHostToDevice));
-// }
+//
+ }
 
 static void cleanUp() {
 
