@@ -80,12 +80,21 @@ void p_softmaxFunction(cublasHandle_t handle,
     const size_t num_feats,
     const size_t num_labels); 
 
+void p_softmaxFunction2(cublasHandle_t handle, 
+    FeatureType* d_theta, 
+    FeatureType* d_x_i,
+    FeatureType* posibilities_positive,
+    const size_t num_feats,
+    const size_t num_labels);
+
 void p_updateParameters(cublasHandle_t handle, 
     FeatureType* d_theta, 
     FeatureType* d_gradient, 
     size_t num_feats, 
     float step_size, 
     bool revert = false);
+
+float p_dot_product(cublasHandle_t handle, float* d_a, float* d_b, const size_t num_elems);
 
 // verify the device properties satisfy the assumptions of the kernel
 // check that the resulting grid and block dimensions

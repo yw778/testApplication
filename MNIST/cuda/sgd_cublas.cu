@@ -14,8 +14,8 @@ static cublasHandle_t handle;
 static void setCudaVariables(
     size_t num_features,
     size_t num_data_points,
-    FeatureType* data_points,
-    FeatureType* parameter_vector) {
+    FeatureType* data_points){
+    // FeatureType* parameter_vector) {
 
     checkCuBlasErrors(cublasCreate(&handle));
 
@@ -35,10 +35,10 @@ static void setCudaVariables(
                                (size_of_datapoint * num_data_points),
                                cudaMemcpyHostToDevice));
 
-    checkCudaErrors(cudaMemcpy(d_parameter_vector, 
-                               parameter_vector,
-                               LABEL_CLASS * num_features * sizeof(FeatureType),
-                                cudaMemcpyHostToDevice));
+    // checkCudaErrors(cudaMemcpy(d_parameter_vector, 
+    //                            parameter_vector,
+    //                            LABEL_CLASS * num_features * sizeof(FeatureType),
+    //                             cudaMemcpyHostToDevice));
 
     printf("after copy parameter..\n");
 //
@@ -76,13 +76,20 @@ static void p_gradientForSinglePoint (
 
     // exit(1);
 
-
-    p_softmaxFunction(handle,
+    p_softmaxFunction2(handle,
         d_parameter_vector,
         d_data_point_i,
         probabilities_of_each,
         num_features,
         LABEL_CLASS);
+
+
+    // p_softmaxFunction(handle,
+    //     d_parameter_vector,
+    //     d_data_point_i,
+    //     probabilities_of_each,
+    //     num_features,
+    //     LABEL_CLASS);
 
     // for(size_t i=0; i<LABEL_CLASS; i++){
     //     printf("posibiility_each is %f\n",probabilities_of_each[i]);
@@ -91,8 +98,8 @@ static void p_gradientForSinglePoint (
     
     // checkCudaErrors(cudaGetLastError());
 
-    // checkCudaErrors(
-    //     cudaMemset(d_gradient, 0, LABEL_CLASS * num_features * sizeof(FeatureType)));
+    checkCudaErrors(
+        cudaMemset(d_gradient, 0, LABEL_CLASS * num_features * sizeof(FeatureType)));
 
     // for(size_t i= 0; i< num_features; i++){
     //     printf("g is %f\n",d_gradient[i]);
@@ -152,8 +159,7 @@ void trainStochasticGradientDescent3(
     setCudaVariables(
         training_set.num_features,
         training_set.num_data_points,
-        training_set.data_points,
-        training_set.parameter_vector);
+        training_set.data_points);
 
     //FeatureType* gradient = new FeatureType[training_set.num_features];
 

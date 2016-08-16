@@ -22,7 +22,7 @@ void p_softmaxFunction(cublasHandle_t handle,
 
     float sum = 0;
 
-  
+
     for(size_t i=0 ; i< num_labels; i++){
         posibilities_positive[i] = exp(posibilities_positive[i]);
         sum += posibilities_positive[i];
@@ -31,6 +31,33 @@ void p_softmaxFunction(cublasHandle_t handle,
     for(size_t i=0 ; i< num_labels; i++){
         posibilities_positive[i] /= sum;
     } 
+}
+
+void p_softmaxFunction2(cublasHandle_t handle, 
+    FeatureType* d_theta, FeatureType* d_x_i,
+    FeatureType* posibilities_positive,
+    const size_t num_feats, 
+    const size_t num_labels){
+
+    for(size_t i=0;i< num_labels;i++){
+        
+        posibilities_positive[i] = p_dot_product(handle,
+            d_theta[i*num_feats],
+            d_x_i,
+            num_feats);
+    }
+
+    float sum = 0;
+
+    for(size_t i=0 ; i< num_labels; i++){
+        posibilities_positive[i] = exp(posibilities_positive[i]);
+        sum += posibilities_positive[i];
+    } 
+
+    for(size_t i=0 ; i< num_labels; i++){
+        posibilities_positive[i] /= sum;
+    } 
+
 }
 
 // adds two device vectors with CuBLAS and stores the results in the first one
@@ -43,6 +70,15 @@ void p_updateParameters(cublasHandle_t handle, FeatureType* d_theta, FeatureType
     float sign = revert ? 1 : -1;
     step_size *= sign;
     cublasSaxpy(handle, num_feats, &step_size, d_gradient, 1, d_theta, 1);
+}
+
+
+float p_dot_product(cublasHandle_t handle, float* d_a, float* d_b, const size_t num_elems) {
+
+    float result[1];
+    cublasSdot (handle, num_elems, d_a, 1, d_b, 1, result);
+    cudaDeviceSynchronize();
+    return *result;
 }
 
 
