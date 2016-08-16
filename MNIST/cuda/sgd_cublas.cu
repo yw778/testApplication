@@ -66,6 +66,12 @@ static void p_gradientForSinglePoint (
         num_features,
         LABEL_CLASS);
 
+    for(size_t i=0; i<LABEL_CLASS; i++){
+        printf("posibiility_each is %f\n",probabilities_of_each[i]);
+    }
+
+    exit(1);
+
     checkCudaErrors(
         cudaMemset(d_gradient, 0, LABEL_CLASS * num_features * sizeof(FeatureType)));
 
