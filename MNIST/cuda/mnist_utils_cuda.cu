@@ -13,11 +13,12 @@ void p_softmaxFunction(cublasHandle_t handle,
 
     float alf=1.0;
     float beta=0;
-    // refer to http://stackoverflow.com/questions/21164373
-    //    /the-cublas-function-call-cublassgemv
+    // refer to http://stackoverflow.com/questions/21164373/the-cublas-function-call-cublassgemv
     cublasSgemv(handle, CUBLAS_OP_T, num_feats, num_labels,
          &alf, d_theta, num_feats, d_x_i, 1, 
          &beta, posibilities_positive, 1);
+
+    cudaDeviceSynchronize();
 
     float sum = 0;
 
