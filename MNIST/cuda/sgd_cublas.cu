@@ -70,7 +70,7 @@ static void p_gradientForSinglePoint (
         printf("posibiility_each is %f\n",probabilities_of_each[i]);
     }
 
-    exit(1);
+    // exit(1);
     // checkCudaErrors(cudaGetLastError());
 
     checkCudaErrors(
