@@ -67,6 +67,13 @@ static void p_gradientForSinglePoint (
 
     float probabilities_of_each[LABEL_CLASS];
 
+    for(size_t i=0 ; i< num_labels; i++){
+        printf("p is %f\n",posibilities_positive[i]);
+    } 
+
+    exit(1);
+
+
     p_softmaxFunction(handle,
         d_parameter_vector,
         d_data_point_i,
