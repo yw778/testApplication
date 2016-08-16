@@ -124,56 +124,64 @@ void runConvergenceRate(
     TrainingOptions training_options,
     BenchmarkOptions benchmark_options) {
 
-    convergenceRate(
-        trainStochasticGradientDescent,
-        "SGD",
-        data_set,
-        training_options,
-        benchmark_options);
+    // convergenceRate(
+    //     trainStochasticGradientDescent,
+    //     "SGD",
+    //     data_set,
+    //     training_options,
+    //     benchmark_options);
 
-    convergenceRate(
-        trainBatchGradientDescent,
-        "BGD",
-        data_set,
-        training_options,
-        benchmark_options);
+    // convergenceRate(
+    //     trainBatchGradientDescent,
+    //     "BGD",
+    //     data_set,
+    //     training_options,
+    //     benchmark_options);
 
-    size_t batch_sizes[10] = {1,2,5,10,20,50,100,200,500,1000};
-    for (size_t i = 0; i < 10; i++) {
-        training_options.config_params["batch_size"]
-        = batch_sizes[i];
-        convergenceRate(
-            trainMiniBatchGradientDescent,
-            "MBGD",
-            data_set,
-            training_options,
-            benchmark_options);
-    }
+    // size_t batch_sizes[10] = {1,2,5,10,20,50,100,200,500,1000};
+    // for (size_t i = 0; i < 10; i++) {
+    //     training_options.config_params["batch_size"]
+    //     = batch_sizes[i];
+    //     convergenceRate(
+    //         trainMiniBatchGradientDescent,
+    //         "MBGD",
+    //         data_set,
+    //         training_options,
+    //         benchmark_options);
+    // }
     
-    printf("in run convergecneRate in cuda\n");
+    // printf("in run convergecneRate in cuda\n");
+
+
+    // convergenceTime(
+    //     trainParallelStochasticGradientDescent1,
+    //     "SGD",
+    //     data_set,
+    //     training_options,
+    //     benchmark_options);
     
-    for (size_t threads_per_datapoint = 128;
-        threads_per_datapoint <= 512;
-        threads_per_datapoint*=2) {
+    // for (size_t threads_per_datapoint = 128;
+    //     threads_per_datapoint <= 512;
+    //     threads_per_datapoint*=2) {
 
-        training_options.config_params["threads_per_datapoint"]
-        = threads_per_datapoint;
+    //     training_options.config_params["threads_per_datapoint"]
+    //     = threads_per_datapoint;
 
-        for (size_t datapoints_per_block = 2;
-            datapoints_per_block <= 8;
-            datapoints_per_block*=2) {
+    //     for (size_t datapoints_per_block = 2;
+    //         datapoints_per_block <= 8;
+    //         datapoints_per_block*=2) {
 
-            training_options.config_params["datapoints_per_block"]
-            = datapoints_per_block;
+    //         training_options.config_params["datapoints_per_block"]
+    //         = datapoints_per_block;
 
-            convergenceRate(
-                trainParallelStochasticGradientDescent2,
-                "CUDA SGD",
-                data_set,
-                training_options,
-                benchmark_options);
-        }
-    }
+    //         convergenceRate(
+    //             trainParallelStochasticGradientDescent2,
+    //             "CUDA SGD",
+    //             data_set,
+    //             training_options,
+    //             benchmark_options);
+    //     }
+    // }
 
     // size_t batch_sizes[10] = {1, 2, 4, 10, 20, 30, 45, 50, 60, 100};
     // for (size_t threads_per_datapoint = 128;
@@ -258,7 +266,7 @@ void runConvergenceTime(
 
     convergenceTime(
         trainParallelStochasticGradientDescent1,
-        "SGD",
+        "Cublas SGD",
         data_set,
         training_options,
         benchmark_options);
@@ -474,9 +482,9 @@ int main(int argc, char *argv[]) {
     // Initial shuffle of the data set to mix spam with ham
     // shuffleKeyValue(data_points, labels, NUM_SAMPLES, NUM_FEATURES);
 
-    // runConvergenceRate(data_set, training_options, benchmark_options);
+    runConvergenceRate(data_set, training_options, benchmark_options);
     // runTrainAndTest(data_set, training_options, benchmark_options);
-    runConvergenceTime(data_set, training_options, benchmark_options);
+    // runConvergenceTime(data_set, training_options, benchmark_options);
 
     // Free memory and exit
     delete[] data_points;
