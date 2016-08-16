@@ -67,7 +67,7 @@ static void p_gradientForSinglePoint (
 
     float probabilities_of_each[LABEL_CLASS];
 
-    for(size_t i=0 ; i< num_labels; i++){
+    for(size_t i=0 ; i< LABEL_CLASS; i++){
         printf("p is %f\n",probabilities_of_each[i]);
     } 
 
