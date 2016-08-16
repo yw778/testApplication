@@ -23,6 +23,12 @@ void p_softmaxFunction(cublasHandle_t handle,
     float sum = 0;
 
     for(size_t i=0 ; i< num_labels; i++){
+        printf("p is %f\n",posibilities_positive[i]);
+    } 
+
+    exit(1);
+
+    for(size_t i=0 ; i< num_labels; i++){
         posibilities_positive[i] = exp(posibilities_positive[i]);
         sum += posibilities_positive[i];
     } 

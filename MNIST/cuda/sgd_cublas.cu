@@ -27,7 +27,7 @@ static void setCudaVariables(
     checkCudaErrors(cudaMalloc(&d_data_points, (size_of_datapoint
                                                 * num_data_points)));
 
-    printf("size_t %d..\n",LABEL_CLASS * size_of_datapoint);
+    // printf("size_t %d..\n",LABEL_CLASS * size_of_datapoint);
 
     checkCudaErrors(cudaMemcpy(d_data_points,
                                data_points,
