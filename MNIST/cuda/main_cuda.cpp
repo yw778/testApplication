@@ -237,12 +237,12 @@ void runConvergenceTime(
     TrainingOptions training_options,
     BenchmarkOptions benchmark_options) {
 
-    // convergenceTime(
-    //     trainStochasticGradientDescent,
-    //     "SGD",
-    //     data_set,
-    //     training_options,
-    //     benchmark_options);
+    convergenceTime(
+        trainStochasticGradientDescent,
+        "SGD",
+        data_set,
+        training_options,
+        benchmark_options);
 
     // convergenceTime(
     //     trainBatchGradientDescent,
@@ -342,29 +342,29 @@ void runConvergenceTime(
     //     }
     // }
 
-    // size_t batch_sizes3[9] = {2, 4, 6, 7, 4, 10, 8, 9, 10};
-    // for (size_t threads_per_datapoint = 480;
-    //     threads_per_datapoint <= 480;
-    //     threads_per_datapoint *= 2) {
+    size_t batch_sizes3[9] = {6, 4, 6, 7, 4, 10, 8, 9, 10};
+    for (size_t threads_per_datapoint = 160;
+        threads_per_datapoint <= 160;
+        threads_per_datapoint *= 2) {
 
-    //     training_options.config_params["threads_per_datapoint"]
-    //     = threads_per_datapoint;
+        training_options.config_params["threads_per_datapoint"]
+        = threads_per_datapoint;
 
-    //     for (size_t i = 0;
-    //         i < 4;
-    //         i++) {
+        for (size_t i = 0;
+            i < 0;
+            i++) {
             
-    //         training_options.config_params["batch_size"]
-    //         = batch_sizes3[i];
+            training_options.config_params["batch_size"]
+            = batch_sizes3[i];
 
-    //         convergenceTime(
-    //             trainParallelMiniBatchGradientDescent12,
-    //             "CUDA MBGD 1-2",
-    //             data_set,
-    //             training_options,
-    //             benchmark_options);
-    //     }
-    // }
+            convergenceTime(
+                trainParallelMiniBatchGradientDescent12,
+                "CUDA MBGD 1-2",
+                data_set,
+                training_options,
+                benchmark_options);
+        }
+    }
 
     // size_t batch_sizes4[10] = {2, 4, 6, 8, 40, 50, 128, 256, 512};
     // for (size_t  threads_per_mini_batch = 64;
