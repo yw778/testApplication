@@ -67,11 +67,11 @@ static void p_gradientForSinglePoint (
 
     float probabilities_of_each[LABEL_CLASS];
 
-    for(size_t i=0 ; i< LABEL_CLASS; i++){
-        printf("p is %f\n",probabilities_of_each[i]);
-    } 
+    // for(size_t i=0 ; i< LABEL_CLASS; i++){
+    //     printf("p is %f\n",probabilities_of_each[i]);
+    // } 
 
-    exit(1);
+    // exit(1);
 
 
     p_softmaxFunction(handle,
@@ -94,7 +94,7 @@ static void p_gradientForSinglePoint (
     // for(size_t i= 0; i< num_features; i++){
     //     printf("g is %f\n",d_gradient[i]);
     // }
-    exit(1);
+    // exit(1);
     for(size_t i=0; i<LABEL_CLASS; i++){
         //case one parameter with the same label
         if(label==i){
@@ -185,7 +185,7 @@ void trainStochasticGradientDescent3(
         for (size_t i = 0; i < training_set.num_data_points; i++) {
             printf("i is %d\n",i);
             FeatureType* d_data_point_i = &d_data_points[i * training_set.num_features];
-            // checkCudaErrors(cudaMemcpy(d_parameter_vector, training_set.parameter_vector,LABEL_CLASS * training_set.num_features * sizeof(FeatureType), cudaMemcpyHostToDevice));
+            checkCudaErrors(cudaMemcpy(d_parameter_vector, training_set.parameter_vector,LABEL_CLASS * training_set.num_features * sizeof(FeatureType), cudaMemcpyHostToDevice));
             p_gradientForSinglePoint(handle, d_parameter_vector, d_data_point_i, training_set.labels[i], training_set.num_features, d_gradient);
             p_updateParameters(handle, d_parameter_vector, d_gradient, LABEL_CLASS * training_set.num_features, annealed_step_size);
         }
