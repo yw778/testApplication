@@ -8,6 +8,6 @@
 
 #include "utils/mnist_defs.h"
 
-void trainStochasticGradientDescent1(DataSet training_set, TrainingOptions training_options);
+void trainStochasticGradientDescent3(DataSet training_set, TrainingOptions training_options);
 
 #endif

@@ -265,7 +265,7 @@ void runConvergenceTime(
     // }
 
     convergenceTime(
-        trainParallelStochasticGradientDescent1,
+        trainParallelStochasticGradientDescent3,
         "Cublas SGD",
         data_set,
         training_options,
@@ -295,28 +295,28 @@ void runConvergenceTime(
     // }
     
 
-    // for (size_t threads_per_datapoint = 160;
-    //     threads_per_datapoint <= 640;
-    //     threads_per_datapoint *= 2) {
+    for (size_t threads_per_datapoint = 160;
+        threads_per_datapoint <= 320;
+        threads_per_datapoint *= 2) {
 
-    //     training_options.config_params["threads_per_datapoint"]
-    //     = threads_per_datapoint;
+        training_options.config_params["threads_per_datapoint"]
+        = threads_per_datapoint;
 
-    //     for (size_t datapoints_per_block = 1;
-    //         datapoints_per_block <= 4;
-    //         datapoints_per_block *= 2) {
+        for (size_t datapoints_per_block = 1;
+            datapoints_per_block <= 4;
+            datapoints_per_block *= 2) {
 
-    //         training_options.config_params["datapoints_per_block"]
-    //         = datapoints_per_block;
+            training_options.config_params["datapoints_per_block"]
+            = datapoints_per_block;
 
-    //         convergenceTime(
-    //             trainParallelStochasticGradientDescent2,
-    //             "CUDA SGD 2",
-    //             data_set,
-    //             training_options,
-    //             benchmark_options);
-    //     }
-    // }
+            convergenceTime(
+                trainParallelStochasticGradientDescent2,
+                "CUDA SGD 2",
+                data_set,
+                training_options,
+                benchmark_options);
+        }
+    }
 
     // size_t batch_sizes2[8] = {2, 4, 6, 8, 8, 9, 10, 11};
     // for (size_t threads_per_datapoint = 32;
@@ -342,16 +342,16 @@ void runConvergenceTime(
     //     }
     // }
 
-    size_t batch_sizes3[9] = {6, 4, 6, 7, 4, 10, 8, 9, 10};
+    size_t batch_sizes3[9] = {3, 6, 6, 7, 4, 10, 8, 9, 10};
     for (size_t threads_per_datapoint = 160;
-        threads_per_datapoint <= 160;
+        threads_per_datapoint <= 320;
         threads_per_datapoint *= 2) {
 
         training_options.config_params["threads_per_datapoint"]
         = threads_per_datapoint;
 
         for (size_t i = 0;
-            i < 0;
+            i < 2;
             i++) {
             
             training_options.config_params["batch_size"]

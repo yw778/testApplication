@@ -112,7 +112,7 @@ static void p_gradientForSinglePoint (
 // executes serial implementation of stochastic gradient descent
 // for logistic regression with a fixed number of iterations
 // config_params: {step_size}
-void trainStochasticGradientDescent1(
+void trainStochasticGradientDescent3(
     DataSet training_set,
     TrainingOptions training_options){
 
