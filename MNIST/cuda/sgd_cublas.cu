@@ -34,7 +34,7 @@ static void setCudaVariables(
                                cudaMemcpyHostToDevice));
     checkCudaErrors(cudaMemcpy(d_parameter_vector, 
                                parameter_vector,
-                               LABEL_CLASS * training_set.num_features * sizeof(FeatureType),
+                               LABEL_CLASS * num_features * sizeof(FeatureType),
                                 cudaMemcpyHostToDevice));
 }
 
