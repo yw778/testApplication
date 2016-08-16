@@ -40,10 +40,11 @@ void p_softmaxFunction2(cublasHandle_t handle,
     const size_t num_labels){
 
     for(size_t i=0;i< num_labels;i++){       
-        posibilities_positive[i] = p_dot_product(handle,
+        float a = p_dot_product(handle,
             d_theta[i*num_feats],
             d_x_i,
             num_feats);
+        posibilities_positive[i] = a;
     }
 
     float sum = 0;
