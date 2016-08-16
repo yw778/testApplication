@@ -14,7 +14,8 @@ static cublasHandle_t handle;
 static void setCudaVariables(
     size_t num_features,
     size_t num_data_points,
-    FeatureType* data_points) {
+    FeatureType* data_points,
+    FeatureType* parameter_vector) {
 
     checkCuBlasErrors(cublasCreate(&handle));
 
@@ -34,10 +35,10 @@ static void setCudaVariables(
                                (size_of_datapoint * num_data_points),
                                cudaMemcpyHostToDevice));
 
-//     checkCudaErrors(cudaMemcpy(d_parameter_vector, 
-//                                parameter_vector,
-//                                LABEL_CLASS * num_features * sizeof(FeatureType),
-//                                 cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(d_parameter_vector, 
+                               parameter_vector,
+                               LABEL_CLASS * num_features * sizeof(FeatureType),
+                                cudaMemcpyHostToDevice));
 //
  }
 
@@ -149,7 +150,8 @@ void trainStochasticGradientDescent3(
     setCudaVariables(
         training_set.num_features,
         training_set.num_data_points,
-        training_set.data_points);
+        training_set.data_points,
+        training_set.parameter_vector);
 
     //FeatureType* gradient = new FeatureType[training_set.num_features];
 
@@ -185,7 +187,7 @@ void trainStochasticGradientDescent3(
         for (size_t i = 0; i < training_set.num_data_points; i++) {
             printf("i is %d\n",i);
             FeatureType* d_data_point_i = &d_data_points[i * training_set.num_features];
-            checkCudaErrors(cudaMemcpy(d_parameter_vector, training_set.parameter_vector,LABEL_CLASS * training_set.num_features * sizeof(FeatureType), cudaMemcpyHostToDevice));
+            // checkCudaErrors(cudaMemcpy(d_parameter_vector, training_set.parameter_vector,LABEL_CLASS * training_set.num_features * sizeof(FeatureType), cudaMemcpyHostToDevice));
             p_gradientForSinglePoint(handle, d_parameter_vector, d_data_point_i, training_set.labels[i], training_set.num_features, d_gradient);
             p_updateParameters(handle, d_parameter_vector, d_gradient, LABEL_CLASS * training_set.num_features, annealed_step_size);
         }
