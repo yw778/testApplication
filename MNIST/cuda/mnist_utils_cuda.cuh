@@ -16,11 +16,11 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
-// #include "cublas_v2.h"
+#include "cublas_v2.h"
 
 #define IDX2C(i,j,ld) (((j)*(ld))+(i))
 #define checkCudaErrors(val) check( (val), #val, __FILE__, __LINE__)
-// #define checkCuBlasErrors(val) checkBlas( (val), #val, __FILE__, __LINE__)
+#define checkCuBlasErrors(val) checkBlas( (val), #val, __FILE__, __LINE__)
 #define DIVIDE_AND_CEIL(obj_dim, block_dim) ((obj_dim + block_dim - 1) / block_dim)
 #define GET_GLOBAL_THREAD_INDEX() (blockIdx.x * blockDim.x + threadIdx.x)
 
@@ -34,13 +34,13 @@ void check(ErrType err, const char* const func, const char* const file, const in
     }
 }
 // check and output CuBLAS errors
-// template <typename ErrType>
-// void checkBlas(ErrType err, const char* const func, const char* const file, const int line) {
-//     if (err != CUBLAS_STATUS_SUCCESS) {
-//         printf("CuBLAS error %d at %s:%d:%s\n", err, file, line, func);
-//         exit(1);
-//     }
-// }
+template <typename ErrType>
+void checkBlas(ErrType err, const char* const func, const char* const file, const int line) {
+    if (err != CUBLAS_STATUS_SUCCESS) {
+        printf("CuBLAS error %d at %s:%d:%s\n", err, file, line, func);
+        exit(1);
+    }
+}
 
 //loads the contents of a global memory vector into shared memory
 template <typename Type>
@@ -65,6 +65,27 @@ __device__ void downloadSharedVector(size_t num_elems, Type* shared_vector, Type
         }
     }
 }
+
+//------cublas function-----
+void p_add_vectors(cublasHandle_t handle, 
+    float* a, 
+    float* b, 
+    const size_t size, 
+    const float scale_for_a);
+
+void p_softmaxFunction(cublasHandle_t handle, 
+    FeatureType* d_theta, 
+    FeatureType* d_x_i,
+    FeatureType* posibilities_positive,
+    const size_t num_feats,
+    const size_t num_labels); 
+
+void p_updateParameters(cublasHandle_t handle, 
+    FeatureType* d_theta, 
+    FeatureType* d_gradient, 
+    size_t num_feats, 
+    float step_size, 
+    bool revert = false);
 
 // verify the device properties satisfy the assumptions of the kernel
 // check that the resulting grid and block dimensions

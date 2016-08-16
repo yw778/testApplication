@@ -11,7 +11,8 @@
 #include "mbgd_1_2.h"
 #include "mbgd_2.h"
 #include "mbgd_2_2.h"
-// #include "sgd_cublas.h"
+#include "sgd_cublas.h"
+
 #include "sgd_single_point_1.h"
 #include "sgd_single_point_2.h"
 void runTrainAndTest(
@@ -255,6 +256,13 @@ void runConvergenceTime(
     //         benchmark_options);
     // }
 
+    convergenceTime(
+        trainParallelStochasticGradientDescent1,
+        "SGD",
+        data_set,
+        training_options,
+        benchmark_options);
+
     // for (size_t threads_per_datapoint = 32;
     //     threads_per_datapoint <= 512;
     //     threads_per_datapoint *= 2) {
@@ -375,29 +383,29 @@ void runConvergenceTime(
     // }
 
 
-    size_t batch_sizes5[10] = {3, 4, 6, 7, 70, 40, 50, 128, 256, 512};
-    for (size_t  threads_per_mini_batch = 640;
-             threads_per_mini_batch <= 640;
-             threads_per_mini_batch *= 2) {
+    // size_t batch_sizes5[10] = {3, 4, 6, 7, 70, 40, 50, 128, 256, 512};
+    // for (size_t  threads_per_mini_batch = 640;
+    //          threads_per_mini_batch <= 640;
+    //          threads_per_mini_batch *= 2) {
     
-        training_options.config_params["threads_per_mini_batch"]
-        =  threads_per_mini_batch;
+    //     training_options.config_params["threads_per_mini_batch"]
+    //     =  threads_per_mini_batch;
     
-        for (size_t i = 0;
-            i < 4;
-            i++) {
+    //     for (size_t i = 0;
+    //         i < 4;
+    //         i++) {
             
-            training_options.config_params["batch_size"]
-            = batch_sizes5[i];
+    //         training_options.config_params["batch_size"]
+    //         = batch_sizes5[i];
     
-            convergenceTime(
-                trainParallelMiniBatchGradientDescent22,
-                "CUDA MBGD 2-2",
-                data_set,
-                training_options,
-                benchmark_options);
-        }
-    }
+    //         convergenceTime(
+    //             trainParallelMiniBatchGradientDescent22,
+    //             "CUDA MBGD 2-2",
+    //             data_set,
+    //             training_options,
+    //             benchmark_options);
+    //     }
+    // }
 }
 
 int main(int argc, char *argv[]) {

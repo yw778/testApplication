@@ -3,6 +3,47 @@
 #include "mnist_utils_cuda.cuh"
 #include "utils/mnist_timer.h"
 
+
+
+//------cublas function for softmax-------
+void p_softmaxFunction(cublasHandle_t handle, 
+    FeatureType* d_theta, FeatureType* d_x_i,
+    FeatureType* posibilities_positive,
+    const size_t num_feats, const size_t num_labels) {
+
+    float alf=1.0;
+    float beta=0;
+    // refer to http://stackoverflow.com/questions/21164373
+    //    /the-cublas-function-call-cublassgemv
+    cublasSgemv(handle, CUBLAS_OP_T, num_feats, num_labels,
+         &alf, d_theta, num_feats, d_x_i, 1, 
+         &beta, posibilities_positive, 1);
+
+    float sum = 0;
+
+    for(size_t i=0 ; i< num_labels; i++){
+        posibilities_positive[i] = exp(posibilities_positive[i]);
+        sum += posibilities_positive[i];
+    } 
+
+    for(size_t i=0 ; i< num_labels; i++){
+        posibilities_positive[i] /= sum;
+    } 
+}
+
+// adds two device vectors with CuBLAS and stores the results in the first one
+void p_add_vectors(cublasHandle_t handle, float* a, float* b, const size_t size, const float scale_for_a) {
+    cublasSaxpy(handle, size, &scale_for_a, b, 1, a, 1);
+}
+
+// update parameter in parallel in CuBLAS
+void p_updateParameters(cublasHandle_t handle, FeatureType* d_theta, FeatureType* d_gradient, size_t num_feats, float step_size, bool revert) {
+    float sign = revert ? 1 : -1;
+    step_size *= sign;
+    cublasSaxpy(handle, num_feats, &step_size, d_gradient, 1, d_theta, 1);
+}
+
+
 // adds two device vectors with CuBLAS and stores the results in the first one
 // void p_addVectors(float* a, float* b, const size_t size, const float scale_for_b) {
      // cublasSaxpy(handle, size, &scale_for_a, b, 1, a, 1);

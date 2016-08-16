@@ -4,7 +4,7 @@
 #include "utils/spamfilter_timer.h"
 
 // adds two device vectors with CuBLAS and stores the results in the first one
-void p_add_vectors(cublasHandle_t handle, float* a, float* b, const size_t size, const float scale_for_a = 1){
+void p_add_vectors(cublasHandle_t handle, float* a, float* b, const size_t size, const float scale_for_a){
      cublasSaxpy(handle, size, &scale_for_a, b, 1, a, 1);
 }
 
@@ -19,7 +19,7 @@ void p_add_vectors(cublasHandle_t handle, float* a, float* b, const size_t size,
 float p_dotProduct(cublasHandle_t handle, float* a, float* b, float* d_a, float* d_b, const size_t size) {
 
      float result[1];
-     cublasSdot (handle, num_elems, d_a, 1, d_b, 1, result);
+     cublasSdot (handle, size, d_a, 1, d_b, 1, result);    
      cudaDeviceSynchronize();
      return *result;
  }
@@ -91,8 +91,8 @@ __device__ void d_memset(
 
 
 // computes logistic function for a given parameter vector (theta) and a data point (x_i)
-double p_logisticFunction(FeatureType* d_theta, FeatureType* d_x_i, const size_t num_features) {
-     return logisticFunction(p_dotProduct(d_theta, d_x_i, num_features));
+double p_logisticFunction(cublasHandle_t handle, FeatureType* d_theta, FeatureType* d_x_i, const size_t num_features) {
+     return logisticFunction(p_dotProduct(handle, d_theta, d_x_i, num_features));
 }
 
 

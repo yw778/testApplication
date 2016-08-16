@@ -51,23 +51,62 @@ static void p_gradientForSinglePoint (
     size_t num_features,
     FeatureType* d_gradient) {
 
-    float probability_of_positive = p_logisticFunction(
-        handle,
+    // float probability_of_positive = p_logisticFunction(
+    //     handle,
+    //     d_parameter_vector,
+    //     d_data_point_i,
+    //     num_features);
+
+    float* probabilities_of_each = new float[LABEL_CLASS];
+
+    p_softmaxFunction(handle,
         d_parameter_vector,
         d_data_point_i,
-        num_features);
-    // float* probabilities_of_positive = new float[LABEL_CLASS];
-    // p_softmaxFunction(handle,d_parameter_vector,d_data_point_i,num_features);
+        probabilities_of_each,
+        num_features,
+        LABEL_CLASS);
 
     checkCudaErrors(
-        cudaMemset(d_gradient, 0, num_features * sizeof(FeatureType)));
+        cudaMemset(d_gradient, 0, LABEL_CLASS * num_features * sizeof(FeatureType)));
 
-    p_add_vectors(
-        handle,
-        d_gradient,
-        d_data_point_i,
-        num_features,
-        (probability_of_positive - label));
+
+    for(size_t i=0; i<LABEL_CLASS; i++){
+        //case one parameter with the same label
+        if(label==i){
+            // addVectors((&gradient[i*num_features]), 
+            //            data_point,
+            //            num_features,
+            //            (posibiility_each[i] - 1));
+            p_add_vectors(
+                    handle,
+                    &d_gradient[i*num_features],
+                    d_data_point_i,
+                    num_features,
+                    (probabilities_of_each[i] - 1));
+        }
+        //case two not the same label
+        else{
+            // addVectors((&gradient[i*num_features]), 
+            //            data_point,
+            //            num_features,
+            //            (posibiility_each[i]));
+            p_add_vectors(
+                    handle,
+                    &d_gradient[i*num_features],
+                    d_data_point_i,
+                    num_features,
+                    probabilities_of_each[i]);
+        }
+
+    }
+
+    // p_add_vectors(
+    //     handle,
+    //     d_gradient,
+    //     d_data_point_i,
+    //     num_features,
+    //     (probability_of_positive - label));
+    delete[] probabilities_of_each;
 }
 
 // executes serial implementation of stochastic gradient descent
@@ -113,10 +152,10 @@ void trainStochasticGradientDescent1(
             FeatureType* d_data_point_i = &d_data_points[i * training_set.num_features];
             //checkCudaErrors(cudaMemcpy(d_parameter_vector, training_set.parameter_vector, training_set.num_features * sizeof(FeatureType), cudaMemcpyHostToDevice));
             p_gradientForSinglePoint(handle, d_parameter_vector, d_data_point_i, training_set.labels[i], training_set.num_features, d_gradient);
-            p_updateParameters(handle, d_parameter_vector, d_gradient, training_set.num_features, annealed_step_size);
+            p_updateParameters(handle, d_parameter_vector, d_gradient, LABEL_CLASS * training_set.num_features, annealed_step_size);
         }
     }
-    checkCudaErrors(cudaMemcpy(training_set.parameter_vector, d_parameter_vector, (training_set.num_features * sizeof(FeatureType)), cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaMemcpy(training_set.parameter_vector, d_parameter_vector, (LABEL_CLASS * training_set.num_features * sizeof(FeatureType)), cudaMemcpyDeviceToHost));
     //delete[] gradient;
 
     *training_options.step_size = annealed_step_size;

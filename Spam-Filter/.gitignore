@@ -3,8 +3,7 @@ parameter_vector*
 *.csv
 *.xlsx
 .~*
-ssh-*.sh
-sftp-*.sh
-scp-*.sh
+*.py
+ssh-*
+sftp-*
 output/*
-lib/
