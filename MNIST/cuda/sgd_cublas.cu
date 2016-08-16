@@ -79,8 +79,8 @@ static void p_gradientForSinglePoint (
     
     // checkCudaErrors(cudaGetLastError());
 
-    checkCudaErrors(
-        cudaMemset(d_gradient, 0, LABEL_CLASS * num_features * sizeof(FeatureType)));
+    // checkCudaErrors(
+    //     cudaMemset(d_gradient, 0, LABEL_CLASS * num_features * sizeof(FeatureType)));
 
     // for(size_t i= 0; i< num_features; i++){
     //     printf("g is %f\n",d_gradient[i]);
