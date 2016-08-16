@@ -82,10 +82,10 @@ static void p_gradientForSinglePoint (
     checkCudaErrors(
         cudaMemset(d_gradient, 0, LABEL_CLASS * num_features * sizeof(FeatureType)));
 
-    for(size_t i= 0; i< num_features; i++){
-        printf("g is %f\n",d_gradient[i]);
-    }
-    exit(1);
+    // for(size_t i= 0; i< num_features; i++){
+    //     printf("g is %f\n",d_gradient[i]);
+    // }
+    // exit(1);
 
 
     for(size_t i=0; i<LABEL_CLASS; i++){
@@ -160,6 +160,10 @@ void trainStochasticGradientDescent3(
             : 0;
 
     double annealed_step_size = step_size;
+
+    printf("%d\n",training_options.num_epochs);
+
+    
 
     for (size_t k = 0; k < training_options.num_epochs; k++) {
 
