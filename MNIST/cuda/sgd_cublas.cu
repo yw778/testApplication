@@ -14,7 +14,7 @@ static cublasHandle_t handle;
 static void setCudaVariables(
     size_t num_features,
     size_t num_data_points,
-    FeatureType* data_points
+    FeatureType* data_points,
     FeatureType* parameter_vector) {
 
     checkCuBlasErrors(cublasCreate(&handle));
