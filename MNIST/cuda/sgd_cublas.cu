@@ -27,6 +27,8 @@ static void setCudaVariables(
     checkCudaErrors(cudaMalloc(&d_data_points, (size_of_datapoint
                                                 * num_data_points)));
 
+    printf("size_t %d..\n",LABEL_CLASS * size_of_datapoint);
+
     checkCudaErrors(cudaMemcpy(d_data_points,
                                data_points,
                                (size_of_datapoint * num_data_points),
@@ -72,9 +74,9 @@ static void p_gradientForSinglePoint (
         num_features,
         LABEL_CLASS);
 
-    for(size_t i=0; i<LABEL_CLASS; i++){
-        printf("posibiility_each is %f\n",probabilities_of_each[i]);
-    }
+    // for(size_t i=0; i<LABEL_CLASS; i++){
+    //     printf("posibiility_each is %f\n",probabilities_of_each[i]);
+    // }
 
     
     // checkCudaErrors(cudaGetLastError());
@@ -85,7 +87,7 @@ static void p_gradientForSinglePoint (
     // for(size_t i= 0; i< num_features; i++){
     //     printf("g is %f\n",d_gradient[i]);
     // }
-    // exit(1);
+    exit(1);
     for(size_t i=0; i<LABEL_CLASS; i++){
         //case one parameter with the same label
         if(label==i){
