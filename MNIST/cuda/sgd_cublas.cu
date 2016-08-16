@@ -80,7 +80,7 @@ static void p_gradientForSinglePoint (
     // checkCudaErrors(cudaGetLastError());
 
     checkCudaErrors(
-        cudaMemset(d_gradient, 0, LABEL_CLASS * num_features * sizeof(FeatureType)));
+        cudaMemset(d_gradient, 0, num_features * sizeof(FeatureType)));
 
 
     for(size_t i=0; i<LABEL_CLASS; i++){
