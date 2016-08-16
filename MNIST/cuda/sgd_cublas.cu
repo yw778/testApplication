@@ -57,7 +57,7 @@ static void p_gradientForSinglePoint (
     //     d_data_point_i,
     //     num_features);
 
-    float* probabilities_of_each = new float[LABEL_CLASS];
+    float probabilities_of_each[LABEL_CLASS];
 
     p_softmaxFunction(handle,
         d_parameter_vector,
@@ -113,7 +113,7 @@ static void p_gradientForSinglePoint (
     //     d_data_point_i,
     //     num_features,
     //     (probability_of_positive - label));
-    delete[] probabilities_of_each;
+    // delete[] probabilities_of_each;
 }
 
 // executes serial implementation of stochastic gradient descent
