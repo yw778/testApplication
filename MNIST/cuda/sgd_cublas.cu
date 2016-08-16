@@ -40,7 +40,7 @@ static void setCudaVariables(
     //                            LABEL_CLASS * num_features * sizeof(FeatureType),
     //                             cudaMemcpyHostToDevice));
 
-    printf("after copy parameter..\n");
+    // printf("after copy parameter..\n");
 //
  }
 
@@ -183,6 +183,8 @@ void trainStochasticGradientDescent3(
 
 
     for (size_t k = 0; k < training_options.num_epochs; k++) {
+
+        printf("run number %d\n",k);
 
         // simulated annealing (reduces step size as it converges)
         annealed_step_size = training_options.config_params["initial_step_size"]
