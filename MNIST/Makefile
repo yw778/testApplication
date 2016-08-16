@@ -49,7 +49,7 @@ baseline: $(BASELINE_DEPS)
 	$(C_COMPILER) $^ -o bin/baseline $(C_FLAGS)
 
 cuda: $(CUDA_DEPS)
-	$(CUDA_COMPILER) $^ -o bin/cuda $(CUDA_FLAGS)
+	$(CUDA_COMPILER) $^ -o bin/cuda $(CUDA_FLAGS) $(CUBLAS_INCLUDEANDLINK)
 
 # main files
 main_baselines.o: main_baselines.cpp
