@@ -157,7 +157,7 @@ void trainStochasticGradientDescent3(
 
         for (size_t i = 0; i < training_set.num_data_points; i++) {
             FeatureType* d_data_point_i = &d_data_points[i * training_set.num_features];
-            // checkCudaErrors(cudaMemcpy(d_parameter_vector, training_set.parameter_vector,LABEL_CLASS * training_set.num_features * sizeof(FeatureType), cudaMemcpyHostToDevice));
+            checkCudaErrors(cudaMemcpy(d_parameter_vector, training_set.parameter_vector,LABEL_CLASS * training_set.num_features * sizeof(FeatureType), cudaMemcpyHostToDevice));
             p_gradientForSinglePoint(handle, d_parameter_vector, d_data_point_i, training_set.labels[i], training_set.num_features, d_gradient);
             p_updateParameters(handle, d_parameter_vector, d_gradient, LABEL_CLASS * training_set.num_features, annealed_step_size);
         }
