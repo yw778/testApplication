@@ -14,8 +14,7 @@ static cublasHandle_t handle;
 static void setCudaVariables(
     size_t num_features,
     size_t num_data_points,
-    FeatureType* data_points,
-    FeatureType* parameter_vector) {
+    FeatureType* data_points) {
 
     checkCuBlasErrors(cublasCreate(&handle));
 
@@ -32,11 +31,11 @@ static void setCudaVariables(
                                data_points,
                                (size_of_datapoint * num_data_points),
                                cudaMemcpyHostToDevice));
-    checkCudaErrors(cudaMemcpy(d_parameter_vector, 
-                               parameter_vector,
-                               LABEL_CLASS * num_features * sizeof(FeatureType),
-                                cudaMemcpyHostToDevice));
-}
+//     checkCudaErrors(cudaMemcpy(d_parameter_vector, 
+//                                parameter_vector,
+//                                LABEL_CLASS * num_features * sizeof(FeatureType),
+//                                 cudaMemcpyHostToDevice));
+// }
 
 static void cleanUp() {
 
@@ -131,8 +130,7 @@ void trainStochasticGradientDescent3(
     setCudaVariables(
         training_set.num_features,
         training_set.num_data_points,
-        training_set.data_points,
-        training_set.parameter_vector);
+        training_set.data_points);
 
     //FeatureType* gradient = new FeatureType[training_set.num_features];
 
