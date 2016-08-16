@@ -3,7 +3,6 @@
 #include "utils/mnist_fileio.hpp"
 #include "utils/mnist_defs.h"
 #include "utils/mnist_utils.hpp"
-
 #include "cpp/sgd_baseline.h"
 #include "cpp/batch_baseline.h"
 #include "cpp/minibatch_baseline.h"
@@ -12,7 +11,6 @@
 #include "mbgd_2.h"
 #include "mbgd_2_2.h"
 #include "sgd_cublas.h"
-
 #include "sgd_single_point_1.h"
 #include "sgd_single_point_2.h"
 void runTrainAndTest(
