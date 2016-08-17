@@ -151,12 +151,12 @@ void runConvergenceRate(
     
     // printf("in run convergecneRate in cuda\n");
 
-     convergenceRate(
-        trainStochasticGradientDescent3,
-        "Cublas SGD",
-        data_set,
-        training_options,
-        benchmark_options);
+     // convergenceRate(
+     //    trainStochasticGradientDescent3,
+     //    "Cublas SGD",
+     //    data_set,
+     //    training_options,
+     //    benchmark_options);
 
 
     // convergenceTime(
@@ -270,12 +270,12 @@ void runConvergenceTime(
     //         benchmark_options);
     // }
 
-    // convergenceTime(
-    //     trainStochasticGradientDescent3,
-    //     "Cublas SGD",
-    //     data_set,
-    //     training_options,
-    //     benchmark_options);
+    convergenceTime(
+        trainStochasticGradientDescent3,
+        "Cublas SGD",
+        data_set,
+        training_options,
+        benchmark_options);
 
     // for (size_t threads_per_datapoint = 32;
     //     threads_per_datapoint <= 512;
