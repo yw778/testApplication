@@ -76,6 +76,7 @@ void p_add_vectors(cublasHandle_t handle,
 void p_softmaxFunction(cublasHandle_t handle, 
     FeatureType* d_theta, 
     FeatureType* d_x_i,
+    FeatureType* d_result,
     FeatureType* posibilities_positive,
     const size_t num_feats,
     const size_t num_labels); 

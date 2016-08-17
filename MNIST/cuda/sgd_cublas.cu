@@ -8,7 +8,7 @@
 #include "mnist_utils_cuda.cuh"
 
 
-static FeatureType *d_parameter_vector, *d_data_points, *d_gradient;
+static FeatureType *d_parameter_vector, *d_data_points, *d_gradient, *d_result;
 static cublasHandle_t handle;
 
 static void setCudaVariables(
@@ -27,6 +27,8 @@ static void setCudaVariables(
     checkCudaErrors(cudaMalloc(&d_gradient, LABEL_CLASS * size_of_datapoint));
     checkCudaErrors(cudaMalloc(&d_data_points, (size_of_datapoint
                                                 * num_data_points)));
+    // cublas matrix multiplication require
+    checkCudaErrors(cudaMalloc(&d_result, LABEL_CLASS * sizeof(FeatureType)));
 
     // printf("size_t %d..\n",LABEL_CLASS * size_of_datapoint);
 
@@ -49,6 +51,8 @@ static void cleanUp() {
     checkCudaErrors(cudaFree(d_parameter_vector));
     checkCudaErrors(cudaFree(d_gradient));
     checkCudaErrors(cudaFree(d_data_points));
+    //cublas matrix multiplication require
+    checkCudaErrors(cudaFree(d_result));
 
     cublasDestroy(handle);
 }
@@ -58,9 +62,10 @@ static void p_gradientForSinglePoint (
     cublasHandle_t handle,
     FeatureType* d_parameter_vector,
     FeatureType* d_data_point_i,
+    FeatureType* d_result,
     LabelType label,
     size_t num_features,
-    FeatureType* d_gradient) {
+    FeatureType* d_gradient){
 
     // float probability_of_positive = p_logisticFunction(
     //     handle,
@@ -76,20 +81,21 @@ static void p_gradientForSinglePoint (
 
     // exit(1);
 
-    p_softmaxFunction2(handle,
-        d_parameter_vector,
-        d_data_point_i,
-        probabilities_of_each,
-        num_features,
-        LABEL_CLASS);
-
-
-    // p_softmaxFunction(handle,
+    // p_softmaxFunction2(handle,
     //     d_parameter_vector,
     //     d_data_point_i,
     //     probabilities_of_each,
     //     num_features,
     //     LABEL_CLASS);
+
+
+    p_softmaxFunction(handle,
+        d_parameter_vector,
+        d_data_point_i,
+        d_result,
+        probabilities_of_each,
+        num_features,
+        LABEL_CLASS);
 
     // for(size_t i=0; i<LABEL_CLASS; i++){
     //     printf("posibiility_each is %f\n",probabilities_of_each[i]);
@@ -198,7 +204,7 @@ void trainStochasticGradientDescent3(
             // printf("i is %d\n",i);
             FeatureType* d_data_point_i = &d_data_points[i * training_set.num_features];
             // checkCudaErrors(cudaMemcpy(d_parameter_vector, training_set.parameter_vector,LABEL_CLASS * training_set.num_features * sizeof(FeatureType), cudaMemcpyHostToDevice));
-            p_gradientForSinglePoint(handle, d_parameter_vector, d_data_point_i, training_set.labels[i], training_set.num_features, d_gradient);
+            p_gradientForSinglePoint(handle, d_parameter_vector, d_data_point_i, training_set.labels[i], training_set.num_features, d_gradient,d_result);
             p_updateParameters(handle, d_parameter_vector, d_gradient, LABEL_CLASS * training_set.num_features, annealed_step_size);
         }
     }

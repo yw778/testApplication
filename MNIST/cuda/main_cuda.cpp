@@ -13,6 +13,7 @@
 #include "sgd_cublas.h"
 #include "sgd_single_point_1.h"
 #include "sgd_single_point_2.h"
+
 void runTrainAndTest(
     DataSet data_set,
     TrainingOptions training_options,
