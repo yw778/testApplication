@@ -19,7 +19,7 @@
 #define MAX_ITER          (NUM_TRAINING)
 #define TOLERANCE         0.0001
 #define NUM_EPOCHS        30
-#define MAX_NUM_EPOCHS    200
+#define MAX_NUM_EPOCHS    100
 #define NUM_RUNS          2
 #define ERROR_GOAL        0.07
 #define THREADS_PER_DATAPOINT    256
