@@ -151,12 +151,12 @@ void runConvergenceRate(
     
     // printf("in run convergecneRate in cuda\n");
 
-     // convergenceRate(
-     //    trainStochasticGradientDescent3,
-     //    "Cublas SGD",
-     //    data_set,
-     //    training_options,
-     //    benchmark_options);
+     convergenceRate(
+        trainStochasticGradientDescent3,
+        "Cublas SGD",
+        data_set,
+        training_options,
+        benchmark_options);
 
 
     // convergenceTime(
@@ -488,9 +488,9 @@ int main(int argc, char *argv[]) {
     // Initial shuffle of the data set to mix spam with ham
     // shuffleKeyValue(data_points, labels, NUM_SAMPLES, NUM_FEATURES);
 
-    runConvergenceRate(data_set, training_options, benchmark_options);
+    // runConvergenceRate(data_set, training_options, benchmark_options);
     // runTrainAndTest(data_set, training_options, benchmark_options);
-    // runConvergenceTime(data_set, training_options, benchmark_options);
+    runConvergenceTime(data_set, training_options, benchmark_options);
 
     // Free memory and exit
     delete[] data_points;
