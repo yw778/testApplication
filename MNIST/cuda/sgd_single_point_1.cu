@@ -193,7 +193,7 @@ static __global__ void p_SgdWithSharedParameterVector(
     // asm("trap;");  
     // computes several indexes, offsets and strides to simplify further code
     size_t tidx = threadIdx.x;
-    size_t points_per_block = (blockDim.x / threads_per_datapoint);
+    // size_t points_per_block = (blockDim.x / threads_per_datapoint);
     size_t point_idx = (blockIdx.x * points_per_block)
                      + (tidx / threads_per_datapoint);
     // index relative to the datapoint instead of the block
@@ -390,7 +390,7 @@ void trainParallelStochasticGradientDescent1(
         1);
 
     const size_t shared_memory_size = block_size.x * sizeof(FeatureType) * LABEL_CLASS
-        + datapoints_per_block * sizeof(FeatureType) * LABEL_CLASS ;
+        + datapoints_per_block * sizeof(FeatureType) * LABEL_CLASS 
         + datapoints_per_block * sizeof(FeatureType) * training_set.num_features;
 
     // printf("memosize is %d",shared_memory_size);
