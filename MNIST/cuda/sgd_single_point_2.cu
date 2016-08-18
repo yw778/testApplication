@@ -409,7 +409,7 @@ void trainParallelStochasticGradientDescent2(
     //big size thread
     const size_t shared_memory_size = block_size.x * sizeof(FeatureType)
         + datapoints_per_block * sizeof(FeatureType) * LABEL_CLASS
-        + datapoints_per_block * sizeof(FeatureType) * num_features;
+        + datapoints_per_block * sizeof(FeatureType) * training_set.num_features;
         // + datapoints_per_block * sizeof(FeatureType);
 
     // printf("memosize is %d",shared_memory_size);
