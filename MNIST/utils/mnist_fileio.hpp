@@ -63,7 +63,9 @@ size_t readImageData(size_t size, const char* file_name, Type* vector)
     {
         //mnist data structure magic number->sample number->rows->columns->pixel value
         int magic_number,number_images,n_rows,n_cols;
-        // Start reading Database 
+        // Start reading Database
+        // First read magic number, number of images, rows and
+        // columns of the pixel 
         data.read((char*)&magic_number,sizeof(magic_number));
         magic_number= reverseInt(magic_number);
         data.read((char*)&number_images,sizeof(number_images));
@@ -72,12 +74,10 @@ size_t readImageData(size_t size, const char* file_name, Type* vector)
         n_rows= reverseInt(n_rows);
         data.read((char*)&n_cols,sizeof(n_cols));
         n_cols= reverseInt(n_cols);
-        //debug use
-        // cout<<"magic number: "<<magic_number<<endl;
-        // cout<<"image number: "<<number_images<<endl;
+
         cout<<"n_rows number: "<<n_rows<<endl;
         cout<<"n_cols number: "<<n_rows<<endl;
- 
+        //reading pixel value
         size_t i;
         for(i=0; i<size; i++){
             
@@ -85,8 +85,6 @@ size_t readImageData(size_t size, const char* file_name, Type* vector)
             data.read((char*)&temp,sizeof(temp));
             //feature scaling normalized by 255
             vector[i]=(Type)temp/255;
-            
-            //cout<<vector[i]<<endl;
         
         }
 

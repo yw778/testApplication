@@ -301,8 +301,8 @@ void runConvergenceTime(
     // }
     
 
-    for (size_t threads_per_datapoint = 160;
-        threads_per_datapoint <= 640;
+    for (size_t threads_per_datapoint = 64;
+        threads_per_datapoint <= 512;
         threads_per_datapoint *= 2) {
 
         training_options.config_params["threads_per_datapoint"]
