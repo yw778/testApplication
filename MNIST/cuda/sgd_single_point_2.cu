@@ -66,6 +66,7 @@ static void cleanUp() {
 // Computes a fraction of the dot product when N threads are working on a
 // single data point. The elements processed by each thread are those
 // separated by a stride equal to N with an offset given by the thread index % N
+// this version is used on sgd_single_point_1.cu but it's much slow than version2
 static __device__ void d_partialDotProduct(
     FeatureType* data_point_i,
     FeatureType* parameter_vector,
@@ -175,12 +176,8 @@ static __global__ void p_SgdWithSharedParameterVector(
     double step_size) {
 
     extern __shared__ FeatureType shared_memory[];
-    float *probabilities_of_each = (float*)&shared_memory[blockDim.x];
-    // if(threadIdx.x==0 &&blockIdx.x==0){
-    //     printf("%d \n", blockDim.x 
-    //             * LABEL_CLASS);
-    // }
-    // asm("trap;");  
+    // memory place to store 10 possibility for one datapoint
+    float *probabilities_of_each = (float*)&shared_memory[blockDim.x];  
     // computes several indexes, offsets and strides to simplify further code
     size_t tidx = threadIdx.x;
     size_t points_per_block = (blockDim.x / threads_per_datapoint);
