@@ -183,6 +183,9 @@ static __global__ void p_SgdWithSharedParameterVector(
     extern __shared__ FeatureType shared_memory[];
     float *probabilities_of_each = (float*)&shared_memory[blockDim.x 
             * LABEL_CLASS];
+    size_t points_per_block = (blockDim.x / threads_per_datapoint);
+    float *shared_data_points = (float*)&probabilities_of_each[points_per_block 
+                        * LABEL_CLASS]; 
     // if(threadIdx.x==0 &&blockIdx.x==0){
     //     printf("%d \n", blockDim.x 
     //             * LABEL_CLASS);
@@ -206,7 +209,12 @@ static __global__ void p_SgdWithSharedParameterVector(
     // make sure the threads don't go out of bounds
     if (point_idx < num_data_points) {
 
-        data_point_i = (FeatureType*) &data_points[point_idx * num_features];
+        for (size_t j = relative_tidx; j < num_features; j += threads_per_datapoint){
+            shared_data_points[j + point_idx_in_block * num_features]
+                =  data_points[point_idx * num_features + j];
+        } 
+
+        data_point_i = (FeatureType*) &shared_data_points[point_idx_in_block * num_features];
 
         // compute partial dot product
         for(size_t i = 0; i<LABEL_CLASS;i++){
@@ -383,7 +391,7 @@ void trainParallelStochasticGradientDescent1(
 
     const size_t shared_memory_size = block_size.x * sizeof(FeatureType) * LABEL_CLASS
         + datapoints_per_block * sizeof(FeatureType) * LABEL_CLASS ;
-        // + datapoints_per_block * sizeof(FeatureType);
+        + datapoints_per_block * sizeof(FeatureType) * training_set.num_features;
 
     // printf("memosize is %d",shared_memory_size);
     // exit(1);
