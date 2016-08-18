@@ -213,8 +213,10 @@ static __global__ void p_SgdWithSharedParameterVector(
             shared_data_points[j + point_idx_in_block * num_features]
                 =  data_points[point_idx * num_features + j];
         } 
-
+        __syncthreads();
         data_point_i = (FeatureType*) &shared_data_points[point_idx_in_block * num_features];
+
+        
 
         // compute partial dot product
         for(size_t i = 0; i<LABEL_CLASS;i++){
