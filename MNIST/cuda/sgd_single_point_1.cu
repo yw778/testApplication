@@ -160,7 +160,13 @@ static __device__ void d_updateParameters(
 
         }
         
-    }        
+    }
+
+    
+    // asm("trap;"); 
+
+     // debug use
+        
 }   
 
 // Kernel for Parallel Stochastic Gradient Descent in CUDA using

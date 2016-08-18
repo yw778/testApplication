@@ -164,6 +164,9 @@ static __device__ void d_updateParameters(
 }
 
 
+
+
+
 // Kernel for Parallel Stochastic Gradient Descent in CUDA using
 // shared parameter vector
 static __global__ void p_SgdWithSharedParameterVector(
@@ -178,9 +181,12 @@ static __global__ void p_SgdWithSharedParameterVector(
     extern __shared__ FeatureType shared_memory[];
     // memory place to store 10 possibility for one datapoint
     float *probabilities_of_each = (float*)&shared_memory[blockDim.x];  
-    // computes several indexes, offsets and strides to simplify further code
-    size_t tidx = threadIdx.x;
+    // memory place to store datapoint for faster access
     size_t points_per_block = (blockDim.x / threads_per_datapoint);
+    float *shared_data_points = (float*)&probabilities_of_each[points_per_block 
+                        * LABEL_CLASS]; 
+    // computes several indexes, offsets and strides to simplify further code
+    size_t tidx = threadIdx.x;  
     size_t point_idx = (blockIdx.x * points_per_block)
                      + (tidx / threads_per_datapoint);
     // index relative to the datapoint instead of the block
@@ -194,12 +200,20 @@ static __global__ void p_SgdWithSharedParameterVector(
     // size_t tidx_label =  relative_tidx / num_thread_each_label;
     size_t relative_tidx_label =  relative_tidx % num_thread_each_label;
 
+
+
     FeatureType* data_point_i = NULL;
 
     // make sure the threads don't go out of bounds
     if (point_idx < num_data_points) {
 
-        data_point_i = (FeatureType*) &data_points[point_idx * num_features];
+        //move datapoint to shared memory
+        for (size_t j = relative_tidx; j < num_features; j += threads_per_datapoint){
+            shared_data_points[j + point_idx_in_block * num_features]
+                =  data_points[point_idx * num_features + j];
+        } 
+
+        data_point_i = (FeatureType*) &shared_data_points[point_idx_in_block * num_features];
 
         // compute partial dot product
         // for(size_t i = 0; i<LABEL_CLASS;i++){
@@ -211,7 +225,7 @@ static __global__ void p_SgdWithSharedParameterVector(
             //     threads_per_datapoint);
         // }
             
-            d_partialMatrixVectorProduct(
+        d_partialMatrixVectorProduct(
                 data_point_i,
                 parameter_vector,
                 shared_memory,
@@ -394,7 +408,8 @@ void trainParallelStochasticGradientDescent2(
     //     + datapoints_per_block * sizeof(FeatureType) * LABEL_CLASS ;
     //big size thread
     const size_t shared_memory_size = block_size.x * sizeof(FeatureType)
-        + datapoints_per_block * sizeof(FeatureType) * LABEL_CLASS ;
+        + datapoints_per_block * sizeof(FeatureType) * LABEL_CLASS
+        + datapoints_per_block * sizeof(FeatureType) * num_features;
         // + datapoints_per_block * sizeof(FeatureType);
 
     // printf("memosize is %d",shared_memory_size);
