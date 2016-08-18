@@ -162,13 +162,6 @@ static __device__ void d_gradientForMiniBatch2 (
 
         __syncthreads();
 
-        // sum reduce to find dot product
-        // for (size_t s = threads_per_mini_batch / 2; s > 0; s>>=1) {
-        //     if (tidx < s){
-        //         dot_product[tidx] += dot_product[tidx + s];
-        //     }
-        // }
-        //  __syncthreads();
 
         // for(size_t i=0 ; i<LABEL_CLASS ;i++){  
         for (size_t s = num_thread_each_label / 2; s > 0; s>>=1) {
