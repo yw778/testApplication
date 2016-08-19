@@ -127,6 +127,15 @@ __device__ void d_updateParameters(
     size_t threads_per_mini_batch,
     double step_size);
 
+__device__ void d_updateParameters1(
+    FeatureType* data_points,
+    FeatureType* probabilities_of_each,
+    FeatureType* parameter_vector,
+    size_t num_features,
+    size_t batch_size,
+    size_t threads_per_mini_batch,
+    double step_size);
+
 // void p_add_vectors(cublasHandle_t handle, float* a, float* b, const size_t size, const float scale_for_a = 1);
 
 // void addVectors(float* a, float* b, const size_t size, const float scale_for_b);

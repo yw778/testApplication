@@ -238,26 +238,6 @@ static __global__ void p_MiniBatchGradientDescent(
     // FeatureType *gradient = shared_memory;
     size_t threads_per_mini_batch = threads_per_datapoint * batch_size;
     
-    // set all gradient values to 0
-    // d_memset(gradient, 0, LABEL_CLASS * num_features, threads_per_mini_batch);
-    // __syncthreads();
-    //debug use
-   // if(threadIdx.x==0&&blockIdx.x==0){
-   //      for(size_t i=0 ;i<PARAMETER_SIZE;i++){
-   //              printf("g%f--",gradient[i]);
-   //          }
-   //          printf("\n\n");
-   // }
-
-    // Finds gradient for mini-batch   
-    // d_gradientForMiniBatch( data_points,
-    //                         parameter_vector,
-    //                         labels,
-    //                         num_features,
-    //                         num_data_points,
-    //                         batch_size,
-    //                         threads_per_datapoint,
-    //                         gradient);
 
     float *dot_product = shared_memory;
     // array probabilities_of_each in shared_memory of size batch_size * LABEL_CLASS
@@ -311,7 +291,6 @@ static __global__ void p_MiniBatchGradientDescent(
         }
         __syncthreads();
     }
-    // }
 
     if (point_idx < num_data_points) {
 
@@ -382,9 +361,11 @@ static __global__ void p_MiniBatchGradientDescent(
     // d_updateParameters( probabilities_of_each, parameter_vector, num_features,
     //                     threads_per_mini_batch, step_size );
 
-    d_updateParameters( data_points, probabilities_of_each, parameter_vector, num_features,
-                        threads_per_mini_batch, reduced_stepsize);
+        d_updateParameters1( data_points, probabilities_of_each, parameter_vector, num_features,
+                            batch_size, threads_per_mini_batch, reduced_stepsize);
     // if(threadIdx.x==0&&blockIdx.x==0){
+
+    }
     //     printf("after update paramters\n");
     // }
 

@@ -255,21 +255,21 @@ __device__ void d_matrixTranspose2(
 
 
 // updates the parameters using atomics
-// __device__ void d_updateParameters(
-//     FeatureType* gradient,
-//     FeatureType* parameter_vector,
-//     size_t num_features,
-//     size_t threads_per_mini_batch,
-//     double step_size) {
+__device__ void d_updateParameters(
+    FeatureType* gradient,
+    FeatureType* parameter_vector,
+    size_t num_features,
+    size_t threads_per_mini_batch,
+    double step_size) {
 
-//     size_t tidx = threadIdx.x;
+    size_t tidx = threadIdx.x;
     
-//     for (size_t i = tidx; i < num_features * LABEL_CLASS; i += threads_per_mini_batch) {
-//         FeatureType gradient_times_step_size = gradient[i] * step_size;
-//         atomicAdd(&parameter_vector[i], -gradient_times_step_size);
-//     }
+    for (size_t i = tidx; i < num_features * LABEL_CLASS; i += threads_per_mini_batch) {
+        FeatureType gradient_times_step_size = gradient[i] * step_size;
+        atomicAdd(&parameter_vector[i], -gradient_times_step_size);
+    }
 
-// }
+}
 
 // static __device__ void d_updateParameters(
 //     FeatureType* data_point_i,
@@ -295,12 +295,12 @@ __device__ void d_matrixTranspose2(
 // }
 
 //calculate gradient and update parameters
-__device__ void d_updateParameters(
+__device__ void d_updateParameters1(
     FeatureType* data_points,
     FeatureType* probabilities_of_each,
-    // FeatureType* gradient,
     FeatureType* parameter_vector,
     size_t num_features,
+    size_t batch_size,
     size_t threads_per_mini_batch,
     double step_size) {
 
@@ -329,8 +329,8 @@ __device__ void d_updateParameters(
             // index of the feature with respect to all features in the dataset
             size_t feature_idx = point_idx * num_features + i;
             //gradient result 
-            gradient_times_stepsize += datapoint_matrix[feature_idx] 
-                * probility_matrix[j*LABEL_CLASS + tidx_label];
+            gradient_times_stepsize += data_points[feature_idx] 
+                * probabilities_of_each[j*LABEL_CLASS + tidx_label];
         }
 
         atomicAdd(&parameter_vector[i+tidx_label*num_features], -gradient_times_stepsize);    
