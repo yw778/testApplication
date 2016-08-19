@@ -255,21 +255,121 @@ __device__ void d_matrixTranspose2(
 
 
 // updates the parameters using atomics
+// __device__ void d_updateParameters(
+//     FeatureType* gradient,
+//     FeatureType* parameter_vector,
+//     size_t num_features,
+//     size_t threads_per_mini_batch,
+//     double step_size) {
+
+//     size_t tidx = threadIdx.x;
+    
+//     for (size_t i = tidx; i < num_features * LABEL_CLASS; i += threads_per_mini_batch) {
+//         FeatureType gradient_times_step_size = gradient[i] * step_size;
+//         atomicAdd(&parameter_vector[i], -gradient_times_step_size);
+//     }
+
+// }
+
+// static __device__ void d_updateParameters(
+//     FeatureType* data_point_i,
+//     FeatureType* parameter_vector,
+//     size_t num_features,
+//     size_t threads_per_datapoint,
+//     size_t point_idx_in_block,
+//     FeatureType* step_size_times_prob_i_minus_label_i) {
+//     //memset to 0
+
+//     size_t thread_offset = threadIdx.x % threads_per_datapoint;
+//     size_t num_thread_each_label = threads_per_datapoint / LABEL_CLASS;
+//     //index relative to each label(corresponding to 784 parameter) 
+//     //Eg: 320 thread for 10 label -> each label 32 thread
+//     size_t tidx_label =  thread_offset / num_thread_each_label;
+//     size_t relative_tidx_label =  thread_offset % num_thread_each_label;
+//     // strided calculation of element-wise vector reduce concurrently in 10 dimentions
+//     for (size_t j = relative_tidx_label; j < num_features; j+= num_thread_each_label)
+
+//         atomicAdd(&parameter_vector[j+tidx_label*num_features], - data_point_i[j] 
+//                 * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+tidx_label]);
+
+// }
+
+//calculate gradient and update parameters
 __device__ void d_updateParameters(
-    FeatureType* gradient,
+    FeatureType* data_points,
+    FeatureType* probabilities_of_each,
+    // FeatureType* gradient,
     FeatureType* parameter_vector,
     size_t num_features,
     size_t threads_per_mini_batch,
     double step_size) {
 
     size_t tidx = threadIdx.x;
+    size_t bidx = blockIdx.x;
+
+    // size_t thread_offset = threadIdx.x % threads_per_datapoint;
+    size_t num_thread_each_label = threads_per_mini_batch / LABEL_CLASS;
+    //index relative to each label(corresponding to 784 parameter) 
+    //Eg: 320 thread for 10 label -> each label 32 thread
+    size_t tidx_label =  tidx / num_thread_each_label;
+    size_t relative_tidx_label =  tidx % num_thread_each_label;
     
-    for (size_t i = tidx; i < num_features * LABEL_CLASS; i += threads_per_mini_batch) {
-        FeatureType gradient_times_step_size = gradient[i] * step_size;
-        atomicAdd(&parameter_vector[i], -gradient_times_step_size);
+    // for (size_t i = tidx; i < num_features * LABEL_CLASS; i += threads_per_mini_batch) {
+    //     FeatureType gradient_times_step_size = gradient[i] * step_size;
+    //     atomicAdd(&parameter_vector[i], -gradient_times_step_size);
+    // }
+
+    for (int i = relative_tidx_label; i < num_features; i += num_thread_each_label) {
+
+        float gradient_times_stepsize = 0;
+
+        for (int j = 0; j < batch_size; j++) {
+            // index of the point with respect to the whole dataset
+            size_t point_idx = bidx * batch_size + j;
+            // index of the feature with respect to all features in the dataset
+            size_t feature_idx = point_idx * num_features + i;
+            //gradient result 
+            gradient_times_stepsize += datapoint_matrix[feature_idx] 
+                * probility_matrix[j*LABEL_CLASS + tidx_label];
+        }
+
+        atomicAdd(&parameter_vector[i+tidx_label*num_features], -gradient_times_stepsize);    
+    
     }
 
 }
+
+// __device__ void d_matrixMatrixMultiply2(
+//     FeatureType* datapoint_matrix,
+//     FeatureType* probility_matrix,
+//     float scalar,
+//     size_t batch_size,
+//     size_t num_features,
+//     size_t threads_per_mini_batch,
+//     FeatureType* result) {
+
+//     size_t tidx = threadIdx.x;
+//     size_t bidx = blockIdx.x;
+
+//     // size_t thread_offset = threadIdx.x % threads_per_datapoint;
+//     size_t num_thread_each_label = threads_per_mini_batch / LABEL_CLASS;
+//     //index relative to each label(corresponding to 784 parameter) 
+//     //Eg: 320 thread for 10 label -> each label 32 thread
+//     size_t tidx_label =  tidx / num_thread_each_label;
+//     size_t relative_tidx_label =  tidx % num_thread_each_label;
+ 
+//     for (int j = 0; j < batch_size; j++) {
+//         for (int i = relative_tidx_label; i < num_features; i += num_thread_each_label) {
+//             // index of the point with respect to the whole dataset
+//             size_t point_idx = bidx * batch_size + j;
+//             // index of the feature with respect to all features in the dataset
+//             size_t feature_idx = point_idx * num_features + i;
+//             //gradient result 
+//             result[i+tidx_label*num_features] += datapoint_matrix[feature_idx] 
+//                 * probility_matrix[j+tidx_label*batch_size] * scalar;
+//         }
+//     }    
+// }
 
 // posibilily another way..
 // speed almost the same 
