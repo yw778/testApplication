@@ -325,9 +325,9 @@ __device__ void d_updateParameters1(
 
         for (int j = 0; j < batch_size; j++) {
             // index of the point with respect to the whole dataset
-            size_t point_idx = bidx * batch_size + j;
+            // size_t point_idx = bidx * batch_size + j;
             // index of the feature with respect to all features in the dataset
-            size_t feature_idx = point_idx * num_features + i;
+            size_t feature_idx = j * num_features + i;
             //gradient result 
             gradient_times_stepsize += data_points[feature_idx] 
                 * probabilities_of_each[j*LABEL_CLASS + tidx_label];

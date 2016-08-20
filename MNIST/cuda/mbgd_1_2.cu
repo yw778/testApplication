@@ -242,6 +242,9 @@ static __global__ void p_MiniBatchGradientDescent(
     float *dot_product = shared_memory;
     // array probabilities_of_each in shared_memory of size batch_size * LABEL_CLASS
     float *probabilities_of_each = (float*)&dot_product[threads_per_mini_batch];
+    // size_t points_per_block = (blockDim.x / threads_per_datapoint);
+    float *shared_data_points = (float*)&probabilities_of_each[batch_size 
+                            * LABEL_CLASS]; 
     // array of transpose of probabilities matrix
     //Eg: [1 2 3 4 5 6 7 8 9 10 1 2 3 4 5 6 7 8 9 10] -> [1 1 2 2 3 3 4 4 5 5 6 6 7 7 8 8 9 9 10 10] 
     // float *probabilities_transpose = (float*)&probabilities_of_each[batch_size * LABEL_CLASS];
@@ -265,9 +268,16 @@ static __global__ void p_MiniBatchGradientDescent(
     // computes softmax function for each data point in the mini batch
     // size_t starting_point = point_idx * num_features;
     if (point_idx < num_data_points){
+
+        //move datapoint to shared memory
+        for (size_t j = relative_tidx; j < num_features; j += threads_per_datapoint){
+            shared_data_points[j + point_idx_in_block * num_features]
+                =  data_points[point_idx * num_features + j];
+        }
         
          d_partialMatrixVectorProduct(
-                &data_points[point_idx * num_features], 
+                // &data_points[point_idx * num_features], 
+                shared_data_points[point_idx_in_block * num_features],
                 parameter_vector,
                 dot_product,
                 num_features,
@@ -307,7 +317,7 @@ static __global__ void p_MiniBatchGradientDescent(
         __syncthreads();
 
 
-        d_updateParameters1( data_points, probabilities_of_each, parameter_vector, num_features,
+        d_updateParameters1( shared_data_points, probabilities_of_each, parameter_vector, num_features,
                             batch_size, threads_per_mini_batch, reduced_stepsize);
     
 
@@ -361,12 +371,10 @@ void trainParallelMiniBatchGradientDescent12(
     const dim3 grid_size(num_blocks, 1, 1);
 
     FeatureType threads_per_batch = threads_per_datapoint * batch_size;
-    //shared Memory for posibility, posibility transpose, dot product and gradient
+    //shared Memory for posibility, dot product and gradient
     const size_t shared_memory_size = LABEL_CLASS * batch_size * sizeof(float) 
-            + threads_per_batch * sizeof(FeatureType);
-            // + LABEL_CLASS * batch_size * sizeof(float)
-           
-            // + LABEL_CLASS * training_set.num_features * sizeof(FeatureType);
+            + threads_per_batch * sizeof(FeatureType)          
+            + batch_size * training_set.num_features * sizeof(FeatureType);
 
  
     if (checkDeviceProps(shared_memory_size, block_size, grid_size)) {
