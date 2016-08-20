@@ -298,8 +298,8 @@ static __global__ void p_MiniBatchGradientDescent(
         //calculate {y(i)=k}−P(y(i)=k|x(i)
         if(relative_tidx < LABEL_CLASS){
             if(labels[point_idx]==relative_tidx){
-                // probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx] -= 1;
-                probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx] *= -reduced_stepsize;
+                probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx] -= 1;
+                probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx] *= reduced_stepsize;
             }else{                   
                 probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx] *= reduced_stepsize;
             }
