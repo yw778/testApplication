@@ -277,7 +277,7 @@ static __global__ void p_MiniBatchGradientDescent(
         
          d_partialMatrixVectorProduct(
                 // &data_points[point_idx * num_features], 
-                shared_data_points[point_idx_in_block * num_features],
+                &shared_data_points[point_idx_in_block * num_features],
                 parameter_vector,
                 dot_product,
                 num_features,
