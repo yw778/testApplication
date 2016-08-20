@@ -381,7 +381,7 @@ void trainParallelMiniBatchGradientDescent12(
             //debug use
             // printf("before enter kernal\n");
             // printf("batch size is %f, threads_per_data is %f\n",batch_size,threads_per_datapoint);
-            
+            //
 
             // adjust step size with a modified version of simulated annealing
 
