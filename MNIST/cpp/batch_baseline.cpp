@@ -236,7 +236,7 @@ static void anneal(
 
 
 // executes serial implementation of stochastic gradient descent for
-// logistic regression until convergence or for a fixed number of epochs
+// softmax regression until convergence or for a fixed number of epochs
 void trainBatchGradientDescent(
     DataSet training_set,
     TrainingOptions training_options) {
@@ -263,9 +263,6 @@ void trainBatchGradientDescent(
 
         softmaxGradientForWholeBatch(training_set, gradient);
         
-        // printf("enter epoch\n");
-        // double previous_loss = softmaxLossFunction(training_set);
-        // printf("%f,",previous_loss);
 
         softmaxBoldDriver(training_set, gradient, &step_size);
         

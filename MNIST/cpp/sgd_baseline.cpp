@@ -117,7 +117,7 @@ void trainStochasticGradientDescent(
         }
 
         // double previous_loss = softmaxLossFunction(training_set);
-        // printf("sgd loss is %f\n",previous_loss); 
+        
     }
 
     *training_options.step_size = annealed_step_size;

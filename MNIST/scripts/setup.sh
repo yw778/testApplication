@@ -19,18 +19,18 @@ case ":$LD_LIBRARY_PATH:" in
 esac
 # cuda
 case ":$PATH:" in
-    *:/usr/local/cuda-7.0/bin:*) true ;;
-    *) export PATH=$PATH:/usr/local/cuda-7.0/bin ;;
+    *:/usr/local/cuda-7.5/bin:*) true ;;
+    *) export PATH=$PATH:/usr/local/cuda-7.5/bin ;;
 esac
 case ":$LD_LIBRARY_PATH:" in
-    *:/usr/local/cuda-7.0/lib64:*) true ;;
-    *) export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-7.0/lib64 ;;
+    *:/usr/local/cuda-7.5/lib64:*) true ;;
+    *) export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-7.5/lib64 ;;
 esac
 case ":$LD_LIBRARY_PATH:" in
-    *:/usr/local/cuda-7.0/targets/x86_64-linux/lib:*) ;;
-    *) export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-7.0/targets/x86_64-linux/lib ;;
+    *:/usr/local/cuda-7.5/targets/x86_64-linux/lib:*) ;;
+    *) export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-7.5/targets/x86_64-linux/lib ;;
 esac
-export CUDA_ROOT=/usr/local/cuda-7.0/bin
+export CUDA_ROOT=/usr/local/cuda-7.5/bin
 
 ######################
 #### for zhang server:

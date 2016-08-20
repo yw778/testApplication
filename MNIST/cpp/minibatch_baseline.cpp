@@ -202,7 +202,7 @@ void trainMiniBatchGradientDescent(
                                    * training_set.num_data_points
                                    / characteristic_time));
         curr_num_epochs++;
-        // printf("pochs %d,step size %f,error is %f\n",curr_num_epochs,annealed_step_size,computeSoftmaxErrorRate(training_set));
+        
         for (int j = 0; j < num_mini_batches; j++){
             size_t idx = j * batch_size;
             // compute gradient
@@ -217,7 +217,7 @@ void trainMiniBatchGradientDescent(
 
         }             
         // double previous_loss = softmaxLossFunction(training_set);
-        // printf("minibatch loss is %f\n",previous_loss);
+        
          *training_options.step_size = annealed_step_size;
         
     }

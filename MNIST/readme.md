@@ -8,7 +8,7 @@ Read the [note](#paths) about paths and then go to [Running the code](#run).
 
 ## Description: ##
 
-This project contains several different versions of the *Gradient Descent* method used to train a *logistic regression* model. This model can be used for binary classification problems, including spam email filtering. The contents of the different modules are explained below:
+This project contains several different versions of the *Gradient Descent* method used to train a *softmax regression* model. This model can be used for classification problems, including digit recognition. The contents of the different modules are explained below:
 
 <a name="paths"></a>**Note:** some libraries (OpenBLAS, CuBLAS, CUDA, Vivado HLS, ...) may be installed in different directories in your system, and thus may require the modification of paths in the Makefiles, setup `.sh` scripts (or the `LD_LIBRARY_PATH` environment variable) and `.tcl` scripts.
 
@@ -52,7 +52,7 @@ Or just
 ```bash
 . compile_and_run_baseline.sh [options]
 ```
-For the different configuration options, see `utils/spamfilter_utils.cpp`.
+For the different configuration options, see `utils/mnist_utils.cpp`.
 
 Make sure the data (features and labels) are located in `./data/`.
 
