@@ -28,7 +28,8 @@ BLAS_INCLUDEANDLINK := -I $(BLAS_INSTALL_DIR)/include -L$(BLAS_INSTALL_DIR)/lib 
 # BLAS_INCLUDEANDLINK :=
 
 C_FLAGS := -O3 -Wall -Wextra -m64 -I./ -I./lib/OpenBLAS/include $(BLAS_INCLUDEANDLINK)
-CUDA_FLAGS := -O3 --gpu-architecture=sm_35 -Xptxas="-v" -Xcompiler -Wall -Xcompiler -Wextra -m64 -I . $(BLAS_INCLUDEANDLINK)
+CUDA_FLAGS := -O3 --gpu-architecture=sm_35 -Xcompiler -Wall -Xcompiler -Wextra -m64 -I . $(BLAS_INCLUDEANDLINK)
+# add -Xptxas="-v" to show register use
 CUDA_SEPARATE_COMPILATION_FLAGS := --device-c
 SDACCEL_FLAGS :=
 
