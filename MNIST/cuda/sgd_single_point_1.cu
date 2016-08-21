@@ -162,9 +162,10 @@ static __device__ void d_updateParameters(
     size_t num_thread_each_class = threads_per_datapoint / threads_class_per_datapoint;
     size_t relative_tidx_each_class = thread_offset % num_thread_each_class;
     size_t parameters_idx_each_class =  thread_offset / num_thread_each_class;
+    size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
     // __syncthreads();
 
-    for(size_t i = 0; i < LABEL_CLASS/threads_class_per_datapoint ; i++){
+    for(size_t i = 0; i < num_parameter_each_class ; i++){
         
         for (size_t j = relative_tidx_each_class; j < num_features; j += num_thread_each_class){
 
@@ -336,6 +337,7 @@ static __global__ void p_SgdWithSharedParameterVector(
             relative_tidx,
             threads_class_per_datapoint,
             probabilities_of_each);
+
         // debug use
         // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block ==1){
         //     for(size_t i=0; i<PARAMETER_SIZE;i++){
