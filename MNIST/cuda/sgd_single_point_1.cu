@@ -216,7 +216,7 @@ static __global__ void p_SgdWithSharedParameterVector(
     // size_t parameters_idx_each_class =  relative_tidx / num_thread_each_class;
 
 
-    // FeatureType* data_point_i = NULL;
+    FeatureType* data_point_i = NULL;
 
     // make sure the threads don't go out of bounds
     if (point_idx < num_data_points) {
@@ -228,14 +228,14 @@ static __global__ void p_SgdWithSharedParameterVector(
 
         __syncthreads();
 
-        // data_point_i = (FeatureType*) &shared_data_points[point_idx * num_features];
+        data_point_i = (FeatureType*) &shared_data_points[point_idx_in_block * num_features];
 
         // compute partial matrix-vector product
         for(size_t i = 0; i < num_parameter_each_class; i++){
             
            
             d_partialMatrixVectorProduct(
-                &shared_data_points[point_idx_in_block * num_features],
+                data_point_i,
                 &parameter_vector[i * threads_class_per_datapoint * num_features],
                 shared_memory,
                 num_features,
@@ -287,7 +287,7 @@ static __global__ void p_SgdWithSharedParameterVector(
        
         // update parameter
         d_updateParameters(
-            &shared_data_points[point_idx_in_block * num_features],
+            data_point_i,
             parameter_vector,
             num_features,
             threads_per_datapoint,
