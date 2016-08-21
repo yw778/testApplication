@@ -80,7 +80,7 @@ static __device__ void d_updateParametersForMiniBatch(
     size_t threads_per_mini_batch,
     size_t threads_class_per_datapoint) {
 
-    // size_t tidx = threadIdx.x;
+    size_t tidx = threadIdx.x;
     size_t bidx = blockIdx.x;
 
     // size_t thread_offset = threadIdx.x % threads_per_datapoint;
@@ -90,8 +90,8 @@ static __device__ void d_updateParametersForMiniBatch(
     // size_t relative_tidx_label =  thread_offset % num_thread_each_label;
     // index relative to each class of thread
     size_t num_thread_each_class = threads_per_mini_batch / threads_class_per_datapoint;
-    size_t relative_tidx_each_class = thread_offset % num_thread_each_class;
-    size_t parameters_idx_each_class =  thread_offset / num_thread_each_class;
+    size_t relative_tidx_each_class = tidx % num_thread_each_class;
+    size_t parameters_idx_each_class =  tidx / num_thread_each_class;
     size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
     
     // for (size_t i = tidx; i < num_features * LABEL_CLASS; i += threads_per_mini_batch) {
