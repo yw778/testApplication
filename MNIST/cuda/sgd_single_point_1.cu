@@ -235,7 +235,7 @@ static __global__ void p_SgdWithSharedParameterVector(
             
            
             d_partialMatrixVectorProduct(
-                &shared_data_points[point_idx * num_features],
+                &shared_data_points[point_idx_in_block * num_features],
                 &parameter_vector[i * threads_class_per_datapoint * num_features],
                 shared_memory,
                 num_features,
@@ -287,7 +287,7 @@ static __global__ void p_SgdWithSharedParameterVector(
        
         // update parameter
         d_updateParameters(
-            &shared_data_points[point_idx * num_features],
+            &shared_data_points[point_idx_in_block * num_features],
             parameter_vector,
             num_features,
             threads_per_datapoint,
