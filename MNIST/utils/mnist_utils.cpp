@@ -559,23 +559,25 @@ void convergenceTime(
     // Output results
     maybePrintHeader("name,config params,runs,epochs,train time,"
                      "train Error,test Error\n");
+    
+    if(training_time > 100){
+        printf( "%s,%s,%lu,%lu,%f,%f,%f\n",
+                name,
+                configParamsToStr(training_options.config_params).c_str(),
+                benchmark_options.num_runs,
+                avg_num_epochs,
+                training_time,
+                // train_errors["tpr"],
+                // train_errors["fpr"],
+                train_errors["error"],
+                // test_errors["tpr"],
+                // test_errors["fpr"],
+                test_errors["error"]);
 
-    printf( "%s,%s,%lu,%lu,%f,%f,%f\n",
-            name,
-            configParamsToStr(training_options.config_params).c_str(),
-            benchmark_options.num_runs,
-            avg_num_epochs,
-            training_time,
-            // train_errors["tpr"],
-            // train_errors["fpr"],
-            train_errors["error"],
-            // test_errors["tpr"],
-            // test_errors["fpr"],
-            test_errors["error"]);
-
-    // reset configuration parameters
-    *training_options.step_size =
-        training_options.config_params["initial_step_size"];
+        // reset configuration parameters
+        *training_options.step_size =
+            training_options.config_params["initial_step_size"];
+    }        
 }
 
 

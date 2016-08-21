@@ -438,17 +438,6 @@ __device__ void d_softMaxFunction(
     size_t relative_tidx,
     size_t point_idx_in_block) {
 
-    //Take fast exponential
-    // if(relative_tidx < LABEL_CLASS){
-    //     // idx to find where the sum of dot product lies
-    //     // size_t block_idx = relative_tidx / threads_class_per_datapoint;
-    //     // size_t sub_block_idx = relative_tidx % threads_class_per_datapoint;
-    //     posibility_each[point_idx_in_block * LABEL_CLASS + i]
-    //         = __expf(posibility_each[point_idx_in_block * LABEL_CLASS + i]);
-
-    // }
-    // __syncthreads();
-
     //calculate sum , each thread has a copy (++)
     float sum = 0;
     for (size_t i=0;i<LABEL_CLASS;i++){
