@@ -250,7 +250,7 @@ static __global__ void p_SgdWithSharedParameterVector(
                 // size_t block_idx = relative_tidx / threads_class_per_datapoint;
                 size_t sub_block_idx = relative_tidx % threads_class_per_datapoint;
 
-                posibility_each[point_idx_in_block * LABEL_CLASS+relative_tidx * i]
+                probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx * i]
                     = __expf(shared_memory[sub_block_idx * num_thread_each_class
                         + point_idx_in_shmem]);
 
