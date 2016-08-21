@@ -433,26 +433,21 @@ __device__ float d_logisticFunction(float exponent) {
 }
 
 // general softmax function for all partitions
-__device__ void d_softMaxFunction(FeatureType* shared_memory, 
+__device__ void d_softMaxFunction(
     FeatureType* posibility_each,
-    size_t point_idx_in_shmem,
     size_t relative_tidx,
-    size_t point_idx_in_block,
-    size_t num_thread_each_class,
-    size_t threads_class_per_datapoint) {
-    
-    //copy (theta)T x and take fast exponential
-    if(relative_tidx < LABEL_CLASS){
-        // idx to find where the sum of dot product lies
-        size_t block_idx = relative_tidx / threads_class_per_datapoint;
-        size_t sub_block_idx = relative_tidx % threads_class_per_datapoint;
+    size_t point_idx_in_block) {
 
-        posibility_each[point_idx_in_block * LABEL_CLASS+relative_tidx]
-            = __expf(shared_memory[sub_block_idx * num_thread_each_class
-                + point_idx_in_shmem + block_idx * blockDim.x]);
+    //Take fast exponential
+    // if(relative_tidx < LABEL_CLASS){
+    //     // idx to find where the sum of dot product lies
+    //     // size_t block_idx = relative_tidx / threads_class_per_datapoint;
+    //     // size_t sub_block_idx = relative_tidx % threads_class_per_datapoint;
+    //     posibility_each[point_idx_in_block * LABEL_CLASS + i]
+    //         = __expf(posibility_each[point_idx_in_block * LABEL_CLASS + i]);
 
-    }
-    __syncthreads();
+    // }
+    // __syncthreads();
 
     //calculate sum , each thread has a copy (++)
     float sum = 0;

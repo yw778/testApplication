@@ -92,8 +92,7 @@ static __device__ void d_partialMatrixVectorProduct(
     FeatureType* shared_memory,
     size_t num_features,
     size_t threads_per_datapoint,
-    size_t threads_class_per_datapoint,
-    size_t parameter_i) {
+    size_t threads_class_per_datapoint) {
     //memset to 0
     FeatureType partial_dot = 0;
 
@@ -115,7 +114,7 @@ static __device__ void d_partialMatrixVectorProduct(
         partial_dot += data_point_i[j] * parameter_vector[j + parameters_idx_each_class * num_features];
 
     // result of the partial dot product is stored in shared memory
-    shared_memory[threadIdx.x + parameter_i * blockDim.x] = partial_dot;
+    shared_memory[threadIdx.x] = partial_dot;
 }
 
 // updates parameter vector in parallel when N threads are working on each point
@@ -195,12 +194,12 @@ static __global__ void p_SgdWithSharedParameterVector(
 
     extern __shared__ FeatureType shared_memory[];
 
-    size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
-
-    float *probabilities_of_each = (float*)&shared_memory[blockDim.x 
-        * num_parameter_each_class]; 
+    
+    // memory place for possibility
+    float *probabilities_of_each = (float*)&shared_memory[blockDim.x]; 
     // computes several indexes, offsets and strides to simplify further code
     size_t tidx = threadIdx.x;
+    size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
     size_t points_per_block = (blockDim.x / threads_per_datapoint);
     size_t point_idx = (blockIdx.x * points_per_block)
                      + (tidx / threads_per_datapoint);
@@ -221,7 +220,7 @@ static __global__ void p_SgdWithSharedParameterVector(
 
         data_point_i = (FeatureType*) &data_points[point_idx * num_features];
 
-        // compute partial dot product
+        // compute partial matrix-vector product
         for(size_t i = 0; i < num_parameter_each_class; i++){
             
            
@@ -231,32 +230,38 @@ static __global__ void p_SgdWithSharedParameterVector(
                 shared_memory,
                 num_features,
                 threads_per_datapoint,
-                threads_class_per_datapoint,
-                i);
-        }
-    }
+                threads_class_per_datapoint);
 
-    __syncthreads();
+            __syncthreads();
 
-    // sum-reduce the results of partial dot product to get final result
-    for(size_t i = 0 ; i < num_parameter_each_class ;i++){  
+            // sum-reduce the results of partial dot product to get final result        
+            for (size_t s = num_thread_each_class / 2; s > 0; s>>=1) {
+                
+                if (relative_tidx_each_class < s) {
+                    shared_memory[tidx] += shared_memory[tidx+s];
+                }
+                __syncthreads();
+            }
 
-        for (size_t s = num_thread_each_class / 2; s > 0; s>>=1) {
-            
-            if (relative_tidx_each_class < s) {
-                shared_memory[tidx+i*blockDim.x] += shared_memory[tidx+s+i*blockDim.x];
+            //copy result from shared_memory to possibility_each
+            //at the same time take fast exponential
+            if(relative_tidx < threads_class_per_datapoint){
+                // idx to find where the sum of dot product lies
+                // size_t block_idx = relative_tidx / threads_class_per_datapoint;
+                size_t sub_block_idx = relative_tidx % threads_class_per_datapoint;
+
+                posibility_each[point_idx_in_block * LABEL_CLASS+relative_tidx * i]
+                    = __expf(shared_memory[sub_block_idx * num_thread_each_class
+                        + point_idx_in_shmem]);
+
             }
             __syncthreads();
-        }
-    }
-    
-    // make sure the threads don't go out of bounds
-    if (point_idx < num_data_points) {
         
-        d_softMaxFunction(shared_memory,probabilities_of_each,
-                    point_idx_in_shmem,relative_tidx,
-                    point_idx_in_block, num_thread_each_class,
-                    threads_class_per_datapoint);
+        }
+
+        d_softMaxFunction(probabilities_of_each,
+                    relative_tidx,
+                    point_idx_in_block);
         
         //calculate step_size_times_prob_i_minus_label_i, store in the same position
         //calculate eta * {y(i)=k}−P(y(i)=k|x(i)
@@ -353,8 +358,7 @@ void trainParallelStochasticGradientDescent1(
 
     //shared memory for matrix-vector partitial product and probability
     const size_t shared_memory_size = block_size.x * sizeof(FeatureType) 
-        * LABEL_CLASS / threads_class_per_datapoint + datapoints_per_block 
-        * sizeof(FeatureType) * LABEL_CLASS ;
+         + datapoints_per_block * sizeof(FeatureType) * LABEL_CLASS ;
   
 
     // check that the resulting grid and block dimensions

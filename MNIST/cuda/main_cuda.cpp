@@ -280,6 +280,35 @@ void runConvergenceTime(
     size_t threads_class_per_datapoint[4] = {1, 2, 5, 10};
 
 
+    for(size_t i = 0 ;i < 2; i++){
+        //define threads classes for one datapoint for blocking
+        training_options.config_params["threads_class_per_datapoint"]
+                = threads_class_per_datapoint[i];
+
+        for (size_t threads_per_datapoint = 64;
+            threads_per_datapoint <= 512;
+            threads_per_datapoint *= 2) {
+
+            training_options.config_params["threads_per_datapoint"]
+            = threads_per_datapoint;
+
+            for (size_t datapoints_per_block = 1;
+                datapoints_per_block <= 8;
+                datapoints_per_block *= 2) {
+
+                training_options.config_params["datapoints_per_block"]
+                = datapoints_per_block;
+
+                convergenceTime(
+                    trainParallelStochasticGradientDescent1,
+                    "CUDA SGD 1",
+                    data_set,
+                    training_options,
+                    benchmark_options);
+            }
+        }
+    }
+
     for(size_t i = 2 ;i < 4; i++){
         //define threads classes for one datapoint for blocking
         training_options.config_params["threads_class_per_datapoint"]

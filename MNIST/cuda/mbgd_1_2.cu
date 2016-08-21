@@ -373,7 +373,7 @@ void trainParallelMiniBatchGradientDescent12(
     const dim3 grid_size(num_blocks, 1, 1);
 
     FeatureType threads_per_batch = threads_per_datapoint * batch_size;
-    //shared Memory for posibility, dot product and gradient
+    //shared Memory for posibility, dot product and datapoint
     const size_t shared_memory_size = LABEL_CLASS * batch_size * sizeof(float) 
             + threads_per_batch * sizeof(FeatureType)          
             + batch_size * training_set.num_features * sizeof(FeatureType);
