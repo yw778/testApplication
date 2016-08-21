@@ -301,7 +301,7 @@ void runConvergenceTime(
 
                 convergenceTime(
                     trainParallelStochasticGradientDescent1,
-                    "CUDA SGD 1",
+                    "CUDA SGD",
                     data_set,
                     training_options,
                     benchmark_options);
@@ -330,7 +330,7 @@ void runConvergenceTime(
 
                 convergenceTime(
                     trainParallelStochasticGradientDescent1,
-                    "CUDA SGD 1",
+                    "CUDA SGD",
                     data_set,
                     training_options,
                     benchmark_options);
