@@ -203,7 +203,7 @@ static __global__ void p_SgdWithSharedParameterVector(
     size_t points_per_block = (blockDim.x / threads_per_datapoint);
     float *shared_data_points = (float*)&probabilities_of_each[points_per_block 
                             * LABEL_CLASS]; 
-
+    //index reletive to all datapoint
     size_t point_idx = (blockIdx.x * points_per_block)
                      + (tidx / threads_per_datapoint);
     // index relative to the datapoint instead of the block
