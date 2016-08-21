@@ -360,90 +360,91 @@ void runConvergenceTime(
     //             benchmark_options);
     //     }
     // }
-    for(size_t i = 0 ;i < 2; i++){
 
-        training_options.config_params["threads_class_per_datapoint"]
-                = threads_class_per_datapoint[i];
+    // for(size_t i = 0 ;i < 2; i++){
 
-        size_t batch_sizes2[8] = {2, 4, 6, 8, 8, 9, 10, 11};
-        for (size_t threads_per_datapoint = 64;
-            threads_per_datapoint <= 512;
-            threads_per_datapoint *= 2) {
+    //     training_options.config_params["threads_class_per_datapoint"]
+    //             = threads_class_per_datapoint[i];
 
-            training_options.config_params["threads_per_datapoint"]
-            = threads_per_datapoint;
+    //     size_t batch_sizes2[8] = {2, 4, 6, 8, 8, 9, 10, 11};
+    //     for (size_t threads_per_datapoint = 64;
+    //         threads_per_datapoint <= 512;
+    //         threads_per_datapoint *= 2) {
 
-            for (size_t i = 0;
-                i < 4;
-                i++) {
+    //         training_options.config_params["threads_per_datapoint"]
+    //         = threads_per_datapoint;
+
+    //         for (size_t i = 0;
+    //             i < 4;
+    //             i++) {
                 
-                training_options.config_params["batch_size"]
-                = batch_sizes2[i];
+    //             training_options.config_params["batch_size"]
+    //             = batch_sizes2[i];
 
-                convergenceTime(
-                    trainParallelMiniBatchGradientDescent,
-                    "CUDA MBGD 1",
-                    data_set,
-                    training_options,
-                    benchmark_options);
-            }
-        }
-    }
-
-    for(size_t i = 3 ;i < 4; i++){
-
-        training_options.config_params["threads_class_per_datapoint"]
-                = threads_class_per_datapoint[i];
-
-        size_t batch_sizes2[8] = {2, 4, 6, 8, 8, 9, 10, 11};
-        for (size_t threads_per_datapoint = 80;
-            threads_per_datapoint <= 640;
-            threads_per_datapoint *= 2) {
-
-            training_options.config_params["threads_per_datapoint"]
-            = threads_per_datapoint;
-
-            for (size_t i = 0;
-                i < 4;
-                i++) {
-                
-                training_options.config_params["batch_size"]
-                = batch_sizes2[i];
-
-                convergenceTime(
-                    trainParallelMiniBatchGradientDescent,
-                    "CUDA MBGD 1",
-                    data_set,
-                    training_options,
-                    benchmark_options);
-            }
-        }
-    }
-
-
-    // size_t batch_sizes3[9] = {2, 3, 4, 5, 6, 6, 6, 7, 8};
-    // for (size_t threads_per_datapoint = 160;
-    //     threads_per_datapoint <= 320;
-    //     threads_per_datapoint *= 2) {
-
-    //     training_options.config_params["threads_per_datapoint"]
-    //     = threads_per_datapoint;
-
-    //     for (size_t i = 0;
-    //         i < 5;
-    //         i++) {
-            
-    //         training_options.config_params["batch_size"]
-    //         = batch_sizes3[i];
-
-    //         convergenceTime(
-    //             trainParallelMiniBatchGradientDescent12,
-    //             "CUDA MBGD 1-2",
-    //             data_set,
-    //             training_options,
-    //             benchmark_options);
+    //             convergenceTime(
+    //                 trainParallelMiniBatchGradientDescent,
+    //                 "CUDA MBGD 1",
+    //                 data_set,
+    //                 training_options,
+    //                 benchmark_options);
+    //         }
     //     }
     // }
+
+    // for(size_t i = 3 ;i < 4; i++){
+
+    //     training_options.config_params["threads_class_per_datapoint"]
+    //             = threads_class_per_datapoint[i];
+
+    //     size_t batch_sizes2[8] = {2, 4, 6, 8, 8, 9, 10, 11};
+    //     for (size_t threads_per_datapoint = 80;
+    //         threads_per_datapoint <= 640;
+    //         threads_per_datapoint *= 2) {
+
+    //         training_options.config_params["threads_per_datapoint"]
+    //         = threads_per_datapoint;
+
+    //         for (size_t i = 0;
+    //             i < 4;
+    //             i++) {
+                
+    //             training_options.config_params["batch_size"]
+    //             = batch_sizes2[i];
+
+    //             convergenceTime(
+    //                 trainParallelMiniBatchGradientDescent,
+    //                 "CUDA MBGD 1",
+    //                 data_set,
+    //                 training_options,
+    //                 benchmark_options);
+    //         }
+    //     }
+    // }
+
+
+    size_t batch_sizes3[9] = {2, 3, 4, 5, 6, 6, 6, 7, 8};
+    for (size_t threads_per_datapoint = 80;
+        threads_per_datapoint <= 320;
+        threads_per_datapoint *= 2) {
+
+        training_options.config_params["threads_per_datapoint"]
+        = threads_per_datapoint;
+
+        for (size_t i = 0;
+            i < 5;
+            i++) {
+            
+            training_options.config_params["batch_size"]
+            = batch_sizes3[i];
+
+            convergenceTime(
+                trainParallelMiniBatchGradientDescent12,
+                "CUDA MBGD 1-2",
+                data_set,
+                training_options,
+                benchmark_options);
+        }
+    }
 
     // size_t batch_sizes4[10] = {2, 4, 6, 8, 40, 50, 128, 256, 512};
     // for (size_t  threads_per_mini_batch = 64;
