@@ -391,7 +391,7 @@ void runConvergenceTime(
     //     }
     // }
 
-    for(size_t i = 2 ;i < 4; i++){
+    for(size_t i = 3 ;i < 4; i++){
 
         training_options.config_params["threads_class_per_datapoint"]
                 = threads_class_per_datapoint[i];
