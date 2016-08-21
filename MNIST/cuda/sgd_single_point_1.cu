@@ -86,7 +86,40 @@ static __device__ void d_partialDotProduct(
     shared_memory[threadIdx.x + position] = partial_dot;
 }
 
+static __device__ void d_partialMatrixVectorProduct(
+    FeatureType* data_point_i,
+    FeatureType* parameter_vector,
+    FeatureType* shared_memory,
+    size_t num_features,
+    size_t threads_per_datapoint,
+    size_t threads_class_per_datapoint,
+    size_t parameter_i) {
+    //memset to 0
+    FeatureType partial_dot = 0;
+
+    size_t thread_offset = threadIdx.x % threads_per_datapoint;
+    // size_t num_thread_each_label = threads_per_datapoint / threads_class_per_datapoint;
+
+    // size_t tidx_label =  thread_offset / num_thread_each_label;
+    // size_t relative_tidx_label =  thread_offset % num_thread_each_label;
+    // index relative to each class of thread
+    size_t num_thread_each_class = threads_per_datapoint / threads_class_per_datapoint;
+    size_t relative_tidx_each_class = thread_offset % num_thread_each_class;
+    size_t parameters_idx_each_class =  thread_offset / num_thread_each_class;
+    // decide which dimension  of parameter to calculate 
+    // size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
+    // size_t parameter_position = num_parameter_each_class * parameters_idx_each_class + parameter_i;
+    // size_t parameter_position = threads_class_per_datapoint * parameter_i + parameters_idx_each_class;
+
+    for (size_t j = relative_tidx_each_class; j < num_features; j += num_thread_each_class)
+        partial_dot += data_point_i[j] * parameter_vector[j + parameters_idx_each_class * num_features];
+
+    // result of the partial dot product is stored in shared memory
+    shared_memory[threadIdx.x + parameter_i * blockDim.x] = partial_dot;
+}
+
 // updates parameter vector in parallel when N threads are working on each point
+// Each time update one parameter
 static __device__ void d_updateParameters(
     FeatureType* data_point_i,
     FeatureType* parameter_vector,
@@ -101,67 +134,50 @@ static __device__ void d_updateParameters(
     size_t thread_offset = threadIdx.x % threads_per_datapoint;
     // __syncthreads();
 
-    // finishes computation of gradient and updates shared parameter_vector
-
-    //debug use
-
-    // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==0){
-    //     for(size_t i=0; i<21;i++){
-    //         printf("gradient-%f--\n", step_size_times_prob_i_minus_label_i[i]);
-    //     }   
-    //     printf("---------------------------\n");
-    // } 
-    // __syncthreads();
-    // asm("trap;"); 
-
-     // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
-     //        for(size_t i=8*num_features; i<PARAMETER_SIZE;i++){
-     //            printf("i=%d p=%f--",i, parameter_vector[i]);
-     //        }   
-
-
-     //        printf("\n\n\n\n\n\n\n\n");  
-     //    } 
-    // asm("trap;");
-    // size_t m=0;
-
     for(size_t i= 0;i<LABEL_CLASS;i++){
-        // i=9;
-        for (size_t j = thread_offset; j < num_features; j+=threads_per_datapoint){
-
-            // the gradient is: x * (pi - y)
-            // FeatureType gradient_times_step_size = data_point_i[j] 
-                // * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i];
-               // // //debug use
-            // if(blockIdx.x==0&&point_idx_in_block==1){
-            //     printf("gradient_times_step_size is  %f\n",gradient_times_step_size);
-            // //     printf("data_point_i[j] is  %f\n",data_point_i[j]);
-            //     printf("minus is  %f\n",step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
-            //     printf("-%dbf%f-\n",(j+i * num_features),parameter_vector[j+i * num_features]);
-                
-            // }
-             // __syncthreads();
-            // if(relative_tidx==0&&blockIdx.x==0){
-            //     printf("before add is %d %f\n",j+i * num_features, parameter_vector[j+i * num_features]);
-            // } 
-            // asm("trap;");
+        
+        for (size_t j = thread_offset; j < num_features; j += threads_per_datapoint){
 
             atomicAdd(&parameter_vector[j+i*num_features], - data_point_i[j] 
                 * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
-            // // //debug use
-            // if(relative_tidx==0&&blockIdx.x==0){
-            //     printf("gradient is  %f\n",parameter_vector[j+i* num_features]);
-            // }
-
-            // if(point_idx_in_block==1&&blockIdx.x==0){
-            //     // printf("-%daf%f-",j+i * num_features,parameter_vector[j+i * num_features]);
-            //     printf("-%d %d-",i,j+i * num_features);
-            // } 
 
         }
         
     }        
 }   
+// update parameter for all kinds of blocking
+// static __device__ void d_updateParameters(
+//     FeatureType* data_point_i,
+//     FeatureType* parameter_vector,
+//     size_t num_features,
+//     size_t threads_per_datapoint,
+//     size_t point_idx_in_block,
+//     size_t relative_tidx,
+//     size_t threads_class_per_datapoint,
+//     FeatureType* step_size_times_prob_i_minus_label_i) {
+
+//     // printf("enter update parameters in sgd_single_point\n");
+
+//     size_t thread_offset = threadIdx.x % threads_per_datapoint;
+//     size_t num_thread_each_class = threads_per_datapoint / threads_class_per_datapoint;
+//     size_t relative_tidx_each_class = thread_offset % num_thread_each_class;
+//     size_t parameters_idx_each_class =  thread_offset / num_thread_each_class;
+//     // __syncthreads();
+
+//     for(size_t i = 0; i < LABEL_CLASS ／ threads_class_per_datapoint ; i++){
+        
+//         for (size_t j = relative_tidx_each_class; j < num_features; j += num_thread_each_class){
+
+//             size_t parameters_idx = parameters_idx_each_class +  threads_class_per_datapoint * i;
+// //            size_t probability_idx = threads_class_per_datapoint * i + parameters_idx_each_class;
+
+//             atomicAdd(&parameter_vector[j+parameters_idx * num_features], - data_point_i[j] 
+//                 * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS + parameters_idx_each_class]);
+
+//         }
+        
+//     }        
+// } 
 
 // Kernel for Parallel Stochastic Gradient Descent in CUDA using
 // shared parameter vector
@@ -172,16 +188,15 @@ static __global__ void p_SgdWithSharedParameterVector(
     size_t num_features,
     size_t num_data_points,
     size_t threads_per_datapoint,
+    size_t threads_class_per_datapoint,
     double step_size) {
 
     extern __shared__ FeatureType shared_memory[];
+
+    size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
+
     float *probabilities_of_each = (float*)&shared_memory[blockDim.x 
-            * LABEL_CLASS];
-    // if(threadIdx.x==0 &&blockIdx.x==0){
-    //     printf("%d \n", blockDim.x 
-    //             * LABEL_CLASS);
-    // }
-    // asm("trap;");  
+        * num_parameter_each_class]; 
     // computes several indexes, offsets and strides to simplify further code
     size_t tidx = threadIdx.x;
     size_t points_per_block = (blockDim.x / threads_per_datapoint);
@@ -191,9 +206,11 @@ static __global__ void p_SgdWithSharedParameterVector(
     size_t relative_tidx = tidx % threads_per_datapoint;
     size_t point_idx_in_shmem = tidx - relative_tidx;
     size_t point_idx_in_block = tidx / threads_per_datapoint;
+    // index relative to each class of thread
+    size_t num_thread_each_class = threads_per_datapoint / threads_class_per_datapoint;
+    size_t relative_tidx_each_class = relative_tidx % num_thread_each_class;
+    // size_t parameters_idx_each_class =  relative_tidx / num_thread_each_class;
 
-    // float *probabilities_of_sum = (float*)&probabilities_of_each[LABEL_CLASS 
-        // * points_per_block];
 
     FeatureType* data_point_i = NULL;
 
@@ -203,15 +220,23 @@ static __global__ void p_SgdWithSharedParameterVector(
         data_point_i = (FeatureType*) &data_points[point_idx * num_features];
 
         // compute partial dot product
-        for(size_t i = 0; i<LABEL_CLASS;i++){
+        for(size_t i = 0; i < num_parameter_each_class; i++){
             
-            d_partialDotProduct(
+            // d_partialMatrixVectorProduct(
+            //     data_point_i,
+            //     parameter_vector,
+            //     shared_memory,
+            //     num_features,
+            //     threads_per_datapoint,
+            //     i*blockDim.x);
+            d_partialMatrixVectorProduct(
                 data_point_i,
-                &parameter_vector[i * num_features],
+                &parameter_vector[i * threads_class_per_datapoint * num_features],
                 shared_memory,
                 num_features,
                 threads_per_datapoint,
-                i*blockDim.x);
+                threads_class_per_datapoint,
+                i);
         }
     }
     //debug use
@@ -225,9 +250,11 @@ static __global__ void p_SgdWithSharedParameterVector(
     __syncthreads();
 
     // sum-reduce the results of partial dot product to get final result
-    for(size_t i=0 ; i<LABEL_CLASS ;i++){    
-        for (size_t s = threads_per_datapoint / 2; s > 0; s>>=1) {
-            if (relative_tidx < s) {
+    for(size_t i = 0 ; i < num_parameter_each_class ;i++){  
+
+        for (size_t s = num_thread_each_class / 2; s > 0; s>>=1) {
+            
+            if (relative_tidx_each_class < s) {
                 shared_memory[tidx+i*blockDim.x] += shared_memory[tidx+s+i*blockDim.x];
             }
             __syncthreads();
@@ -238,9 +265,10 @@ static __global__ void p_SgdWithSharedParameterVector(
     if (point_idx < num_data_points) {
         // double probability_of_positive =
         //     d_softMaxFunction(shared_memory[point_idx_in_shmem]);
-        d_softMaxFunction1(shared_memory,probabilities_of_each,
-                 point_idx_in_shmem,relative_tidx,
-                    point_idx_in_block, LABEL_CLASS);
+        d_softMaxFunction(shared_memory,probabilities_of_each,
+                    point_idx_in_shmem,relative_tidx,
+                    point_idx_in_block, num_thread_each_class,
+                    threads_class_per_datapoint);
         // debug use
         // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
         //     for(size_t i=1; i<21;i++){
@@ -359,6 +387,11 @@ void trainParallelStochasticGradientDescent1(
             ? training_options.config_params["characteristic_time"]
             : CHARACTERISTIC_TIME;
 
+    const double threads_class_per_datapoint =
+            (fieldExists(training_options.config_params, "threads_class_per_datapoint"))
+            ? training_options.config_params["threads_class_per_datapoint"]
+            : THREADS_CLASS_PER_DATAPOINT;
+
     size_t curr_num_epochs =
             (fieldExists(training_options.config_params, "curr_num_epochs"))
             ? training_options.config_params["curr_num_epochs"]
@@ -375,12 +408,11 @@ void trainParallelStochasticGradientDescent1(
         1,
         1);
 
-    const size_t shared_memory_size = block_size.x * sizeof(FeatureType) * LABEL_CLASS
-        + datapoints_per_block * sizeof(FeatureType) * LABEL_CLASS ;
-        // + datapoints_per_block * sizeof(FeatureType);
-
-    // printf("memosize is %d",shared_memory_size);
-    // exit(1);
+    //shared memory for matrix-vector partitial product and probability
+    const size_t shared_memory_size = block_size.x * sizeof(FeatureType) 
+        * LABEL_CLASS / threads_class_per_datapoint + datapoints_per_block 
+        * sizeof(FeatureType) * LABEL_CLASS ;
+  
 
     // check that the resulting grid and block dimensions
     // dont' violate device limits
@@ -412,6 +444,7 @@ void trainParallelStochasticGradientDescent1(
                     training_set.num_features,
                     training_set.num_data_points,
                     threads_per_datapoint,
+                    threads_class_per_datapoint,
                     annealed_step_size);
             cudaDeviceSynchronize();
             checkCudaErrors(cudaGetLastError());

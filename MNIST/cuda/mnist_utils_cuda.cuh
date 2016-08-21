@@ -183,6 +183,16 @@ __device__ float d_logisticFunction(float exponent);
 
 
 
+//  general softmax function
+__device__ void d_softMaxFunction(FeatureType* shared_memory, 
+    FeatureType* posibility_each,
+    size_t point_idx_in_shmem,
+    size_t relative_tidx,
+    size_t point_idx_in_block,
+    size_t num_thread_each_class,
+    size_t threads_class_per_datapoint);
+
+
 __device__ void  d_softMaxFunction1(FeatureType* shared_memory, 
     FeatureType* posibility_each,
     size_t point_idx_in_shmem,

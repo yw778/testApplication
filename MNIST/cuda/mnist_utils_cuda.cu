@@ -432,6 +432,41 @@ __device__ float d_logisticFunction(float exponent) {
     return (1.0f / (1.0f + __expf(-exponent)));
 }
 
+// general softmax function for all partitions
+__device__ void d_softMaxFunction(FeatureType* shared_memory, 
+    FeatureType* posibility_each,
+    size_t point_idx_in_shmem,
+    size_t relative_tidx,
+    size_t point_idx_in_block,
+    size_t num_thread_each_class,
+    size_t threads_class_per_datapoint) {
+    
+    //copy (theta)T x and take fast exponential
+    if(relative_tidx < LABEL_CLASS){
+        // idx to find where the sum of dot product lies
+        size_t block_idx = relative_tidx / threads_class_per_datapoint;
+        size_t sub_block_idx = relative_tidx % threads_class_per_datapoint;
+
+        posibility_each[point_idx_in_block * LABEL_CLASS+relative_tidx]
+            = __expf(shared_memory[sub_block_idx * num_thread_each_class
+                + point_idx_in_shmem + block_idx * blockDim.x]);
+
+    }
+    __syncthreads();
+
+    //calculate sum , each thread has a copy (++)
+    float sum = 0;
+    for (size_t i=0;i<LABEL_CLASS;i++){
+        sum += posibility_each[point_idx_in_block * LABEL_CLASS + i];
+    }
+    __syncthreads();
+    
+    //calculate final posibility for each point
+    if(relative_tidx < LABEL_CLASS){
+        posibility_each[point_idx_in_block * LABEL_CLASS+relative_tidx] /= sum;
+    }
+    __syncthreads();
+}
 
 
 // one - way dimention parallel softmax function

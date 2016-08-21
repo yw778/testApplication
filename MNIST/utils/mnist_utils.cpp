@@ -780,7 +780,7 @@ void matrixVectorMultiply(
     cblas_sgemv(CblasRowMajor, CblasTrans, num_data_points, num_features,
                 scalar, matrix, num_features, vect, 1, 0, result, 1);
 }
-
+// matrix-matrix multiplication wrapper
 void matrixMatrixMultiply(
     float* matrixA,
     float* matrixB,
