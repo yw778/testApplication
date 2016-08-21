@@ -277,7 +277,7 @@ void runConvergenceTime(
     //     training_options,
     //     benchmark_options);
 
-    // size_t threads_class_per_datapoint[4] = {1, 2, 5, 10};
+    size_t threads_class_per_datapoint[4] = {1, 2, 5, 10};
 
 
     for(size_t i = 0 ;i < 2; i++){
