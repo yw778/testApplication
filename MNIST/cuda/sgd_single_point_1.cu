@@ -197,6 +197,9 @@ static __global__ void p_SgdWithSharedParameterVector(
 
     float *probabilities_of_each = (float*)&shared_memory[blockDim.x 
         * num_parameter_each_class]; 
+
+    float *shared_data_points = (float*)&probabilities_of_each[batch_size 
+                            * LABEL_CLASS]; 
     // computes several indexes, offsets and strides to simplify further code
     size_t tidx = threadIdx.x;
     size_t points_per_block = (blockDim.x / threads_per_datapoint);
@@ -217,7 +220,13 @@ static __global__ void p_SgdWithSharedParameterVector(
     // make sure the threads don't go out of bounds
     if (point_idx < num_data_points) {
 
-        data_point_i = (FeatureType*) &data_points[point_idx * num_features];
+        //move datapoint to shared memory
+        for (size_t j = relative_tidx; j < num_features; j += threads_per_datapoint){
+            shared_data_points[j + point_idx_in_block * num_features]
+                =  data_points[point_idx * num_features + j];
+        }
+
+        data_point_i = (FeatureType*)&shared_data_points[point_idx_in_block * num_features];
 
         // compute partial dot product
         for(size_t i = 0; i < num_parameter_each_class; i++){
@@ -410,10 +419,10 @@ void trainParallelStochasticGradientDescent1(
 
     //shared memory for matrix-vector partitial product and probability
     const size_t shared_memory_size = block_size.x * sizeof(FeatureType) 
-        * LABEL_CLASS / threads_class_per_datapoint + datapoints_per_block 
-        * sizeof(FeatureType) * LABEL_CLASS ;
+        * LABEL_CLASS / threads_class_per_datapoint 
+        + datapoints_per_block * sizeof(FeatureType) * LABEL_CLASS
+        + datapoints_per_block * training_set.num_features * sizeof(FeatureType);  
   
-
     // check that the resulting grid and block dimensions
     // dont' violate device limits
     if(checkDeviceProps(shared_memory_size, block_size, grid_size)) {

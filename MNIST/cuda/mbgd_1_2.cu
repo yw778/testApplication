@@ -274,6 +274,8 @@ static __global__ void p_MiniBatchGradientDescent(
             shared_data_points[j + point_idx_in_block * num_features]
                 =  data_points[point_idx * num_features + j];
         }
+
+        __syncthreads();
         
          d_partialMatrixVectorProduct(
                 // &data_points[point_idx * num_features], 
