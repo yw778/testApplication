@@ -164,7 +164,7 @@ static __device__ void d_updateParameters(
     size_t parameters_idx_each_class =  thread_offset / num_thread_each_class;
     // __syncthreads();
 
-    for(size_t i = 0; i < LABEL_CLASS ／ threads_class_per_datapoint ; i++){
+    for(size_t i = 0; i < LABEL_CLASS/threads_class_per_datapoint ; i++){
         
         for (size_t j = relative_tidx_each_class; j < num_features; j += num_thread_each_class){
 
