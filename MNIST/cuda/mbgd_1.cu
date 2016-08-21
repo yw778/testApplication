@@ -180,15 +180,15 @@ static __global__ void p_MiniBatchGradientDescent(
     // array probabilities_of_each in shared_memory of size batch_size * LABEL_CLASS
     // memory for possibility
     float *probabilities_of_each = (float*)&dot_product[threads_per_mini_batch];
-    size_t points_per_block = (blockDim.x / threads_per_datapoint);
+    // size_t points_per_block = (blockDim.x / threads_per_datapoint);
     float *shared_data_points = (float*)&probabilities_of_each[batch_size 
                             * LABEL_CLASS]; 
     
     size_t tidx = threadIdx.x;
     size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
-    size_t points_per_block = (blockDim.x / threads_per_datapoint);
+    // size_t points_per_block = (blockDim.x / threads_per_datapoint);
     //index reletive to all datapoint
-    size_t point_idx = (blockIdx.x * points_per_block)
+    size_t point_idx = (blockIdx.x * batch_size)
                      + (tidx / threads_per_datapoint);
     // index relative to the datapoint instead of the block
     size_t relative_tidx = tidx % threads_per_datapoint;
