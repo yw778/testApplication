@@ -108,9 +108,9 @@ static __device__ void d_updateParametersForMiniBatch(
 
             for (size_t j = 0; j < batch_size; j++) {
                 // index of the point with respect to the whole dataset
-                size_t point_idx = bidx * batch_size + j;
+                // size_t point_idx = bidx * batch_size + j;
                 // index of the feature with respect to all features in the dataset
-                size_t feature_idx = point_idx * num_features + i;
+                size_t feature_idx = j * num_features + i;
                 //gradient result 
                 gradient_times_stepsize += data_points[feature_idx] 
                     * probabilities_of_each[j*LABEL_CLASS + parameter_position];
@@ -180,9 +180,10 @@ static __global__ void p_MiniBatchGradientDescent(
     // array probabilities_of_each in shared_memory of size batch_size * LABEL_CLASS
     // memory for possibility
     float *probabilities_of_each = (float*)&dot_product[threads_per_mini_batch];
-    // size_t points_per_block = (blockDim.x / threads_per_datapoint);
-    // float *shared_data_points = (float*)&probabilities_of_each[batch_size 
-                            // * LABEL_CLASS]; 
+    size_t points_per_block = (blockDim.x / threads_per_datapoint);
+    float *shared_data_points = (float*)&probabilities_of_each[batch_size 
+                            * LABEL_CLASS]; 
+    
     size_t tidx = threadIdx.x;
     size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
     size_t points_per_block = (blockDim.x / threads_per_datapoint);
@@ -201,10 +202,10 @@ static __global__ void p_MiniBatchGradientDescent(
     if (point_idx < num_data_points) {
 
         // possibilly copy the data to the shared memory first...
-        // for (size_t j = relative_tidx; j < num_features; j += threads_per_datapoint){
-        //     shared_data_points[j + point_idx_in_block * num_features]
-        //         =  data_points[point_idx * num_features + j];
-        // }
+        for (size_t j = relative_tidx; j < num_features; j += threads_per_datapoint){
+            shared_data_points[j + point_idx_in_block * num_features]
+                =  data_points[point_idx * num_features + j];
+        }
 
         // __syncthreads();
 
@@ -213,7 +214,7 @@ static __global__ void p_MiniBatchGradientDescent(
             
            
             d_partialMatrixVectorProduct(
-                &data_points[point_idx * num_features],
+                &shared_data_points[point_idx_in_block * num_features],
                 &parameter_vector[i * threads_class_per_datapoint * num_features],
                 shared_memory,
                 num_features,
@@ -267,7 +268,7 @@ static __global__ void p_MiniBatchGradientDescent(
        
         // update parameter
        d_updateParametersForMiniBatch(
-            data_points,
+            shared_data_points,
             probabilities_of_each,
             parameter_vector,
             num_features,
@@ -333,7 +334,9 @@ void trainParallelMiniBatchGradientDescent(
     FeatureType threads_per_batch = threads_per_datapoint * batch_size;
     //shared Memory for posibility,dot product and gradient
     const size_t shared_memory_size = LABEL_CLASS * batch_size * sizeof(float) 
-            + (threads_per_batch) * sizeof(FeatureType);
+            + (threads_per_batch) * sizeof(FeatureType)
+            + batch_size * training_set.num_features * sizeof(FeatureType);
+
  
     if (checkDeviceProps(shared_memory_size, block_size, grid_size)) {
         // iterate if dimensions are okay
