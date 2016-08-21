@@ -120,32 +120,6 @@ static __device__ void d_partialMatrixVectorProduct(
 
 // updates parameter vector in parallel when N threads are working on each point
 // Each time update one parameter
-static __device__ void d_updateParameters(
-    FeatureType* data_point_i,
-    FeatureType* parameter_vector,
-    size_t num_features,
-    size_t threads_per_datapoint,
-    size_t point_idx_in_block,
-    size_t relative_tidx,
-    FeatureType* step_size_times_prob_i_minus_label_i) {
-
-    // printf("enter update parameters in sgd_single_point\n");
-
-    size_t thread_offset = threadIdx.x % threads_per_datapoint;
-    // __syncthreads();
-
-    for(size_t i= 0;i<LABEL_CLASS;i++){
-        
-        for (size_t j = thread_offset; j < num_features; j += threads_per_datapoint){
-
-            atomicAdd(&parameter_vector[j+i*num_features], - data_point_i[j] 
-                * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
-
-        }
-        
-    }        
-}   
-// update parameter for all kinds of blocking
 // static __device__ void d_updateParameters(
 //     FeatureType* data_point_i,
 //     FeatureType* parameter_vector,
@@ -153,31 +127,57 @@ static __device__ void d_updateParameters(
 //     size_t threads_per_datapoint,
 //     size_t point_idx_in_block,
 //     size_t relative_tidx,
-//     size_t threads_class_per_datapoint,
 //     FeatureType* step_size_times_prob_i_minus_label_i) {
 
 //     // printf("enter update parameters in sgd_single_point\n");
 
 //     size_t thread_offset = threadIdx.x % threads_per_datapoint;
-//     size_t num_thread_each_class = threads_per_datapoint / threads_class_per_datapoint;
-//     size_t relative_tidx_each_class = thread_offset % num_thread_each_class;
-//     size_t parameters_idx_each_class =  thread_offset / num_thread_each_class;
 //     // __syncthreads();
 
-//     for(size_t i = 0; i < LABEL_CLASS ／ threads_class_per_datapoint ; i++){
+//     for(size_t i= 0;i<LABEL_CLASS;i++){
         
-//         for (size_t j = relative_tidx_each_class; j < num_features; j += num_thread_each_class){
+//         for (size_t j = thread_offset; j < num_features; j += threads_per_datapoint){
 
-//             size_t parameters_idx = parameters_idx_each_class +  threads_class_per_datapoint * i;
-// //            size_t probability_idx = threads_class_per_datapoint * i + parameters_idx_each_class;
-
-//             atomicAdd(&parameter_vector[j+parameters_idx * num_features], - data_point_i[j] 
-//                 * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS + parameters_idx_each_class]);
+//             atomicAdd(&parameter_vector[j+i*num_features], - data_point_i[j] 
+//                 * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
 
 //         }
         
 //     }        
-// } 
+// }   
+// update parameter for all kinds of blocking
+static __device__ void d_updateParameters(
+    FeatureType* data_point_i,
+    FeatureType* parameter_vector,
+    size_t num_features,
+    size_t threads_per_datapoint,
+    size_t point_idx_in_block,
+    size_t relative_tidx,
+    size_t threads_class_per_datapoint,
+    FeatureType* step_size_times_prob_i_minus_label_i) {
+
+    // printf("enter update parameters in sgd_single_point\n");
+
+    size_t thread_offset = threadIdx.x % threads_per_datapoint;
+    size_t num_thread_each_class = threads_per_datapoint / threads_class_per_datapoint;
+    size_t relative_tidx_each_class = thread_offset % num_thread_each_class;
+    size_t parameters_idx_each_class =  thread_offset / num_thread_each_class;
+    // __syncthreads();
+
+    for(size_t i = 0; i < LABEL_CLASS ／ threads_class_per_datapoint ; i++){
+        
+        for (size_t j = relative_tidx_each_class; j < num_features; j += num_thread_each_class){
+
+            size_t parameters_idx = parameters_idx_each_class +  threads_class_per_datapoint * i;
+//            size_t probability_idx = threads_class_per_datapoint * i + parameters_idx_each_class;
+
+            atomicAdd(&parameter_vector[j+parameters_idx * num_features], - data_point_i[j] 
+                * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS + parameters_idx_each_class]);
+
+        }
+        
+    }        
+} 
 
 // Kernel for Parallel Stochastic Gradient Descent in CUDA using
 // shared parameter vector
@@ -194,15 +194,12 @@ static __global__ void p_SgdWithSharedParameterVector(
     extern __shared__ FeatureType shared_memory[];
 
     size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
-    size_t points_per_block = (blockDim.x / threads_per_datapoint);
 
     float *probabilities_of_each = (float*)&shared_memory[blockDim.x 
         * num_parameter_each_class]; 
-
-    float *shared_data_points = (float*)&probabilities_of_each[points_per_block
-         * LABEL_CLASS]; 
     // computes several indexes, offsets and strides to simplify further code
     size_t tidx = threadIdx.x;
+    size_t points_per_block = (blockDim.x / threads_per_datapoint);
     size_t point_idx = (blockIdx.x * points_per_block)
                      + (tidx / threads_per_datapoint);
     // index relative to the datapoint instead of the block
@@ -220,14 +217,7 @@ static __global__ void p_SgdWithSharedParameterVector(
     // make sure the threads don't go out of bounds
     if (point_idx < num_data_points) {
 
-        //move datapoint to shared memory
-        for (size_t j = relative_tidx; j < num_features; j += threads_per_datapoint){
-            shared_data_points[j + point_idx_in_block * num_features]
-                =  data_points[point_idx * num_features + j];
-        }
-        __syncthreads();
-
-        data_point_i = (FeatureType*)&shared_data_points[point_idx_in_block * num_features];
+        data_point_i = (FeatureType*) &data_points[point_idx * num_features];
 
         // compute partial dot product
         for(size_t i = 0; i < num_parameter_each_class; i++){
@@ -418,13 +408,12 @@ void trainParallelStochasticGradientDescent1(
         1,
         1);
 
-    //shared memory for matrix-vector partitial product and probability and
-    //cached datapoint
+    //shared memory for matrix-vector partitial product and probability
     const size_t shared_memory_size = block_size.x * sizeof(FeatureType) 
-        * LABEL_CLASS / threads_class_per_datapoint 
-        + datapoints_per_block * sizeof(FeatureType) * LABEL_CLASS
-        + datapoints_per_block * training_set.num_features * sizeof(FeatureType);  
+        * LABEL_CLASS / threads_class_per_datapoint + datapoints_per_block 
+        * sizeof(FeatureType) * LABEL_CLASS ;
   
+
     // check that the resulting grid and block dimensions
     // dont' violate device limits
     if(checkDeviceProps(shared_memory_size, block_size, grid_size)) {
