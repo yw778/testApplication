@@ -194,15 +194,15 @@ static __global__ void p_SgdWithSharedParameterVector(
     extern __shared__ FeatureType shared_memory[];
 
     size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
+    size_t points_per_block = (blockDim.x / threads_per_datapoint);
 
     float *probabilities_of_each = (float*)&shared_memory[blockDim.x 
         * num_parameter_each_class]; 
 
-    float *shared_data_points = (float*)&probabilities_of_each[batch_size 
-                            * LABEL_CLASS]; 
+    float *shared_data_points = (float*)&probabilities_of_each[points_per_block
+         * LABEL_CLASS]; 
     // computes several indexes, offsets and strides to simplify further code
     size_t tidx = threadIdx.x;
-    size_t points_per_block = (blockDim.x / threads_per_datapoint);
     size_t point_idx = (blockIdx.x * points_per_block)
                      + (tidx / threads_per_datapoint);
     // index relative to the datapoint instead of the block
