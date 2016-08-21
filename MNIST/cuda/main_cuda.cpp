@@ -280,13 +280,13 @@ void runConvergenceTime(
     size_t threads_class_per_datapoint[4] = {1, 2, 5, 10};
 
 
-    for(size_t i = 0 ;i < 2; i++){
+    for(size_t i = 2 ;i < 4; i++){
         //define threads classes for one datapoint for blocking
         training_options.config_params["threads_class_per_datapoint"]
                 = threads_class_per_datapoint[i];
 
-        for (size_t threads_per_datapoint = 64;
-            threads_per_datapoint <= 512;
+        for (size_t threads_per_datapoint = 80;
+            threads_per_datapoint <= 640;
             threads_per_datapoint *= 2) {
 
             training_options.config_params["threads_per_datapoint"]
