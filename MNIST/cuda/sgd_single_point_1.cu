@@ -334,6 +334,7 @@ static __global__ void p_SgdWithSharedParameterVector(
             threads_per_datapoint,
             point_idx_in_block,
             relative_tidx,
+            threads_class_per_datapoint,
             probabilities_of_each);
         // debug use
         // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block ==1){
