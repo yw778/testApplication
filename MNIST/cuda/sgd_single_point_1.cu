@@ -66,25 +66,25 @@ static void cleanUp() {
 // Computes a fraction of the dot product when N threads are working on a
 // single data point. The elements processed by each thread are those
 // separated by a stride equal to N with an offset given by the thread index % N
-static __device__ void d_partialDotProduct(
-    FeatureType* data_point_i,
-    FeatureType* parameter_vector,
-    FeatureType* shared_memory,
-    size_t num_features,
-    size_t threads_per_datapoint,
-    size_t position) {
-    //memset to 0
-    FeatureType partial_dot = 0;
+// static __device__ void d_partialDotProduct(
+//     FeatureType* data_point_i,
+//     FeatureType* parameter_vector,
+//     FeatureType* shared_memory,
+//     size_t num_features,
+//     size_t threads_per_datapoint,
+//     size_t position) {
+//     //memset to 0
+//     FeatureType partial_dot = 0;
 
-    size_t thread_offset = threadIdx.x % threads_per_datapoint;
+//     size_t thread_offset = threadIdx.x % threads_per_datapoint;
 
-    // strided sum of element-wise products
-    for (size_t j = thread_offset; j < num_features; j+=threads_per_datapoint)
-        partial_dot += data_point_i[j] * parameter_vector[j];
+//     // strided sum of element-wise products
+//     for (size_t j = thread_offset; j < num_features; j+=threads_per_datapoint)
+//         partial_dot += data_point_i[j] * parameter_vector[j];
 
-    // result of the partial dot product is stored in shared memory
-    shared_memory[threadIdx.x + position] = partial_dot;
-}
+//     // result of the partial dot product is stored in shared memory
+//     shared_memory[threadIdx.x + position] = partial_dot;
+// }
 
 static __device__ void d_partialMatrixVectorProduct(
     FeatureType* data_point_i,
