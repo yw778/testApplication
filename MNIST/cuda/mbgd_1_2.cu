@@ -285,8 +285,8 @@ static __global__ void p_MiniBatchGradientDescent(
                 num_features,
                 threads_per_datapoint);
         
-    }
-    __syncthreads();
+    
+        __syncthreads();
 
 
     // sum-reduce the results of partial matrix-vector product to get final result
@@ -298,7 +298,7 @@ static __global__ void p_MiniBatchGradientDescent(
         __syncthreads();
     }
 
-    if (point_idx < num_data_points) {
+    // if (point_idx < num_data_points) {
 
 
         d_softMaxFunction2(dot_product, probabilities_of_each,
