@@ -224,13 +224,7 @@ static __global__ void p_SgdWithSharedParameterVector(
         // compute partial dot product
         for(size_t i = 0; i < num_parameter_each_class; i++){
             
-            // d_partialMatrixVectorProduct(
-            //     data_point_i,
-            //     parameter_vector,
-            //     shared_memory,
-            //     num_features,
-            //     threads_per_datapoint,
-            //     i*blockDim.x);
+           
             d_partialMatrixVectorProduct(
                 data_point_i,
                 &parameter_vector[i * threads_class_per_datapoint * num_features],
@@ -241,13 +235,6 @@ static __global__ void p_SgdWithSharedParameterVector(
                 i);
         }
     }
-    //debug use
-    // for(size_t i=blockDim/2; i<blockDim.x;i++){
-    //     printf("shared memory is %f\n", shared_memory[i]);
-    // }   
-
-    // printf("block size is %d\n",blockDim.x);
-
 
     __syncthreads();
 
@@ -262,73 +249,29 @@ static __global__ void p_SgdWithSharedParameterVector(
             __syncthreads();
         }
     }
-    //__syncthreads();
+    
     // make sure the threads don't go out of bounds
     if (point_idx < num_data_points) {
-        // double probability_of_positive =
-        //     d_softMaxFunction(shared_memory[point_idx_in_shmem]);
+        
         d_softMaxFunction(shared_memory,probabilities_of_each,
                     point_idx_in_shmem,relative_tidx,
                     point_idx_in_block, num_thread_each_class,
                     threads_class_per_datapoint);
-        // debug use
-        // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
-        //     for(size_t i=1; i<21;i++){
-        //         printf("shared memory is %f\n", probabilities_of_each[i]);
-        //     }   
-        // } 
-        // asm("trap;");  
+        
         //calculate step_size_times_prob_i_minus_label_i, store in the same position
         //calculate eta * {y(i)=k}−P(y(i)=k|x(i)
         if(relative_tidx < LABEL_CLASS){
             if(labels[point_idx]==relative_tidx){
-                probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]-=1;
-                probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
+                probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx] -= 1;
+                probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx] *= step_size;
             }else{                   
-                // if(relative_tidx==0&&blockIdx.x==0){
-                //     printf("before inupdating..%f\n",probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]);
-                //      printf("step size is %f\n",step_size);
-                // }
-
-                probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]*=step_size;
-                // if(relative_tidx==0&&blockIdx.x==0){
-                //     printf("inupdating..%f\n",probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx]);
-                // }
+                probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx] *= step_size;
             }
         }
-        //debug use
-        // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
-        //     for(size_t i=0; i<22;i++){
-        //         printf("after parameter is factored %f\n", probabilities_of_each[i]);
-        //     }   
-        //     printf("label is %f\n",labels[point_idx]);
-        // } 
-        // asm("trap;");  
-
-        // double step_size_times_prob_i_minus_label_i =
-        //     (probability_of_positive - labels[point_idx]) * step_size;
+        
         __syncthreads();
-        // debug use
-        //    if(relative_tidx==0&&blockIdx.x==0){
-        //     // printf("blockIdx.x is %d--tid is %d\n",blockIdx.x,threadIdx.x);
-        //     // printf("point_index is %d----%f\n",point_idx,labels[point_idx]);
-        //     for(size_t i=0; i<10;i++){
-        //         printf("after parameter is factored %f\n", probabilities_of_each[i]);
-        //     }   
-        // } 
-        // asm("trap;");
-
-        // debug use
-        // printf("before update parameters \n");
-        // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block==1){
-        //     for(size_t i=0; i<num_features;i++){
-        //         printf("p+%f--", parameter_vector[i]);
-        //     }   
-
-        //     printf("\n\n\n\n\n\n\n\n");
-        // } 
-        // asm("trap;");
-
+       
+        // update parameter
         d_updateParameters(
             data_point_i,
             parameter_vector,
@@ -339,20 +282,16 @@ static __global__ void p_SgdWithSharedParameterVector(
             // threads_class_per_datapoint,
             probabilities_of_each);
 
-        // debug use
-        // if(relative_tidx==0&&blockIdx.x==0&&point_idx_in_block ==1){
-        //     for(size_t i=0; i<PARAMETER_SIZE;i++){
-        //         printf("p-%f--\n", parameter_vector[i]);
-        //     }   
-        // } 
+     
     }   
 
 }
 
 
-// Executes serial implementation of stochastic gradient descent for logistic
+// Executes serial implementation of stochastic gradient descent for softmax
 // regression with a fixed number of iterations
-// config_params: {step_size, threads_per_datapoint, datapoints_per_block}
+// config_params: {step_size, threads_per_datapoint, datapoints_per_block, 
+// threads_class_per_datapoint}
 void trainParallelStochasticGradientDescent1(
     DataSet training_set,
     TrainingOptions training_options) {
@@ -432,12 +371,6 @@ void trainParallelStochasticGradientDescent1(
                                        * training_set.num_data_points
                                        / characteristic_time));
             curr_num_epochs++;
-            // printf("before kernal is launched\n");
-
-            // for(size_t i=0 ;i<PARAMETER_SIZE;i++){
-            //     printf("p%f--",training_set.parameter_vector[i]);
-            // }
-            // printf("\n\n");
 
             // call kernel and check for errors
             p_SgdWithSharedParameterVector
