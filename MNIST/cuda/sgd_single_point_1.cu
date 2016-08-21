@@ -417,7 +417,8 @@ void trainParallelStochasticGradientDescent1(
         1,
         1);
 
-    //shared memory for matrix-vector partitial product and probability
+    //shared memory for matrix-vector partitial product and probability and
+    //cached datapoint
     const size_t shared_memory_size = block_size.x * sizeof(FeatureType) 
         * LABEL_CLASS / threads_class_per_datapoint 
         + datapoints_per_block * sizeof(FeatureType) * LABEL_CLASS
