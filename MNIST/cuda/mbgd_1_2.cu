@@ -275,7 +275,7 @@ static __global__ void p_MiniBatchGradientDescent(
                 =  data_points[point_idx * num_features + j];
         }
 
-        __syncthreads();
+        // __syncthreads();
         
          d_partialMatrixVectorProduct(
                 // &data_points[point_idx * num_features], 
