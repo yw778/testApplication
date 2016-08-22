@@ -272,26 +272,6 @@ static __global__ void p_MiniBatchGradientDescent2(
         __syncthreads();
 
     }
-
-    // only matrix vector product is calculate all threads for each point
-    // index to parallelly caculate softmax function for each point 
-    // each 10 threads for one point move the data as mbgd_1
-    // this way employ maximum parallelism
-    // size_t threads_per_datapoint = threads_per_mini_batch / batch_size;
-    // size_t point_idx_in_block = tidx / threads_per_datapoint;
-    // size_t relative_tidx = tidx % threads_per_datapoint;
-    // size_t point_idx = (blockIdx.x * batch_size) + (tidx / threads_per_datapoint);
-
-    // d_softMaxFunction(probabilities_of_each,
-    //         relative_tidx,
-    //         point_idx_in_block);
-    // d_softMaxFunction(probabilities_of_each);
-
-    
-    
-    
-    
-    // __syncthreads();
    
     // update parameter
    d_updateParametersForMiniBatch(
@@ -302,6 +282,7 @@ static __global__ void p_MiniBatchGradientDescent2(
         batch_size,
         threads_per_mini_batch,
         threads_class_per_datapoint);
+
 }
         
 

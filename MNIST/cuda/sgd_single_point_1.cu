@@ -146,39 +146,39 @@ static __device__ void d_updateParameters(
 }   
 // update parameter for all kinds of blocking
 // slightly slow than above one
-// static __device__ void d_updateParameters(
-//     FeatureType* data_point_i,
-//     FeatureType* parameter_vector,
-//     size_t num_features,
-//     size_t threads_per_datapoint,
-//     size_t point_idx_in_block,
-//     size_t relative_tidx,
-//     size_t threads_class_per_datapoint,
-//     FeatureType* step_size_times_prob_i_minus_label_i) {
+static __device__ void d_updateParameters(
+    FeatureType* data_point_i,
+    FeatureType* parameter_vector,
+    size_t num_features,
+    size_t threads_per_datapoint,
+    size_t point_idx_in_block,
+    size_t relative_tidx,
+    size_t threads_class_per_datapoint,
+    FeatureType* step_size_times_prob_i_minus_label_i) {
 
-//     // printf("enter update parameters in sgd_single_point\n");
+    // printf("enter update parameters in sgd_single_point\n");
 
-//     size_t thread_offset = threadIdx.x % threads_per_datapoint;
-//     size_t num_thread_each_class = threads_per_datapoint / threads_class_per_datapoint;
-//     size_t relative_tidx_each_class = thread_offset % num_thread_each_class;
-//     size_t parameters_idx_each_class =  thread_offset / num_thread_each_class;
-//     size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
-//     // __syncthreads();
+    size_t thread_offset = threadIdx.x % threads_per_datapoint;
+    size_t num_thread_each_class = threads_per_datapoint / threads_class_per_datapoint;
+    size_t relative_tidx_each_class = thread_offset % num_thread_each_class;
+    size_t parameters_idx_each_class =  thread_offset / num_thread_each_class;
+    size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
+    // __syncthreads();
 
-//     for(size_t i = 0; i < num_parameter_each_class ; i++){
+    for(size_t i = 0; i < num_parameter_each_class ; i++){
         
-//         for (size_t j = relative_tidx_each_class; j < num_features; j += num_thread_each_class){
+        for (size_t j = relative_tidx_each_class; j < num_features; j += num_thread_each_class){
 
-//             size_t parameters_idx = parameters_idx_each_class +  threads_class_per_datapoint * i;
-// //            size_t probability_idx = threads_class_per_datapoint * i + parameters_idx_each_class;
+            size_t parameters_idx = parameters_idx_each_class +  threads_class_per_datapoint * i;
+//            size_t probability_idx = threads_class_per_datapoint * i + parameters_idx_each_class;
 
-//             atomicAdd(&parameter_vector[j+parameters_idx * num_features], - data_point_i[j] 
-//                 * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS + parameters_idx_each_class]);
+            atomicAdd(&parameter_vector[j+parameters_idx * num_features], - data_point_i[j] 
+                * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS + parameters_idx]);
 
-//         }
+        }
         
-//     }        
-// } 
+    }        
+} 
 
 // Kernel for Parallel Stochastic Gradient Descent in CUDA using
 // shared parameter vector
