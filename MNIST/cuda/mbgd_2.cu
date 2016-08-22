@@ -7,8 +7,8 @@
 # include "mnist_utils_cuda.cuh"
 
 /* Parallel approach to mini batch gradient descent. In this version all
-threads in the block compute for a single point for matrix vector product 
-before moving on to the next one. */
+threads in the block compute for a single point before moving on to 
+the next one. */
 
 // pointers to device global variables
 static FeatureType *d_parameter_vector, *d_data_points;
@@ -176,7 +176,6 @@ static __device__ void d_partialMatrixVectorProduct(
 
 
 
-
 static __global__ void p_MiniBatchGradientDescent2(
     FeatureType* data_points,
     FeatureType* parameter_vector,
@@ -253,6 +252,22 @@ static __global__ void p_MiniBatchGradientDescent2(
         } 
            
         // }
+        d_softMaxFunction(probabilities_of_each,
+                tidx,
+                i_batch);
+
+        if(tidx < LABEL_CLASS){
+
+            float reduced_stepsize = step_size / batch_size;
+            if(labels[point_idx]==tidx){
+                probabilities_of_each[i_batch * LABEL_CLASS+tidx] -= 1;
+                probabilities_of_each[i_batch * LABEL_CLASS+tidx] *= reduced_stepsize;
+            }else{                   
+                probabilities_of_each[i_batch * LABEL_CLASS+tidx] *= reduced_stepsize;
+            }  
+        
+        } 
+        __syncthreads();
 
     }
 
@@ -260,29 +275,25 @@ static __global__ void p_MiniBatchGradientDescent2(
     // index to parallelly caculate softmax function for each point 
     // each 10 threads for one point move the data as mbgd_1
     // this way employ maximum parallelism
-    size_t threads_per_datapoint = threads_per_mini_batch / batch_size;
-    size_t point_idx_in_block = tidx / threads_per_datapoint;
-    size_t relative_tidx = tidx % threads_per_datapoint;
-    size_t point_idx = (blockIdx.x * batch_size) + (tidx / threads_per_datapoint);
+    // size_t threads_per_datapoint = threads_per_mini_batch / batch_size;
+    // size_t point_idx_in_block = tidx / threads_per_datapoint;
+    // size_t relative_tidx = tidx % threads_per_datapoint;
+    // size_t point_idx = (blockIdx.x * batch_size) + (tidx / threads_per_datapoint);
 
-    d_softMaxFunction(probabilities_of_each,
-            relative_tidx,
-            point_idx_in_block);
+    // d_softMaxFunction(probabilities_of_each,
+    //         relative_tidx,
+    //         point_idx_in_block);
+    // d_softMaxFunction(probabilities_of_each);
 
-    float reduced_stepsize = step_size / batch_size;
-
-    //calculate step_size_times_prob_i_minus_label_i, store in the same position
-    //calculate eta * {y(i)=k}−P(y(i)=k|x(i)
-    if(relative_tidx < LABEL_CLASS){
-        if(labels[point_idx]==relative_tidx){
-            probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx] -= 1;
-            probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx] *= reduced_stepsize;
-        }else{                   
-            probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx] *= reduced_stepsize;
-        }
-    }
     
-    __syncthreads();
+
+    //employ first LABEL_CLASS * batch_size threads to calculate softmax 
+//step_size_times_prob_i_minus_label_i, store in the same position
+//calculate eta * {y(i)=k}−P(y(i)=k|x(i)
+
+    
+    
+    // __syncthreads();
    
     // update parameter
    d_updateParametersForMiniBatch(
