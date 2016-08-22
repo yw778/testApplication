@@ -211,10 +211,12 @@ static __global__ void p_MiniBatchGradientDescent2(
     for (size_t i_batch = 0; i_batch < batch_size; i_batch++) {
 
         size_t point_idx = bidx * batch_size + i_batch;
-        // for (size_t j = tidx; j < num_features; j += threads_per_mini_batch){
-        //     shared_data_points[j + i_batch * num_features]
-        //         =  data_points[point_idx * num_features + j];
-        // }
+        //move data from global memory to shared memory as cache
+        for (size_t j = tidx; j < num_features; j += threads_per_mini_batch){
+            shared_data_points[j + i_batch * num_features]
+                =  data_points[point_idx * num_features + j];
+        }
+
         data_point_i = (FeatureType*)&shared_data_points[i_batch * num_features];
                                
         // if (point_idx < num_data_points){
