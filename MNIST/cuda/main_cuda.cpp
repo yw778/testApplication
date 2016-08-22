@@ -60,7 +60,7 @@ void runTrainAndTest(
 
     // blocking parameter
     // Be factor of LABLE_CLASS
-    // size_t threads_class_per_datapoint[4] = {1, 2, 5, 10};
+    size_t threads_class_per_datapoint[4] = {1, 2, 5, 10};
 
     // //CUDA sgd implementation with shared memory
     // for(size_t i = 0 ;i < 2; i++){
