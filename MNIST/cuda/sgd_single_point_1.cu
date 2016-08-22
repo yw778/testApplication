@@ -66,25 +66,25 @@ static void cleanUp() {
 // Computes a fraction of the dot product when N threads are working on a
 // single data point. The elements processed by each thread are those
 // separated by a stride equal to N with an offset given by the thread index % N
-// static __device__ void d_partialDotProduct(
-//     FeatureType* data_point_i,
-//     FeatureType* parameter_vector,
-//     FeatureType* shared_memory,
-//     size_t num_features,
-//     size_t threads_per_datapoint,
-//     size_t position) {
-//     //memset to 0
-//     FeatureType partial_dot = 0;
+static __device__ void d_partialDotProduct(
+    FeatureType* data_point_i,
+    FeatureType* parameter_vector,
+    FeatureType* shared_memory,
+    size_t num_features,
+    size_t threads_per_datapoint,
+    size_t position) {
+    //memset to 0
+    FeatureType partial_dot = 0;
 
-//     size_t thread_offset = threadIdx.x % threads_per_datapoint;
+    size_t thread_offset = threadIdx.x % threads_per_datapoint;
 
-//     // strided sum of element-wise products
-//     for (size_t j = thread_offset; j < num_features; j+=threads_per_datapoint)
-//         partial_dot += data_point_i[j] * parameter_vector[j];
+    // strided sum of element-wise products
+    for (size_t j = thread_offset; j < num_features; j+=threads_per_datapoint)
+        partial_dot += data_point_i[j] * parameter_vector[j];
 
-//     // result of the partial dot product is stored in shared memory
-//     shared_memory[threadIdx.x + position] = partial_dot;
-// }
+    // result of the partial dot product is stored in shared memory
+    shared_memory[threadIdx.x + position] = partial_dot;
+}
 
 static __device__ void d_partialMatrixVectorProduct(
     FeatureType* data_point_i,
@@ -145,7 +145,7 @@ static __device__ void d_partialMatrixVectorProduct(
 //     }        
 // }   
 // update parameter for all kinds of blocking
-// slightly slow than above one
+// slightly faster than above one
 static __device__ void d_updateParameters(
     FeatureType* data_point_i,
     FeatureType* parameter_vector,
@@ -201,9 +201,6 @@ static __global__ void p_SgdWithSharedParameterVector(
     size_t tidx = threadIdx.x;
     size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
     size_t points_per_block = (blockDim.x / threads_per_datapoint);
-    float *shared_data_points = (float*)&probabilities_of_each[points_per_block 
-                            * LABEL_CLASS]; 
-    //index reletive to all datapoint
     size_t point_idx = (blockIdx.x * points_per_block)
                      + (tidx / threads_per_datapoint);
     // index relative to the datapoint instead of the block
@@ -221,14 +218,7 @@ static __global__ void p_SgdWithSharedParameterVector(
     // make sure the threads don't go out of bounds
     if (point_idx < num_data_points) {
 
-        for (size_t j = relative_tidx; j < num_features; j += threads_per_datapoint){
-            shared_data_points[j + point_idx_in_block * num_features]
-                =  data_points[point_idx * num_features + j];
-        }
-
-        __syncthreads();
-
-        data_point_i = (FeatureType*) &shared_data_points[point_idx_in_block * num_features];
+        data_point_i = (FeatureType*) &data_points[point_idx * num_features];
 
         // compute partial matrix-vector product
         for(size_t i = 0; i < num_parameter_each_class; i++){
@@ -257,6 +247,7 @@ static __global__ void p_SgdWithSharedParameterVector(
             //at the same time take fast exponential
             if(relative_tidx < threads_class_per_datapoint){
                 // idx to find where the sum of dot product lies
+                // size_t block_idx = relative_tidx / threads_class_per_datapoint;
                 size_t sub_block_idx = relative_tidx % threads_class_per_datapoint;
 
                 probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx 
@@ -367,9 +358,8 @@ void trainParallelStochasticGradientDescent1(
 
     //shared memory for matrix-vector partitial product and probability
     const size_t shared_memory_size = block_size.x * sizeof(FeatureType) 
-         + datapoints_per_block * sizeof(FeatureType) * LABEL_CLASS
-         + datapoints_per_block * training_set.num_features * sizeof(FeatureType);
-   
+         + datapoints_per_block * sizeof(FeatureType) * LABEL_CLASS ;
+  
 
     // check that the resulting grid and block dimensions
     // dont' violate device limits
