@@ -198,6 +198,7 @@ static __global__ void p_MiniBatchGradientDescent2(
     // float *shared_data_points = (float*)&probabilities_of_each[batch_size 
     //                         * LABEL_CLASS]; 
     size_t tidx = threadIdx.x;
+    size_t bidx = blockIdx.x;
     size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
     // size_t point_idx = (blockIdx.x * batch_size) + (tidx / threads_per_datapoint);
     // index relative to the datapoint instead of the block
@@ -280,7 +281,7 @@ static __global__ void p_MiniBatchGradientDescent2(
            
             // update parameter
            d_updateParametersForMiniBatch(
-                shared_data_points,
+                data_points,
                 probabilities_of_each,
                 parameter_vector,
                 num_features,
