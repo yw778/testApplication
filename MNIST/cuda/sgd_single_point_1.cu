@@ -119,31 +119,31 @@ static __device__ void d_partialMatrixVectorProduct(
 
 // updates parameter vector in parallel when N threads are working on each point
 // Each time update one parameter
-static __device__ void d_updateParameters(
-    FeatureType* data_point_i,
-    FeatureType* parameter_vector,
-    size_t num_features,
-    size_t threads_per_datapoint,
-    size_t point_idx_in_block,
-    size_t relative_tidx,
-    FeatureType* step_size_times_prob_i_minus_label_i) {
+// static __device__ void d_updateParameters(
+//     FeatureType* data_point_i,
+//     FeatureType* parameter_vector,
+//     size_t num_features,
+//     size_t threads_per_datapoint,
+//     size_t point_idx_in_block,
+//     size_t relative_tidx,
+//     FeatureType* step_size_times_prob_i_minus_label_i) {
 
-    // printf("enter update parameters in sgd_single_point\n");
+//     // printf("enter update parameters in sgd_single_point\n");
 
-    size_t thread_offset = threadIdx.x % threads_per_datapoint;
-    // __syncthreads();
+//     size_t thread_offset = threadIdx.x % threads_per_datapoint;
+//     // __syncthreads();
 
-    for(size_t i= 0;i < LABEL_CLASS; i++){
+//     for(size_t i= 0;i < LABEL_CLASS; i++){
         
-        for (size_t j = thread_offset; j < num_features; j += threads_per_datapoint){
+//         for (size_t j = thread_offset; j < num_features; j += threads_per_datapoint){
 
-            atomicAdd(&parameter_vector[j+i*num_features], - data_point_i[j] 
-                * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
+//             atomicAdd(&parameter_vector[j+i*num_features], - data_point_i[j] 
+//                 * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS+i]);
 
-        }
+//         }
         
-    }        
-}   
+//     }        
+// }   
 // update parameter for all kinds of blocking
 // slightly slow than above one
 static __device__ void d_updateParameters(
@@ -284,7 +284,7 @@ static __global__ void p_SgdWithSharedParameterVector(
             threads_per_datapoint,
             point_idx_in_block,
             relative_tidx,
-            // threads_class_per_datapoint,
+            threads_class_per_datapoint,
             probabilities_of_each);
 
      
