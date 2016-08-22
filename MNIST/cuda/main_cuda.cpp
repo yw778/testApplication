@@ -446,10 +446,10 @@ void runConvergenceTime(
     //     }
     // }
 
-    size_t batch_sizes4[5] = {2, 4, 6, 8, 40};
+    
 
     for(size_t i = 0 ;i < 2; i++){
-
+        size_t batch_sizes4[5] = {2, 4, 6, 8, 40};
         training_options.config_params["threads_class_per_datapoint"]
                 = threads_class_per_datapoint[i];
 
@@ -477,9 +477,9 @@ void runConvergenceTime(
         }
     }
 
-    size_t batch_sizes4[5] = {2, 3, 4, 6, 8};
+    
     for(size_t i = 2 ;i < 4; i++){
-
+        size_t batch_sizes4[5] = {2, 3, 4, 6, 8};
         training_options.config_params["threads_class_per_datapoint"]
                 = threads_class_per_datapoint[i];
 
