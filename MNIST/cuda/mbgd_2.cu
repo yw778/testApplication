@@ -256,6 +256,9 @@ static __global__ void p_MiniBatchGradientDescent2(
                 tidx,
                 i_batch);
 
+        //employ first LABEL_CLASS threads to calculate 
+        //step_size_times_prob_i_minus_label_i, store in the same position
+        //calculate eta * {y(i)=k}−P(y(i)=k|x(i)
         if(tidx < LABEL_CLASS){
 
             float reduced_stepsize = step_size / batch_size;
@@ -265,7 +268,6 @@ static __global__ void p_MiniBatchGradientDescent2(
             }else{                   
                 probabilities_of_each[i_batch * LABEL_CLASS+tidx] *= reduced_stepsize;
             }  
-        
         } 
         __syncthreads();
 
@@ -287,9 +289,7 @@ static __global__ void p_MiniBatchGradientDescent2(
 
     
 
-    //employ first LABEL_CLASS * batch_size threads to calculate softmax 
-//step_size_times_prob_i_minus_label_i, store in the same position
-//calculate eta * {y(i)=k}−P(y(i)=k|x(i)
+   
 
     
     
