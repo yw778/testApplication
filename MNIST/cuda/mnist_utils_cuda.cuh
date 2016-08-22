@@ -120,21 +120,7 @@ __device__ void d_memset(
 //      bool revert = false);
 
 // updates the parameters using atomics 
-__device__ void d_updateParameters(
-    FeatureType* gradient,
-    FeatureType* parameter_vector,
-    size_t num_features,
-    size_t threads_per_mini_batch,
-    double step_size);
 
-__device__ void d_updateParameters1(
-    FeatureType* data_points,
-    FeatureType* probabilities_of_each,
-    FeatureType* parameter_vector,
-    size_t num_features,
-    size_t batch_size,
-    size_t threads_per_mini_batch,
-    double step_size);
 
 // void p_add_vectors(cublasHandle_t handle, float* a, float* b, const size_t size, const float scale_for_a = 1);
 
@@ -144,43 +130,14 @@ __device__ void d_updateParameters1(
 
 // void p_MatrixVectorMultiply(cublasHandle_t handle, float* matrix, float* vect, float scalar, size_t num_data_points, size_t num_features, float* result);
 
-// Parallel implementation of matrix vector multiplication. Each thread goes
-// a certain number of features and strides by the number of threads in the 
-// whole mini batch.
-__device__ void d_matrixTranspose(
-    FeatureType* probility_matrix,
-    FeatureType* probility_transpose,
-    size_t batch_size,
-    size_t relative_tidx,
-    size_t point_idx_in_block);
-
-__device__ void d_matrixTranspose2(
-    FeatureType* probility_matrix,
-    FeatureType* probility_transpose,
-    size_t batch_size);
-
-
-__device__ void d_matrixMatrixMultiply(
-    FeatureType* probility_matrix,
-    FeatureType* datapoint_matrix,
-    float scalar,
-    size_t batch_size,
+__device__ void d_updateParametersForMiniBatch(
+    FeatureType* data_points,
+    FeatureType* probabilities_of_each,
+    FeatureType* parameter_vector,
     size_t num_features,
-    size_t threads_per_mini_batch,
-    FeatureType* result);
-
-__device__ void d_matrixMatrixMultiply2(
-    FeatureType* matrix,
-    FeatureType* vect,
-    float scalar,
     size_t batch_size,
-    size_t num_features,
     size_t threads_per_mini_batch,
-    FeatureType* result);
-
-// double p_logisticFunction(cublasHandle_t handle, FeatureType* d_theta, FeatureType* d_x_i, const size_t num_features);
-__device__ float d_logisticFunction(float exponent);
-
+    size_t threads_class_per_datapoint);
 
 
 //  general softmax function
@@ -189,32 +146,5 @@ __device__ void d_softMaxFunction(
     size_t relative_tidx,
     size_t point_idx_in_block);
 
-
-__device__ void  d_softMaxFunction1(FeatureType* shared_memory, 
-    FeatureType* posibility_each,
-    size_t point_idx_in_shmem,
-    size_t relative_tidx,
-    size_t point_idx_in_block,
-    size_t num_label);
-
-
-__device__ void  d_softMaxFunction2(FeatureType* shared_memory, 
-    FeatureType* posibility_each,
-    size_t point_idx_in_shmem,
-    size_t relative_tidx,
-    size_t point_idx_in_block,
-    size_t num_thread_each_label);
-
-__device__ void  d_softMaxFunction3(FeatureType* shared_memory, 
-    FeatureType* posibility_each,
-    size_t relative_tidx,
-    size_t point_idx_in_batch,
-    size_t num_label);
-
-__device__ void  d_softMaxFunction4(FeatureType* shared_memory, 
-    FeatureType* posibility_each,
-    size_t relative_tidx,
-    size_t point_idx_in_batch,
-    size_t num_label);
 
 #endif
