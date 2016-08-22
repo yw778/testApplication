@@ -453,14 +453,14 @@ void runConvergenceTime(
         training_options.config_params["threads_class_per_datapoint"]
                 = threads_class_per_datapoint[i];
 
-        for (size_t threads_per_mini_batch = 32;
+        for (size_t threads_per_mini_batch = 64;
                  threads_per_mini_batch <= 512;
                  threads_per_mini_batch *= 2) {
         
             training_options.config_params["threads_per_mini_batch"]
             =  threads_per_mini_batch;
         
-            for (size_t i = 0;
+            for (size_t i = 3;
                 i < 4;
                 i++) {
                 
