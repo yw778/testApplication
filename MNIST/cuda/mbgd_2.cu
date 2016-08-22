@@ -288,9 +288,9 @@ static __global__ void p_MiniBatchGradientDescent2(
     // d_softMaxFunction(probabilities_of_each);
 
     
-
-   
-
+    if(threadIdx.x==0&&blockIdx.x==0){
+        printf("before enter dudate...");
+    }
     
     
     // __syncthreads();
