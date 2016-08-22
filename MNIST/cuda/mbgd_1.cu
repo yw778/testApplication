@@ -50,6 +50,10 @@ static void cleanUp() {
 }
 
 
+// update parametr
+// thread is divide in several classes
+// each number in one class calcualte strided
+// vector add 
 static __device__ void d_updateParametersForMiniBatch(
     FeatureType* data_points,
     FeatureType* probabilities_of_each,
@@ -69,6 +73,8 @@ static __device__ void d_updateParametersForMiniBatch(
     size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
     
 
+    // for each loop update parameter in parallel by several class
+    // of threads
     for(size_t m = 0; m < num_parameter_each_class; m++){
 
         for (size_t i = relative_tidx_each_class; i < num_features; i += num_thread_each_class) {
@@ -94,11 +100,10 @@ static __device__ void d_updateParametersForMiniBatch(
 
 }
 
-
-
-
-
-
+// calcuate partitial matrix-vector product
+// thread is divide in several classes
+// each number in one class calcualte strided
+// dot product (later one refers to spam-filter) 
 static __device__ void d_partialMatrixVectorProduct(
     FeatureType* data_point_i,
     FeatureType* parameter_vector,
@@ -116,7 +121,7 @@ static __device__ void d_partialMatrixVectorProduct(
     size_t relative_tidx_each_class = thread_offset % num_thread_each_class;
     size_t parameters_idx_each_class =  thread_offset / num_thread_each_class;
 
-    //Strided sum of vetor-vector product in parallel
+    // calculate parameter in parallel by several class of threads
     for (size_t j = relative_tidx_each_class; j < num_features; j += num_thread_each_class)
         partial_dot += data_point_i[j] * parameter_vector[j + parameters_idx_each_class * num_features];
 

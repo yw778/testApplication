@@ -63,29 +63,11 @@ static void cleanUp() {
     checkCudaErrors(cudaFree(d_labels));
 }
 
-// Computes a fraction of the dot product when N threads are working on a
-// single data point. The elements processed by each thread are those
-// separated by a stride equal to N with an offset given by the thread index % N
-static __device__ void d_partialDotProduct(
-    FeatureType* data_point_i,
-    FeatureType* parameter_vector,
-    FeatureType* shared_memory,
-    size_t num_features,
-    size_t threads_per_datapoint,
-    size_t position) {
-    //memset to 0
-    FeatureType partial_dot = 0;
 
-    size_t thread_offset = threadIdx.x % threads_per_datapoint;
-
-    // strided sum of element-wise products
-    for (size_t j = thread_offset; j < num_features; j+=threads_per_datapoint)
-        partial_dot += data_point_i[j] * parameter_vector[j];
-
-    // result of the partial dot product is stored in shared memory
-    shared_memory[threadIdx.x + position] = partial_dot;
-}
-
+// calcuate partitial matrix-vector product
+// thread is divide in several classes
+// each number in one class calcualte strided
+// dot product (later one refers to spam-filter) 
 static __device__ void d_partialMatrixVectorProduct(
     FeatureType* data_point_i,
     FeatureType* parameter_vector,
@@ -97,19 +79,12 @@ static __device__ void d_partialMatrixVectorProduct(
     FeatureType partial_dot = 0;
 
     size_t thread_offset = threadIdx.x % threads_per_datapoint;
-    // size_t num_thread_each_label = threads_per_datapoint / threads_class_per_datapoint;
 
-    // size_t tidx_label =  thread_offset / num_thread_each_label;
-    // size_t relative_tidx_label =  thread_offset % num_thread_each_label;
-    // index relative to each class of thread
     size_t num_thread_each_class = threads_per_datapoint / threads_class_per_datapoint;
     size_t relative_tidx_each_class = thread_offset % num_thread_each_class;
     size_t parameters_idx_each_class =  thread_offset / num_thread_each_class;
-    // decide which dimension  of parameter to calculate 
-    // size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
-    // size_t parameter_position = num_parameter_each_class * parameters_idx_each_class + parameter_i;
-    // size_t parameter_position = threads_class_per_datapoint * parameter_i + parameters_idx_each_class;
 
+    // calculate parameter in parallel by several class of threads
     for (size_t j = relative_tidx_each_class; j < num_features; j += num_thread_each_class)
         partial_dot += data_point_i[j] * parameter_vector[j + parameters_idx_each_class * num_features];
 
@@ -146,6 +121,9 @@ static __device__ void d_partialMatrixVectorProduct(
 // }   
 // update parameter for all kinds of blocking
 // slightly faster than above one
+// thread is divide in several classes
+// each number in one class calcualte strided
+// vector add 
 static __device__ void d_updateParameters(
     FeatureType* data_point_i,
     FeatureType* parameter_vector,

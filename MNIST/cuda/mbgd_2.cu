@@ -48,7 +48,10 @@ static void cleanUp() {
     checkCudaErrors(cudaFree(d_labels));
 }
 
-
+// update parametr
+// thread is divide in several classes
+// each number in one class calcualte strided
+// vector add 
 static __device__ void d_updateParametersForMiniBatch(
     FeatureType* data_points,
     FeatureType* probabilities_of_each,
@@ -61,21 +64,14 @@ static __device__ void d_updateParametersForMiniBatch(
     size_t tidx = threadIdx.x;
     size_t bidx = blockIdx.x;
 
-    // size_t thread_offset = threadIdx.x % threads_per_datapoint;
-    // size_t num_thread_each_label = threads_per_datapoint / threads_class_per_datapoint;
-
-    // size_t tidx_label =  thread_offset / num_thread_each_label;
-    // size_t relative_tidx_label =  thread_offset % num_thread_each_label;
     // index relative to each class of thread
     size_t num_thread_each_class = threads_per_mini_batch / threads_class_per_datapoint;
     size_t relative_tidx_each_class = tidx % num_thread_each_class;
     size_t parameters_idx_each_class =  tidx / num_thread_each_class;
     size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
     
-    // for (size_t i = tidx; i < num_features * LABEL_CLASS; i += threads_per_mini_batch) {
-    //     FeatureType gradient_times_step_size = gradient[i] * step_size;
-    //     atomicAdd(&parameter_vector[i], -gradient_times_step_size);
-    // }
+    // for each loop update parameter in parallel by several class
+    // of threads
     for(size_t m = 0; m < num_parameter_each_class; m++){
 
         for (size_t i = relative_tidx_each_class; i < num_features; i += num_thread_each_class) {
@@ -101,6 +97,10 @@ static __device__ void d_updateParametersForMiniBatch(
 
 }
 
+// calcuate partitial matrix-vector product
+// thread is divide in several classes
+// each number in one class calcualte strided
+// dot product (later one refers to spam-filter) 
 static __device__ void d_partialMatrixVectorProduct(
     FeatureType* data_point_i,
     FeatureType* parameter_vector,
@@ -112,20 +112,12 @@ static __device__ void d_partialMatrixVectorProduct(
     FeatureType partial_dot = 0;
 
     size_t tidx = threadIdx.x;
-    // size_t thread_offset = threadIdx.x % threads_per_datapoint;
-    // size_t num_thread_each_label = threads_per_datapoint / threads_class_per_datapoint;
 
-    // size_t tidx_label =  thread_offset / num_thread_each_label;
-    // size_t relative_tidx_label =  thread_offset % num_thread_each_label;
-    // index relative to each class of thread
     size_t num_thread_each_class = threads_per_mini_batch / threads_class_per_datapoint;
     size_t relative_tidx_each_class = tidx % num_thread_each_class;
     size_t parameters_idx_each_class =  tidx / num_thread_each_class;
-    // decide which dimension  of parameter to calculate 
-    // size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
-    // size_t parameter_position = num_parameter_each_class * parameters_idx_each_class + parameter_i;
-    // size_t parameter_position = threads_class_per_datapoint * parameter_i + parameters_idx_each_class;
 
+    // calculate parameter in parallel by several class of threads
     for (size_t j = relative_tidx_each_class; j < num_features; j += num_thread_each_class)
         partial_dot += data_point_i[j] * parameter_vector[j + parameters_idx_each_class * num_features];
 
@@ -152,9 +144,7 @@ static __global__ void p_MiniBatchGradientDescent2(
     // array probabilities_of_each in shared_memory of size batch_size * LABEL_CLASS
     // memory for possibility
     float *probabilities_of_each = (float*)&dot_product[threads_per_mini_batch];
-    // size_t points_per_block = (blockDim.x / threads_per_datapoint);
-    // float *shared_data_points = (float*)&probabilities_of_each[batch_size 
-    //                         * LABEL_CLASS]; 
+
     size_t tidx = threadIdx.x;
     size_t bidx = blockIdx.x;
     size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
@@ -169,10 +159,7 @@ static __global__ void p_MiniBatchGradientDescent2(
     for (size_t i_batch = 0; i_batch < batch_size; i_batch++) {
 
         size_t point_idx = bidx * batch_size + i_batch;
-        // for (size_t j = tidx; j < num_features; j += threads_per_mini_batch){
-        //     shared_data_points[j + i_batch * num_features]
-        //         =  data_points[point_idx * num_features + j];
-        // }
+
         data_point_i = (FeatureType*)&data_points[point_idx * num_features];
                                
         // if (point_idx < num_data_points){
