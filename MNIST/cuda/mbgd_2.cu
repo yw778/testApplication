@@ -217,80 +217,81 @@ static __global__ void p_MiniBatchGradientDescent2(
         // }
         data_point_i = (FeatureType*)&data_points[point_idx * num_features];
                                
-        if (point_idx < num_data_points){
+        // if (point_idx < num_data_points){
 
-            for(size_t i = 0; i<num_parameter_each_class; i++){
+        for(size_t i = 0; i < num_parameter_each_class; i++){
 
-                d_partialMatrixVectorProduct(
-                    data_point_i,
-                    &parameter_vector[i * threads_class_per_datapoint * num_features],
-                    dot_product,
-                    num_features,
-                    threads_per_mini_batch,
-                    threads_class_per_datapoint);
-
-                __syncthreads();
-                  
-                for (size_t s = num_thread_each_class / 2; s > 0; s>>=1) {
-                    if (relative_tidx_each_class < s) {
-                        dot_product[tidx] += dot_product[tidx+s];
-                    }
-                    __syncthreads();
-                }
-
-                //copy result from shared_memory to possibility_each
-                //at the same time take fast exponential
-                if(tidx < threads_class_per_datapoint){
-                    // idx to find where the sum of dot product lies
-                    size_t sub_block_idx = tidx % threads_class_per_datapoint;
-
-                    probabilities_of_each[i_batch * LABEL_CLASS + tidx 
-                        + i * threads_class_per_datapoint]= 
-                            __expf(shared_memory[sub_block_idx * num_thread_each_class]);
-
-                }
-                __syncthreads();
-            } 
-
-            // only matrix vector product is calculate all threads for each point
-            // index to parallelly caculate softmax function for each point 
-            // each 10 threads for one point move the data as mbgd_1
-            // this way employ maximum parallelism
-            size_t threads_per_datapoint = threads_per_mini_batch / batch_size;
-            size_t point_idx_in_block = tidx / threads_per_datapoint;
-            size_t relative_tidx = tidx % threads_per_datapoint;
-
-            d_softMaxFunction(probabilities_of_each,
-                    relative_tidx,
-                    point_idx_in_block);
-
-            float reduced_stepsize = step_size / batch_size;
-        
-            //calculate step_size_times_prob_i_minus_label_i, store in the same position
-            //calculate eta * {y(i)=k}−P(y(i)=k|x(i)
-            if(relative_tidx < LABEL_CLASS){
-                if(labels[point_idx]==relative_tidx){
-                    probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx] -= 1;
-                    probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx] *= reduced_stepsize;
-                }else{                   
-                    probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx] *= reduced_stepsize;
-                }
-            }
-            
-            __syncthreads();
-           
-            // update parameter
-           d_updateParametersForMiniBatch(
-                data_points,
-                probabilities_of_each,
-                parameter_vector,
+            d_partialMatrixVectorProduct(
+                data_point_i,
+                &parameter_vector[i * threads_class_per_datapoint * num_features],
+                dot_product,
                 num_features,
-                batch_size,
                 threads_per_mini_batch,
                 threads_class_per_datapoint);
-        }
+
+            __syncthreads();
+              
+            for (size_t s = num_thread_each_class / 2; s > 0; s>>=1) {
+                if (relative_tidx_each_class < s) {
+                    dot_product[tidx] += dot_product[tidx+s];
+                }
+                __syncthreads();
+            }
+
+            //copy result from shared_memory to possibility_each
+            //at the same time take fast exponential
+            if(tidx < threads_class_per_datapoint){
+                // idx to find where the sum of dot product lies
+                size_t sub_block_idx = tidx % threads_class_per_datapoint;
+
+                probabilities_of_each[i_batch * LABEL_CLASS + tidx 
+                    + i * threads_class_per_datapoint]= 
+                        __expf(shared_memory[sub_block_idx * num_thread_each_class]);
+
+            }
+            __syncthreads();
+        } 
+           
+        // }
 
     }
+
+    // only matrix vector product is calculate all threads for each point
+    // index to parallelly caculate softmax function for each point 
+    // each 10 threads for one point move the data as mbgd_1
+    // this way employ maximum parallelism
+    size_t threads_per_datapoint = threads_per_mini_batch / batch_size;
+    size_t point_idx_in_block = tidx / threads_per_datapoint;
+    size_t relative_tidx = tidx % threads_per_datapoint;
+
+    d_softMaxFunction(probabilities_of_each,
+            relative_tidx,
+            point_idx_in_block);
+
+    float reduced_stepsize = step_size / batch_size;
+
+    //calculate step_size_times_prob_i_minus_label_i, store in the same position
+    //calculate eta * {y(i)=k}−P(y(i)=k|x(i)
+    if(relative_tidx < LABEL_CLASS){
+        if(labels[point_idx]==relative_tidx){
+            probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx] -= 1;
+            probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx] *= reduced_stepsize;
+        }else{                   
+            probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx] *= reduced_stepsize;
+        }
+    }
+    
+    __syncthreads();
+   
+    // update parameter
+   d_updateParametersForMiniBatch(
+        data_points,
+        probabilities_of_each,
+        parameter_vector,
+        num_features,
+        batch_size,
+        threads_per_mini_batch,
+        threads_class_per_datapoint);
 }
         
 
