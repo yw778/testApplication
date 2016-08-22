@@ -20,33 +20,33 @@ void runTrainAndTest(
     BenchmarkOptions benchmark_options) {
 
    //baseline SGD
-    trainAndTest(
-        trainStochasticGradientDescent,
-        "SGD",
-        data_set,
-        training_options,
-        benchmark_options);
+    // trainAndTest(
+    //     trainStochasticGradientDescent,
+    //     "SGD",
+    //     data_set,
+    //     training_options,
+    //     benchmark_options);
 
-    //baseline BGD
-    trainAndTest(
-        trainBatchGradientDescent,
-        "BGD",
-        data_set,
-        training_options,
-        benchmark_options);
+    // //baseline BGD
+    // trainAndTest(
+    //     trainBatchGradientDescent,
+    //     "BGD",
+    //     data_set,
+    //     training_options,
+    //     benchmark_options);
 
-    //baseline MBGD
-    size_t batch_sizes1[10] = {1,2,5,10,20,50,100,200,500,1000};
-    for (size_t i = 0; i < 10; i++) {
-        training_options.config_params["batch_size"]
-        = batch_sizes1[i];
-        trainAndTest(
-            trainMiniBatchGradientDescent,
-            "MBGD",
-            data_set,
-            training_options,
-            benchmark_options);
-    }
+    // //baseline MBGD
+    // size_t batch_sizes1[10] = {1,2,5,10,20,50,100,200,500,1000};
+    // for (size_t i = 0; i < 10; i++) {
+    //     training_options.config_params["batch_size"]
+    //     = batch_sizes1[i];
+    //     trainAndTest(
+    //         trainMiniBatchGradientDescent,
+    //         "MBGD",
+    //         data_set,
+    //         training_options,
+    //         benchmark_options);
+    // }
 
     //cublas+cuda implementation
     // much slower than baseline code
@@ -60,66 +60,66 @@ void runTrainAndTest(
 
     // blocking parameter
     // Be factor of LABLE_CLASS
-    size_t threads_class_per_datapoint[4] = {1, 2, 5, 10};
+    // size_t threads_class_per_datapoint[4] = {1, 2, 5, 10};
 
-    //CUDA sgd implementation with shared memory
-    for(size_t i = 0 ;i < 2; i++){
-        //define threads classes for one datapoint for blocking
-        training_options.config_params["threads_class_per_datapoint"]
-                = threads_class_per_datapoint[i];
+    // //CUDA sgd implementation with shared memory
+    // for(size_t i = 0 ;i < 2; i++){
+    //     //define threads classes for one datapoint for blocking
+    //     training_options.config_params["threads_class_per_datapoint"]
+    //             = threads_class_per_datapoint[i];
 
-        for (size_t threads_per_datapoint = 32;
-            threads_per_datapoint <= 512;
-            threads_per_datapoint *= 2) {
+    //     for (size_t threads_per_datapoint = 32;
+    //         threads_per_datapoint <= 512;
+    //         threads_per_datapoint *= 2) {
 
-            training_options.config_params["threads_per_datapoint"]
-            = threads_per_datapoint;
+    //         training_options.config_params["threads_per_datapoint"]
+    //         = threads_per_datapoint;
 
-            for (size_t datapoints_per_block = 1;
-                datapoints_per_block <= 8;
-                datapoints_per_block *= 2) {
+    //         for (size_t datapoints_per_block = 1;
+    //             datapoints_per_block <= 8;
+    //             datapoints_per_block *= 2) {
 
-                training_options.config_params["datapoints_per_block"]
-                = datapoints_per_block;
+    //             training_options.config_params["datapoints_per_block"]
+    //             = datapoints_per_block;
 
-                trainAndTest(
-                    trainParallelStochasticGradientDescent1,
-                    "CUDA SGD",
-                    data_set,
-                    training_options,
-                    benchmark_options);
-            }
-        }
-    }
+    //             trainAndTest(
+    //                 trainParallelStochasticGradientDescent1,
+    //                 "CUDA SGD",
+    //                 data_set,
+    //                 training_options,
+    //                 benchmark_options);
+    //         }
+    //     }
+    // }
 
-    for(size_t i = 2 ;i < 4; i++){
-        //define threads classes for one datapoint for blocking
-        training_options.config_params["threads_class_per_datapoint"]
-                = threads_class_per_datapoint[i];
+    // for(size_t i = 2 ;i < 4; i++){
+    //     //define threads classes for one datapoint for blocking
+    //     training_options.config_params["threads_class_per_datapoint"]
+    //             = threads_class_per_datapoint[i];
 
-        for (size_t threads_per_datapoint = 40;
-            threads_per_datapoint <= 640;
-            threads_per_datapoint *= 2) {
+    //     for (size_t threads_per_datapoint = 40;
+    //         threads_per_datapoint <= 640;
+    //         threads_per_datapoint *= 2) {
 
-            training_options.config_params["threads_per_datapoint"]
-            = threads_per_datapoint;
+    //         training_options.config_params["threads_per_datapoint"]
+    //         = threads_per_datapoint;
 
-            for (size_t datapoints_per_block = 1;
-                datapoints_per_block <= 8;
-                datapoints_per_block *= 2) {
+    //         for (size_t datapoints_per_block = 1;
+    //             datapoints_per_block <= 8;
+    //             datapoints_per_block *= 2) {
 
-                training_options.config_params["datapoints_per_block"]
-                = datapoints_per_block;
+    //             training_options.config_params["datapoints_per_block"]
+    //             = datapoints_per_block;
 
-                trainAndTest(
-                    trainParallelStochasticGradientDescent1,
-                    "CUDA SGD",
-                    data_set,
-                    training_options,
-                    benchmark_options);
-            }
-        }
-    }
+    //             trainAndTest(
+    //                 trainParallelStochasticGradientDescent1,
+    //                 "CUDA SGD",
+    //                 data_set,
+    //                 training_options,
+    //                 benchmark_options);
+    //         }
+    //     }
+    // }
 
     // special form when threads_class_per_datapoint =10
     // no use now
