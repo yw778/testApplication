@@ -53,7 +53,7 @@ static void cleanUp() {
 // update parametr
 // thread is divide in several classes
 // each number in one class calcualte strided
-// vecor dot product 
+// vecor add
 static __device__ void d_updateParametersForMiniBatch(
     FeatureType* data_points,
     FeatureType* probabilities_of_each,

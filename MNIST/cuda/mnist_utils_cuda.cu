@@ -116,50 +116,50 @@ __device__ void d_memset(
 // thread is divide in several classes
 // each number in one class calcualte strided
 // vector add 
-__device__ void d_updateParametersForMiniBatch(
-    FeatureType* data_points,
-    FeatureType* probabilities_of_each,
-    FeatureType* parameter_vector,
-    size_t num_features,
-    size_t batch_size,
-    size_t threads_per_mini_batch,
-    size_t threads_class_per_datapoint) {
+// __device__ void d_updateParametersForMiniBatch(
+//     FeatureType* data_points,
+//     FeatureType* probabilities_of_each,
+//     FeatureType* parameter_vector,
+//     size_t num_features,
+//     size_t batch_size,
+//     size_t threads_per_mini_batch,
+//     size_t threads_class_per_datapoint) {
 
-    size_t tidx = threadIdx.x;
-    size_t bidx = blockIdx.x;
+//     size_t tidx = threadIdx.x;
+//     size_t bidx = blockIdx.x;
 
-    // index relative to each class of thread
-    size_t num_thread_each_class = threads_per_mini_batch / threads_class_per_datapoint;
-    size_t relative_tidx_each_class = tidx % num_thread_each_class;
-    size_t parameters_idx_each_class =  tidx / num_thread_each_class;
-    size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
+//     // index relative to each class of thread
+//     size_t num_thread_each_class = threads_per_mini_batch / threads_class_per_datapoint;
+//     size_t relative_tidx_each_class = tidx % num_thread_each_class;
+//     size_t parameters_idx_each_class =  tidx / num_thread_each_class;
+//     size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
     
-    // for each loop update parameter in parallel by several class
-    // of threads
-    for(size_t m = 0; m < num_parameter_each_class; m++){
+//     // for each loop update parameter in parallel by several class
+//     // of threads
+//     for(size_t m = 0; m < num_parameter_each_class; m++){
 
-        for (size_t i = relative_tidx_each_class; i < num_features; i += num_thread_each_class) {
+//         for (size_t i = relative_tidx_each_class; i < num_features; i += num_thread_each_class) {
 
-            float gradient_times_stepsize = 0;
+//             float gradient_times_stepsize = 0;
 
-            size_t parameter_position = parameters_idx_each_class + m * threads_class_per_datapoint;
+//             size_t parameter_position = parameters_idx_each_class + m * threads_class_per_datapoint;
 
-            for (size_t j = 0; j < batch_size; j++) {
-                // index of the point with respect to the whole dataset
-                size_t point_idx = bidx * batch_size + j;
-                // index of the feature with respect to all features in the dataset
-                size_t feature_idx = point_idx * num_features + i;
-                //gradient result 
-                gradient_times_stepsize += data_points[feature_idx] 
-                    * probabilities_of_each[j*LABEL_CLASS + parameter_position];
-            }
+//             for (size_t j = 0; j < batch_size; j++) {
+//                 // index of the point with respect to the whole dataset
+//                 size_t point_idx = bidx * batch_size + j;
+//                 // index of the feature with respect to all features in the dataset
+//                 size_t feature_idx = point_idx * num_features + i;
+//                 //gradient result 
+//                 gradient_times_stepsize += data_points[feature_idx] 
+//                     * probabilities_of_each[j*LABEL_CLASS + parameter_position];
+//             }
 
-            atomicAdd(&parameter_vector[i + parameter_position * num_features], -gradient_times_stepsize);    
+//             atomicAdd(&parameter_vector[i + parameter_position * num_features], -gradient_times_stepsize);    
         
-        }
-    }    
+//         }
+//     }    
 
-}
+// }
 
 
 

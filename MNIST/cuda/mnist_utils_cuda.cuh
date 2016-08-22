@@ -130,14 +130,14 @@ __device__ void d_memset(
 
 // void p_MatrixVectorMultiply(cublasHandle_t handle, float* matrix, float* vect, float scalar, size_t num_data_points, size_t num_features, float* result);
 
-__device__ void d_updateParametersForMiniBatch(
-    FeatureType* data_points,
-    FeatureType* probabilities_of_each,
-    FeatureType* parameter_vector,
-    size_t num_features,
-    size_t batch_size,
-    size_t threads_per_mini_batch,
-    size_t threads_class_per_datapoint);
+// __device__ void d_updateParametersForMiniBatch(
+//     FeatureType* data_points,
+//     FeatureType* probabilities_of_each,
+//     FeatureType* parameter_vector,
+//     size_t num_features,
+//     size_t batch_size,
+//     size_t threads_per_mini_batch,
+//     size_t threads_class_per_datapoint);
 
 
 //  general softmax function
