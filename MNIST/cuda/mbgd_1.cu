@@ -181,6 +181,7 @@ static __global__ void p_MiniBatchGradientDescent(
     // memory for possibility
     float *probabilities_of_each = (float*)&dot_product[threads_per_mini_batch];
     // size_t points_per_block = (blockDim.x / threads_per_datapoint);
+    // shared memory space for cache datapoints
     float *shared_data_points = (float*)&probabilities_of_each[batch_size 
                             * LABEL_CLASS]; 
     
@@ -216,7 +217,7 @@ static __global__ void p_MiniBatchGradientDescent(
             d_partialMatrixVectorProduct(
                 &shared_data_points[point_idx_in_block * num_features],
                 &parameter_vector[i * threads_class_per_datapoint * num_features],
-                shared_memory,
+                dot_product,
                 num_features,
                 threads_per_datapoint,
                 threads_class_per_datapoint);
