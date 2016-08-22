@@ -460,7 +460,7 @@ void runConvergenceTime(
             training_options.config_params["threads_per_mini_batch"]
             =  threads_per_mini_batch;
         
-            for (size_t i = 2;
+            for (size_t i = 0;
                 i < 4;
                 i++) {
                 
