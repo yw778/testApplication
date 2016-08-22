@@ -200,7 +200,7 @@ static __global__ void p_MiniBatchGradientDescent2(
     size_t tidx = threadIdx.x;
     size_t bidx = blockIdx.x;
     size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
-    // size_t point_idx = (blockIdx.x * batch_size) + (tidx / threads_per_datapoint);
+   
     // index relative to the datapoint instead of the block
     size_t num_thread_each_class = threads_per_mini_batch / threads_class_per_datapoint;
     size_t relative_tidx_each_class = tidx % num_thread_each_class;
@@ -263,6 +263,7 @@ static __global__ void p_MiniBatchGradientDescent2(
     size_t threads_per_datapoint = threads_per_mini_batch / batch_size;
     size_t point_idx_in_block = tidx / threads_per_datapoint;
     size_t relative_tidx = tidx % threads_per_datapoint;
+    size_t point_idx = (blockIdx.x * batch_size) + (tidx / threads_per_datapoint);
 
     d_softMaxFunction(probabilities_of_each,
             relative_tidx,
