@@ -251,6 +251,7 @@ static __global__ void p_MiniBatchGradientDescent(
         d_softMaxFunction(probabilities_of_each,
                     relative_tidx,
                     point_idx_in_block);
+        
 
         float reduced_stepsize = step_size / batch_size;
         
