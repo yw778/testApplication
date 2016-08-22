@@ -448,34 +448,34 @@ void runConvergenceTime(
 
     
 
-    for(size_t i = 0 ;i < 2; i++){
-        size_t batch_sizes4[5] = {2, 4, 6, 8, 40};
-        training_options.config_params["threads_class_per_datapoint"]
-                = threads_class_per_datapoint[i];
+    // for(size_t i = 0 ;i < 2; i++){
+    //     size_t batch_sizes4[5] = {2, 4, 6, 8, 40};
+    //     training_options.config_params["threads_class_per_datapoint"]
+    //             = threads_class_per_datapoint[i];
 
-        for (size_t threads_per_mini_batch = 32;
-                 threads_per_mini_batch <= 512;
-                 threads_per_mini_batch *= 2) {
+    //     for (size_t threads_per_mini_batch = 32;
+    //              threads_per_mini_batch <= 512;
+    //              threads_per_mini_batch *= 2) {
         
-            training_options.config_params["threads_per_mini_batch"]
-            =  threads_per_mini_batch;
+    //         training_options.config_params["threads_per_mini_batch"]
+    //         =  threads_per_mini_batch;
         
-            for (size_t i = 0;
-                i < 4;
-                i++) {
+    //         for (size_t i = 0;
+    //             i < 4;
+    //             i++) {
                 
-                training_options.config_params["batch_size"]
-                = batch_sizes4[i];
+    //             training_options.config_params["batch_size"]
+    //             = batch_sizes4[i];
         
-                convergenceTime(
-                    trainParallelMiniBatchGradientDescent2,
-                    "CUDA MBGD 2",
-                    data_set,
-                    training_options,
-                    benchmark_options);
-            }
-        }
-    }
+    //             convergenceTime(
+    //                 trainParallelMiniBatchGradientDescent2,
+    //                 "CUDA MBGD 2",
+    //                 data_set,
+    //                 training_options,
+    //                 benchmark_options);
+    //         }
+    //     }
+    // }
 
     
     for(size_t i = 2 ;i < 4; i++){
