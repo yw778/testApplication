@@ -479,12 +479,12 @@ void runConvergenceTime(
     BenchmarkOptions benchmark_options) {
 
     //baseline SGD
-    // convergenceTime(
-    //     trainStochasticGradientDescent,
-    //     "SGD",
-    //     data_set,
-    //     training_options,
-    //     benchmark_options);
+    convergenceTime(
+        trainStochasticGradientDescent,
+        "SGD",
+        data_set,
+        training_options,
+        benchmark_options);
 
     // //baseline BGD
     // convergenceTime(
