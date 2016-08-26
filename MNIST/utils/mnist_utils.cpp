@@ -131,16 +131,24 @@ std::vector<double> softmaxFunction(
     
     //dot product theta * x
     std::vector<double> posibiility_each(LABEL_CLASS);
-    for(size_t i=0;i<LABEL_CLASS;i++){
-        posibiility_each[i]= dotProduct(&parameter_vector[i*NUM_FEATURES], data_point_i, num_features);
-    }
+    // for(size_t i = 0; i < LABEL_CLASS; i++){
+    //     posibiility_each[i] = dotProduct(&parameter_vector[i*NUM_FEATURES], data_point_i, num_features);
+    // }
+    // matrixVectorMultiply(&training_set.data_points[starting_point_idx], 
+    //                      probabilities_of_positive, factor, batch_size, 
+    //                      training_set.num_features, gradient);
+
+    matrixVectorMultiply(parameter_vector, 
+                         data_point_i, 1, num_features, 
+                         LABEL_CLASS, &posibiility_each[0]);
+
     //calculate max value
     double max = max_val(posibiility_each);
     double sum = 0;
     //minus max value and calculate sum
-    for(size_t i=0;i<LABEL_CLASS;i++){
-        posibiility_each[i] =exp((posibiility_each[i]-max)) ;
-        sum+= posibiility_each[i];   
+    for(size_t i = 0; i < LABEL_CLASS; i++){
+        posibiility_each[i] = exp((posibiility_each[i]-max)) ;
+        sum += posibiility_each[i];   
     }
     //calucate possibility by average value
     for(size_t i=0;i<LABEL_CLASS;i++){

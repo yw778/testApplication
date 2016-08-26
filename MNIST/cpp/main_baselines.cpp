@@ -83,12 +83,12 @@ void runConvergenceTime(
     TrainingOptions training_options,
     BenchmarkOptions benchmark_options) {
 
-    // convergenceTime(
-    //     trainStochasticGradientDescent,
-    //     "SGD",
-    //     data_set,
-    //     training_options,
-    //     benchmark_options);
+    convergenceTime(
+        trainStochasticGradientDescent,
+        "SGD",
+        data_set,
+        training_options,
+        benchmark_options);
 
     // convergenceTime(
     //     trainBatchGradientDescent,
@@ -96,7 +96,7 @@ void runConvergenceTime(
     //     data_set,
     //     training_options,
     //     benchmark_options);
-    printf("enter batch\n");
+
     size_t batch_sizes[10] = {1,2,5,10,20,50,100,200,500,1000};
     for (size_t i = 0; i < 10; i++) {
         training_options.config_params["batch_size"]

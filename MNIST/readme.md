@@ -1,10 +1,13 @@
 # Parallelized Softmax Regression for digit classification #
 
-By Gustavo
-
 #### tl;dr: ####
 
 Read the [note](#paths) about paths and then go to [Running the code](#run).
+
+## Reference: ##
+
+This project is to speed up the training process of softmax regression, the file name and classes in this project is the name
+as spam-filter.
 
 ## Description: ##
 
@@ -14,11 +17,12 @@ This project contains several different versions of the *Gradient Descent* metho
 
 ### cpp ###
 
-This folder contains the baselines (C++ serial implementation) for **Batch Gradient Descent** and **Stochastic Gradient Descent**. The use of OpenBLAS for linear algebra procedures reduces the execution time of the baselines considerably. In order to use OpenBLAS, set the path to your installed BLAS library (see the [note](#paths) about paths) and make sure the Makefile contains the flag `-DUSE_OPENBLAS`.
+This folder contains the baselines (C++ serial implementation) for **Batch Gradient Descent** **Stochastic Gradient Descent** and **MiniBatch Gradient Descent**. The use of OpenBLAS for linear algebra procedures reduces the execution time of the baselines considerably. In order to use OpenBLAS, set the path to your installed BLAS library (see the [note](#paths) about paths) and make sure the Makefile contains the flag `-DUSE_OPENBLAS`.
 
 ### cuda ###
 
-This folder contains two variations of **Stochastic Gradient Descent**. The first one, `sgd_cublas`, uses calls to CuBLAS functions for linear algebra operations. This version is very slow, so it was removed from the default Makefile. If you want to test it, add it to the `cuda:` target and use `CUBLAS_INCLUDEANDLINK`. The second version, `sgd_single_point`, uses both data and model parallelism, and it runs faster than the CPU versions under the right settings. It has a custom implementation of the linear algebra procedures.
+This folder contains four variations of **Stochastic Gradient Descent**. The first one, `sgd_cublas`, uses calls to CuBLAS functions for linear algebra operations. This version is very slow, so it was removed from the default Makefile. If you want to test it, add it to the `cuda:` target and use `CUBLAS_INCLUDEANDLINK`. The second version, `sgd_single_point`, uses both data and model parallelism, and it runs faster than the CPU versions under the right settings. It has a custom implementation of the linear algebra procedures. The third version, which is a minibatch-1 version, speeds up a lot by updating parameter by
+minibatch. The last version, which is minibatch-2, choose a different way to parallize threads with regard to the first one. 
 
 ### sdaccel-c ###
 
