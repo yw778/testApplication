@@ -83,12 +83,12 @@ void runConvergenceTime(
     TrainingOptions training_options,
     BenchmarkOptions benchmark_options) {
 
-    convergenceTime(
-        trainStochasticGradientDescent,
-        "SGD",
-        data_set,
-        training_options,
-        benchmark_options);
+    // convergenceTime(
+    //     trainStochasticGradientDescent,
+    //     "SGD",
+    //     data_set,
+    //     training_options,
+    //     benchmark_options);
 
     // convergenceTime(
     //     trainBatchGradientDescent,
