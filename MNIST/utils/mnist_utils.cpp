@@ -176,6 +176,7 @@ std::vector<float> softmaxFunctionFloat(
     }
 
     return posibiility_each;
+    
 
 }
 

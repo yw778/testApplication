@@ -140,18 +140,18 @@ static __device__ void d_updateParameters(
     size_t num_thread_each_class = threads_per_datapoint / threads_class_per_datapoint;
     size_t relative_tidx_each_class = thread_offset % num_thread_each_class;
     size_t parameters_idx_each_class =  thread_offset / num_thread_each_class;
-    size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
+    // size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
     // __syncthreads();
 
-    for(size_t i = 0; i < num_parameter_each_class ; i++){
+    for(size_t i = parameters_idx_each_class; i < LABEL_CLASS ; i +＝ threads_class_per_datapoint){
         
         for (size_t j = relative_tidx_each_class; j < num_features; j += num_thread_each_class){
 
-            size_t parameters_idx = parameters_idx_each_class +  threads_class_per_datapoint * i;
+            // size_t parameters_idx = parameters_idx_each_class +  threads_class_per_datapoint * i;
 //            size_t probability_idx = threads_class_per_datapoint * i + parameters_idx_each_class;
 
-            atomicAdd(&parameter_vector[j+parameters_idx * num_features], - data_point_i[j] 
-                * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS + parameters_idx]);
+            atomicAdd(&parameter_vector[j+i * num_features], - data_point_i[j] 
+                * step_size_times_prob_i_minus_label_i[point_idx_in_block * LABEL_CLASS + i]);
 
         }
         
@@ -177,7 +177,7 @@ static __global__ void p_SgdWithSharedParameterVector(
     float *probabilities_of_each = (float*)&shared_memory[blockDim.x]; 
     // computes several indexes, offsets and strides to simplify further code
     size_t tidx = threadIdx.x;
-    size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
+    // size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
     size_t points_per_block = (blockDim.x / threads_per_datapoint);
     size_t point_idx = (blockIdx.x * points_per_block)
                      + (tidx / threads_per_datapoint);
@@ -188,7 +188,7 @@ static __global__ void p_SgdWithSharedParameterVector(
     // index relative to each class of thread
     size_t num_thread_each_class = threads_per_datapoint / threads_class_per_datapoint;
     size_t relative_tidx_each_class = relative_tidx % num_thread_each_class;
-    // size_t parameters_idx_each_class =  relative_tidx / num_thread_each_class;
+    size_t parameters_idx_each_class =  relative_tidx / num_thread_each_class;
 
 
     FeatureType* data_point_i = NULL;
@@ -198,13 +198,14 @@ static __global__ void p_SgdWithSharedParameterVector(
 
         data_point_i = (FeatureType*) &data_points[point_idx * num_features];
 
+// for (size_t j = relative_tidx_each_class; j < num_features; j += num_thread_each_class)
         // compute partial matrix-vector product
-        for(size_t i = 0; i < num_parameter_each_class; i++){
+        for(size_t i = parameters_idx_each_class; i < LABEL_CLASS; i +＝ threads_class_per_datapoint){
             
            
             d_partialMatrixVectorProduct(
                 data_point_i,
-                &parameter_vector[i * threads_class_per_datapoint * num_features],
+                &parameter_vector[i * num_features],
                 shared_memory,
                 num_features,
                 threads_per_datapoint,
@@ -229,7 +230,7 @@ static __global__ void p_SgdWithSharedParameterVector(
                 size_t sub_block_idx = relative_tidx % threads_class_per_datapoint;
 
                 probabilities_of_each[point_idx_in_block * LABEL_CLASS+relative_tidx 
-                    + i * threads_class_per_datapoint]= 
+                    + i]= 
                         __expf(shared_memory[sub_block_idx * num_thread_each_class + point_idx_in_shmem]);
 
             }
