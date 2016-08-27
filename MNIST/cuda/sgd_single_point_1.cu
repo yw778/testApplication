@@ -143,7 +143,7 @@ static __device__ void d_updateParameters(
     // size_t num_parameter_each_class = LABEL_CLASS / threads_class_per_datapoint;
     // __syncthreads();
 
-    for(size_t i = parameters_idx_each_class; i < LABEL_CLASS ; i +＝ threads_class_per_datapoint){
+    for(size_t i = parameters_idx_each_class; i < LABEL_CLASS ; i += threads_class_per_datapoint){
         
         for (size_t j = relative_tidx_each_class; j < num_features; j += num_thread_each_class){
 
@@ -200,7 +200,7 @@ static __global__ void p_SgdWithSharedParameterVector(
 
 // for (size_t j = relative_tidx_each_class; j < num_features; j += num_thread_each_class)
         // compute partial matrix-vector product
-        for(size_t i = parameters_idx_each_class; i < LABEL_CLASS; i +＝ threads_class_per_datapoint){
+        for(size_t i = parameters_idx_each_class; i < LABEL_CLASS; i += threads_class_per_datapoint){
             
            
             d_partialMatrixVectorProduct(
