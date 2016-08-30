@@ -1,6 +1,6 @@
-// #include <stdlib.h>
-// #include <stdio.h>
-// #include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
 
 #include "defs.h"
 #define LOOP_PIPELINE __attribute__((xcl_pipeline_loop))
