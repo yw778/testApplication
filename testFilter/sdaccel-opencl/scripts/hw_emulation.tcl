@@ -11,7 +11,7 @@ source scripts/project_setup.tcl
 compile_emulation -flow hardware -opencl_binary [get_opencl_binary kernel_file]
 
 # Generate the system estimate report
-report_estimate
+# report_estimate
 
 # Run the design in CPU emulation mode
 run_emulation -flow hardware -args "-d acc -k SgdLR -f kernel_file.xclbin"
