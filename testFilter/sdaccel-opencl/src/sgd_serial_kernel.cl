@@ -40,9 +40,9 @@ FeatureType cl_dotProduct(__local FeatureType* a, __local FeatureType* b, int si
 }
 
 // hard logistic function
-// int c_hardLogisticFunction(FeatureType exponent) {
-//     return (exponent >= 0) ? 1 : 0;
-// }
+int cl_hardLogisticFunction(FeatureType exponent) {
+    return (exponent >= 0) ? 1 : 0;
+}
 
 // logistic function
 float cl_logisticFunction(FeatureType exponent) {
@@ -165,7 +165,7 @@ __kernel void SgdLR(__global FeatureType * global_data_points,
             // starts computation of gradient
             FeatureType dot = cl_dotProduct(parameter_vector, data_point_i, NUM_FEATURES);
 
-            float probability_of_positive = cl_logisticFunction(dot);
+            float probability_of_positive = cl_hardLogisticFunction(dot);
 
             float step = -(probability_of_positive - global_labels[i]) * STEP_SIZE;
 
