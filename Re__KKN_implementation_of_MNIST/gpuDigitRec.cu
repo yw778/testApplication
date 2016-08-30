@@ -16,11 +16,12 @@ __global__ void calculations(unsigned char* trainImage, unsigned char* testImage
   int tIdx = threadIdx.x;
   //__global__ int* distance;
   unsigned char* diff;
+  printf("%d\n", 100);
   diff[fullIdx] = trainImage[fullIdx] ^ testImage[tIdx%99];
   syncthreads();
   calcDistGPU(diff,distances);
   distances[tIdx] = 100;
-  printf("%d\n", 100);
+  // printf("%d\n", 100);
   syncthreads();
 
 }
@@ -170,7 +171,7 @@ int digitrec(char* trainLabels, unsigned char* trainImages,int trainingSize, uns
     cudaMemcpy(testImage, input, 784/8*sizeof(char), cudaMemcpyHostToDevice);
 
     //printf("Hello1\n");
-    calculations<<<1, 980>>>(trainImage, testImage, distances);
+    calculations<<<6000, 980>>>(trainImage, testImage, distances);
 
     //printf("Hello2\n");
     cudaMemcpy(diff, distances, 60000*sizeof(int), cudaMemcpyDeviceToHost);
