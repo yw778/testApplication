@@ -22,8 +22,6 @@ SOURCES := src/main_sdaccel.cpp \
 			src/SdaccelSgd.cpp \
 			$(UTILS_DIR)/utils.cpp
 
-ALL_DEPS = $(HEADERS) $(SOURCES)
-
 sw_emulation: $(SW_EMUL_TCL) $(ALL_DEPS)
 	$(SDACCEL) $(SW_EMUL_TCL)
 
