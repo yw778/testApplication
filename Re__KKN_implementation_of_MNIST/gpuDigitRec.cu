@@ -16,18 +16,25 @@ __global__ void calculations(unsigned char* trainImage, unsigned char* testImage
   int tIdx = threadIdx.x;
   //__global__ int* distance;
   unsigned char* diff;
-  printf("%d\n", 100);
+   if(threadIdx.x==0&&blockIdx.x==0){
+   printf("%d\n",100);
+  }
   diff[fullIdx] = trainImage[fullIdx] ^ testImage[tIdx%99];
   syncthreads();
   calcDistGPU(diff,distances);
   distances[tIdx] = 100;
-  printf("%d\n", 200);
+  if(threadIdx.x==0&&blockIdx.x==0){
+   printf("%d\n",300);
+  }
   syncthreads();
 
 }
 
 __device__ void calcDistGPU (unsigned char* data, int* distances)
 {
+  if(threadIdx.x==0&&blockIdx.x==0){
+   printf("%d\n",200);
+  }
   int i = (blockIdx.x * 980) + threadIdx.x;
     if (threadIdx.x<98) {
       for(int j = 0; j<8; j++){
