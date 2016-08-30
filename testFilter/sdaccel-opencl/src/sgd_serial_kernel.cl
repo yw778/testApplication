@@ -28,7 +28,7 @@ typedef float LabelType;
 // extern "C" {
 
 // dot product between two vectors
-FeatureType cl_dotProduct(FeatureType* a, FeatureType* b, int size) {
+FeatureType cl_dotProduct(__local FeatureType* a, __local FeatureType* b, int size) {
 
     FeatureType result = 0;
 
