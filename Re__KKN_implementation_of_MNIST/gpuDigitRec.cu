@@ -142,9 +142,9 @@ int digitrec(char* trainLabels, unsigned char* trainImages,int trainingSize, uns
 
   //const int arrayBytes = 784*sizeof(char);
 
-  cudaMalloc((void**) &trainImage, 60000*784/8*sizeof(char));
-  cudaMalloc((void**) &testImage, 784/8*sizeof(char));
-  cudaMalloc((void**) &distances, 60000*sizeof(int));
+  cudaMalloc( &trainImage, 60000*784/8*sizeof(char));
+  cudaMalloc(&testImage, 784/8*sizeof(char));
+  cudaMalloc( &distances, 60000*sizeof(int));
 
   //sets distance array to max
   int a;
