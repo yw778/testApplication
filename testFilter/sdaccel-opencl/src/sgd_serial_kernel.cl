@@ -32,6 +32,7 @@ FeatureType cl_dotProduct(__local FeatureType* a, __local FeatureType* b, int si
 
     FeatureType result = 0;
 
+    LOOP_PIPELINE
     for (int j = 0; j < size; j++)
         result += a[j] * b[j];
 
@@ -140,7 +141,7 @@ __kernel void SgdLR(__global FeatureType * global_data_points,
     event_t results_copy;
     // event_t data_copy;
 
-    __local FeatureType parameter_vector[NUM_FEATURES];
+    __local FeatureType parameter_vector[NUM_FEATURES]; 
     __local FeatureType data_point_i[NUM_FEATURES];
 
     parameter_copy = async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES , 0);
@@ -150,6 +151,7 @@ __kernel void SgdLR(__global FeatureType * global_data_points,
 
         // Iterate over all training instances (data points)
         // static int read = 0;
+        LOOP_PIPELINE
         for (int i = 0; i < NUM_TRAINING; i++) {
             // Read data point from global memory
             // read = 0;
@@ -168,6 +170,7 @@ __kernel void SgdLR(__global FeatureType * global_data_points,
             float step = -(probability_of_positive - global_labels[i]) * STEP_SIZE;
 
             // finishes computation of (gradient * step size) and updates parameter vector
+            LOOP_PIPELINE
             for (int j = 0; j < NUM_FEATURES; j++)
                 parameter_vector[j] += step * data_point_i[j];
 
