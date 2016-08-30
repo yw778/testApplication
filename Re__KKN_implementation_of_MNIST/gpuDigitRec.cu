@@ -21,7 +21,7 @@ __global__ void calculations(unsigned char* trainImage, unsigned char* testImage
   syncthreads();
   calcDistGPU(diff,distances);
   distances[tIdx] = 100;
-  // printf("%d\n", 100);
+  printf("%d\n", 200);
   syncthreads();
 
 }
