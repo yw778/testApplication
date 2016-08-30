@@ -17,14 +17,14 @@ __global__ void calculations(unsigned char* trainImage, unsigned char* testImage
   //__global__ int* distance;
   unsigned char* diff;
    if(threadIdx.x==0&&blockIdx.x==0){
-   printf("%d\n",100);
+   printf("%d\n",200); // this one prints
   }
   diff[fullIdx] = trainImage[fullIdx] ^ testImage[tIdx%99];
   syncthreads();
   calcDistGPU(diff,distances);
   distances[tIdx] = 100;
   if(threadIdx.x==0&&blockIdx.x==0){
-   printf("%d\n",300);
+   printf("%d\n",300); // this one doesn't print
   }
   syncthreads();
 
