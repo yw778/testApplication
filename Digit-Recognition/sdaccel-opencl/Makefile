@@ -6,7 +6,7 @@ DEBUG_TCL   = scripts/debug.tcl
 BOARD_COMPILE_TCL = scripts/board_compile.tcl
 BOARD_RUN_TCL = scripts/board_run.tcl
 
-HARNESS_DIR = harness/sdaccel/
+HARNESS_DIR = harness/sdaccel
 
 HEADERS = $(HARNESS_DIR)/CLKernel.h \
 					$(HARNESS_DIR)/CLMemObj.h \
