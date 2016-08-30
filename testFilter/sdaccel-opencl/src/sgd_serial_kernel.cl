@@ -1,8 +1,18 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
+// #include <stdlib.h>
+// #include <stdio.h>
+// #include <math.h>
+#define NUM_FEATURES      1024
+#define NUM_SAMPLES       100
+#define NUM_TRAINING      90
+#define NUM_TESTING       10
+#define STEP_SIZE         50 //step size (eta)
+#define NUM_EPOCHS        1
+#define MAX_NUM_EPOCHS    1
 
-#include "defs.h"
+
+typedef float FeatureType;
+typedef float LabelType;
+// #include "defs.h"
 #define LOOP_PIPELINE __attribute__((xcl_pipeline_loop))
 #define LOOP_UNROLL __attribute__((opencl_unroll_hint))
 
