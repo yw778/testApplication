@@ -34,11 +34,15 @@ typedef float4 VectorLabelType;
 // dot product between two vectors
 FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureType* b, int size) {
 
+    VectorFeatureType result_vector = (0,0,0,0);
     FeatureType result = 0;
 
     // LOOP_PIPELINE
     for (int j = 0; j < size; j++)
-        result += a[j] * b[j];
+        result_vector += a[j] * b[j];
+
+    result = result_vector.x + result_vector.y
+                + result_vector.z + result_vector.w;
 
     return result;
 }
