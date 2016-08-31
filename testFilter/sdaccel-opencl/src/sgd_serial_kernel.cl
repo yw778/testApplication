@@ -15,8 +15,8 @@ typedef float LabelType;
 typedef float4 VectorFeatureType;
 typedef float4 VectorLabelType;
 // #include "defs.h"
-// #define LOOP_PIPELINE __attribute__((xcl_pipeline_loop))
-// #define LOOP_UNROLL __attribute__((opencl_unroll_hint))
+#define LOOP_PIPELINE __attribute__((xcl_pipeline_loop))
+#define LOOP_UNROLL __attribute__((opencl_unroll_hint))
 
 /*
  * Parallel approach to Stochastic Gradient Descent #4 - Sdaccel - Opencl:
