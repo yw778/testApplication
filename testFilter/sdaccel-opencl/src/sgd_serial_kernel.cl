@@ -142,7 +142,7 @@ float cl_logisticFunction(FeatureType exponent) {
 __attribute__ ((reqd_work_group_size(1, 1, 1)))
 //__kernel void DigitRec(__global long long * global_training_set, __global long long * global_test_set, __global long long * global_results) {
 __kernel void SgdLR(__global VectorFeatureType * global_data_points, 
-    __global VectorLabelType * global_labels, 
+    __global LabelType * global_labels, 
     __global VectorFeatureType * global_parameter_vector) {
 
     // event_t parameter_copy;
@@ -181,9 +181,13 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
             float step = -(probability_of_positive - global_labels[i]) * STEP_SIZE;
 
             // finishes computation of (gradient * step size) and updates parameter vector
-            // LOOP_PIPELINE
-            for (int j = 0; j < NUM_FEATURES/4; j++)
-                parameter_vector[j] += step * data_point[i * NUM_FEATURES/4 + j];
+            // LOOP_UNROLL
+            for (int j = 0; j < NUM_FEATURES/4; j++){
+                parameter_vector[j].x += step * data_point[i * NUM_FEATURES/4 + j].x;
+                parameter_vector[j].y += step * data_point[i * NUM_FEATURES/4 + j].y;
+                parameter_vector[j].z += step * data_point[i * NUM_FEATURES/4 + j].z;
+                parameter_vector[j].w += step * data_point[i * NUM_FEATURES/4 + j].w;
+            }
 
         }
     }
