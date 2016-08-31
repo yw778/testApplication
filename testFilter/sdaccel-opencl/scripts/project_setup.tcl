@@ -26,6 +26,8 @@ set_property file_type "c header files" [get_files "src/utils.hpp"]
 # Kernel definition
 create_kernel SgdLR -type clc
 add_files -kernel [get_kernels SgdLR] "src/sgd_serial_kernel.cl"
+# set_property max_memory_ports true [get_kernels SgdLR]
+# set_property memory_port_data_width 512 [get_kernels SgdLR]
 
 # Define binary containers
 create_opencl_binary kernel_file
