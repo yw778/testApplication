@@ -12,6 +12,8 @@
 
 typedef float FeatureType;
 typedef float LabelType;
+typedef float4 VectorFeatureType;
+typedef float4 VectorLabelType;
 // #include "defs.h"
 // #define LOOP_PIPELINE __attribute__((xcl_pipeline_loop))
 // #define LOOP_UNROLL __attribute__((opencl_unroll_hint))
@@ -20,10 +22,17 @@ typedef float LabelType;
  * Parallel approach to Stochastic Gradient Descent #4 - Sdaccel - Opencl:
  *
  */
+// typedef struct tag_float4_t 
+// {
+//   long x;
+//   long y;
+//   long z;
+//   long w;
+// } float4_t;
 
 
 // dot product between two vectors
-FeatureType cl_dotProduct(__local FeatureType* a, __local FeatureType* b, int size) {
+FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureType* b, int size) {
 
     FeatureType result = 0;
 
@@ -128,19 +137,19 @@ float cl_logisticFunction(FeatureType exponent) {
 
 __attribute__ ((reqd_work_group_size(1, 1, 1)))
 //__kernel void DigitRec(__global long long * global_training_set, __global long long * global_test_set, __global long long * global_results) {
-__kernel void SgdLR(__global FeatureType * global_data_points, 
-    __global LabelType * global_labels, 
-    __global FeatureType * global_parameter_vector) {
+__kernel void SgdLR(__global VectorFeatureType * global_data_points, 
+    __global VectorLabelType * global_labels, 
+    __global VectorFeatureType * global_parameter_vector) {
 
     // event_t parameter_copy;
     // event_t results_copy;
     // event_t data_copy;
 
-    __local FeatureType parameter_vector[NUM_FEATURES]; 
-    __local FeatureType data_point[NUM_FEATURES * NUM_TRAINING];
+    __local VectorFeatureType parameter_vector[NUM_FEATURES/4]; 
+    __local VectorFeatureType data_point[NUM_FEATURES * NUM_TRAINING/4];
 
-    async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES , 0);
-    async_work_group_copy(data_point, global_data_points, NUM_FEATURES * NUM_TRAINING , 0);
+    async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES/4 , 0);
+    async_work_group_copy(data_point, global_data_points, NUM_FEATURES * NUM_TRAINING/4 , 0);
     // wait_group_events(1, &data_copy);
     // wait_group_events(1, &parameter_copy);
 
@@ -161,7 +170,7 @@ __kernel void SgdLR(__global FeatureType * global_data_points,
             //     data_point_i[j] = global_data_points[j + i * NUM_FEATURES];
 
             // starts computation of gradient
-            FeatureType dot = cl_dotProduct(parameter_vector, &data_point[i * NUM_FEATURES], NUM_FEATURES);
+            FeatureType dot = cl_dotProduct(parameter_vector, &data_point[i * NUM_FEATURES/4], NUM_FEATURES/4);
 
             float probability_of_positive = cl_hardLogisticFunction(dot);   
 
@@ -169,13 +178,13 @@ __kernel void SgdLR(__global FeatureType * global_data_points,
 
             // finishes computation of (gradient * step size) and updates parameter vector
             // LOOP_PIPELINE
-            for (int j = 0; j < NUM_FEATURES; j++)
-                parameter_vector[j] += step * data_point[i * NUM_FEATURES + j];
+            for (int j = 0; j < NUM_FEATURES/4; j++)
+                parameter_vector[j] += step * data_point[i * NUM_FEATURES/4 + j];
 
         }
     }
     barrier(CLK_LOCAL_MEM_FENCE);
-    async_work_group_copy(global_parameter_vector, parameter_vector, NUM_FEATURES, 0);
+    async_work_group_copy(global_parameter_vector, parameter_vector, NUM_FEATURES/4, 0);
     barrier(CLK_LOCAL_MEM_FENCE);
     // wait_group_events(1, &results_copy);
 }

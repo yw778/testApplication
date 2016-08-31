@@ -23,4 +23,4 @@ build_system
 package_system
 
 # Run packaged system
-run_system -args "-d acc -k SgdLR -f kernel_file.xclbin"
+# run_system -args "-d acc -k SgdLR -f kernel_file.xclbin"
