@@ -132,15 +132,19 @@ __kernel void SgdLR(__global FeatureType * global_data_points,
     __global LabelType * global_labels, 
     __global FeatureType * global_parameter_vector) {
 
-    event_t parameter_copy;
-    event_t results_copy;
+    // event_t parameter_copy;
+    // event_t results_copy;
     // event_t data_copy;
 
     __local FeatureType parameter_vector[NUM_FEATURES]; 
-    __local FeatureType data_point_i[NUM_FEATURES];
+    __local FeatureType data_point[NUM_FEATURES * NUM_TRAINING];
 
-    parameter_copy = async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES , 0);
-    wait_group_events(1, &parameter_copy);
+    async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES , 0);
+    async_work_group_copy(data_point, global_data_points, NUM_FEATURES * NUM_TRAINING , 0);
+    // wait_group_events(1, &data_copy);
+    // wait_group_events(1, &parameter_copy);
+
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     for (int epoch = 0; epoch < NUM_EPOCHS; epoch++) {
 
@@ -150,29 +154,29 @@ __kernel void SgdLR(__global FeatureType * global_data_points,
         for (int i = 0; i < NUM_TRAINING; i++) {
             // Read data point from global memory
             // read = 0;
-            event_t data_copy;
-            data_copy = async_work_group_copy(data_point_i, &global_data_points[i * NUM_FEATURES], NUM_FEATURES , 0);
-            wait_group_events(1, &data_copy);
+            // event_t data_copy;
+            
 
             // for (int j = 0; j < NUM_FEATURES; j++)
             //     data_point_i[j] = global_data_points[j + i * NUM_FEATURES];
 
             // starts computation of gradient
-            FeatureType dot = cl_dotProduct(parameter_vector, data_point_i, NUM_FEATURES);
+            FeatureType dot = cl_dotProduct(parameter_vector, &data_point_i[i * NUM_FEATURES], NUM_FEATURES);
 
-            float probability_of_positive = cl_hardLogisticFunction(dot);
+            float probability_of_positive = cl_hardLogisticFunction(dot);   
 
             float step = -(probability_of_positive - global_labels[i]) * STEP_SIZE;
 
             // finishes computation of (gradient * step size) and updates parameter vector
             // LOOP_PIPELINE
             for (int j = 0; j < NUM_FEATURES; j++)
-                parameter_vector[j] += step * data_point_i[j];
+                parameter_vector[j] += step * data_point_i[i * NUM_FEATURES + j];
 
         }
     }
-
-    results_copy = async_work_group_copy(global_parameter_vector, parameter_vector, NUM_FEATURES, 0);
-    wait_group_events(1, &results_copy);
+    barrier(CLK_LOCAL_MEM_FENCE);
+    async_work_group_copy(global_parameter_vector, parameter_vector, NUM_FEATURES, 0);
+    barrier(CLK_LOCAL_MEM_FENCE);
+    // wait_group_events(1, &results_copy);
 }
 
