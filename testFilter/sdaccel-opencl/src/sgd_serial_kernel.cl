@@ -161,7 +161,7 @@ __kernel void SgdLR(__global FeatureType * global_data_points,
             //     data_point_i[j] = global_data_points[j + i * NUM_FEATURES];
 
             // starts computation of gradient
-            FeatureType dot = cl_dotProduct(parameter_vector, &data_point_i[i * NUM_FEATURES], NUM_FEATURES);
+            FeatureType dot = cl_dotProduct(parameter_vector, &data_point[i * NUM_FEATURES], NUM_FEATURES);
 
             float probability_of_positive = cl_hardLogisticFunction(dot);   
 
@@ -170,7 +170,7 @@ __kernel void SgdLR(__global FeatureType * global_data_points,
             // finishes computation of (gradient * step size) and updates parameter vector
             // LOOP_PIPELINE
             for (int j = 0; j < NUM_FEATURES; j++)
-                parameter_vector[j] += step * data_point_i[i * NUM_FEATURES + j];
+                parameter_vector[j] += step * data_point[i * NUM_FEATURES + j];
 
         }
     }
