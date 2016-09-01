@@ -1,7 +1,7 @@
 // #include <stdlib.h>
 // #include <stdio.h>
 // #include <math.h>
-#define NUM_FEATURES      1024
+#define NUM_FEATURES      1024/4
 #define NUM_SAMPLES       100
 #define NUM_TRAINING      90
 #define NUM_TESTING       10
@@ -12,6 +12,7 @@
 
 typedef float FeatureType;
 typedef float LabelType;
+typedef float4 VectorFeatureType;
 // #include "defs.h"
 #define LOOP_PIPELINE __attribute__((xcl_pipeline_loop))
 #define LOOP_UNROLL __attribute__((opencl_unroll_hint))
@@ -25,11 +26,15 @@ typedef float LabelType;
 // dot product between two vectors
 FeatureType cl_dotProduct(__local FeatureType* a, __local FeatureType* b, int size) {
 
+    VectorFeatureType result_vector = (0.0f,0.0f,0.0f,0.0f);
     FeatureType result = 0;
 
     LOOP_PIPELINE
     for (int j = 0; j < size; j++)
-        result += a[j] * b[j];
+        result_vector += a[j] * b[j];
+
+    result = result_vector.x + result_vector.y
+                + result_vector.z + result_vector.w;
 
     return result;
 }
@@ -128,16 +133,16 @@ float cl_logisticFunction(FeatureType exponent) {
 
 __attribute__ ((reqd_work_group_size(1, 1, 1)))
 //__kernel void DigitRec(__global long long * global_training_set, __global long long * global_test_set, __global long long * global_results) {
-__kernel void SgdLR(__global FeatureType * global_data_points, 
+__kernel void SgdLR(__global VectorFeatureType * global_data_points, 
     __global LabelType * global_labels, 
-    __global FeatureType * global_parameter_vector) {
+    __global VectorFeatureType * global_parameter_vector) {
 
     // event_t parameter_copy;
     // event_t results_copy;
     // event_t data_copy;
 
-    __local FeatureType parameter_vector[NUM_FEATURES]; __attribute__((xcl_array_partition(complete, 1)));
-    __local FeatureType data_point[NUM_FEATURES * NUM_TRAINING]; __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
+    __local VectorFeatureType parameter_vector[NUM_FEATURES]; __attribute__((xcl_array_partition(complete, 1)));
+    __local VectorFeatureType data_point[NUM_FEATURES * NUM_TRAINING]; __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
 
     async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES , 0);
     async_work_group_copy(data_point, global_data_points, NUM_FEATURES * NUM_TRAINING , 0);
@@ -169,9 +174,12 @@ __kernel void SgdLR(__global FeatureType * global_data_points,
 
             // finishes computation of (gradient * step size) and updates parameter vector
             LOOP_PIPELINE
-            for (int j = 0; j < NUM_FEATURES; j++)
-                parameter_vector[j] += step * data_point[i * NUM_FEATURES + j];
-
+            for (int j = 0; j < NUM_FEATURES; j++){
+                parameter_vector[j].x += step * data_point[i * NUM_FEATURES + j].x;
+                parameter_vector[j].y += step * data_point[i * NUM_FEATURES + j].y;
+                parameter_vector[j].z += step * data_point[i * NUM_FEATURES + j].z;
+                parameter_vector[j].w += step * data_point[i * NUM_FEATURES + j].w;
+            }
         }
     }
     barrier(CLK_LOCAL_MEM_FENCE);
