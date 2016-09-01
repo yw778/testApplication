@@ -137,7 +137,7 @@ __kernel void SgdLR(__global FeatureType * global_data_points,
     // event_t data_copy;
 
     __local FeatureType parameter_vector[NUM_FEATURES]; 
-    __local FeatureType data_point[NUM_FEATURES * NUM_TRAINING];
+    __local FeatureType data_point[NUM_FEATURES * NUM_TRAINING]; __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
 
     async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES , 0);
     async_work_group_copy(data_point, global_data_points, NUM_FEATURES * NUM_TRAINING , 0);
@@ -150,7 +150,7 @@ __kernel void SgdLR(__global FeatureType * global_data_points,
 
         // Iterate over all training instances (data points)
         // static int read = 0;
-        LOOP_PIPELINE
+        // LOOP_PIPELINE
         for (int i = 0; i < NUM_TRAINING; i++) {
             // Read data point from global memory
             // read = 0;
