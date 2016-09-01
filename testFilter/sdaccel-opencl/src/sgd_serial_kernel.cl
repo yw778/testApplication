@@ -24,7 +24,7 @@ typedef float4 VectorFeatureType;
 
 
 // dot product between two vectors
-FeatureType cl_dotProduct(__local FeatureType* a, __local FeatureType* b, int size) {
+FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureType* b, int size) {
 
     VectorFeatureType result_vector = (0.0f,0.0f,0.0f,0.0f);
     FeatureType result = 0;
