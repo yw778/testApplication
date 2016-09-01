@@ -200,7 +200,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
             }
         }
     }
-    barrier(CLK_LOCAL_MEM_FENCE);
+    // barrier(CLK_LOCAL_MEM_FENCE);
     async_work_group_copy(global_parameter_vector, parameter_vector, NUM_FEATURES, 0);
     barrier(CLK_LOCAL_MEM_FENCE);
     // wait_group_events(1, &results_copy);
