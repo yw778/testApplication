@@ -38,8 +38,8 @@ FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureTyp
 
     result = result_vector.s0 + result_vector.s1 + result_vector.s2 + result_vector.s3
                 + result_vector.s4 + result_vector.s5 + result_vector.s6 + result_vector.s7
-                + result_vector.s8 + result_vector.s9 + result_vector.s10 + result_vector.s11
-                + result_vector.s12 + result_vector.s13 + result_vector.s14 + result_vector.s15;
+                + result_vector.s8 + result_vector.s9 + result_vector.sa + result_vector.sb
+                + result_vector.sc + result_vector.sd + result_vector.se + result_vector.sf;
 
     return result;
 }
@@ -191,12 +191,12 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
                 parameter_vector[j].s7 += step * data_point[i * NUM_FEATURES + j].s7;
                 parameter_vector[j].s8 += step * data_point[i * NUM_FEATURES + j].s8;
                 parameter_vector[j].s9 += step * data_point[i * NUM_FEATURES + j].s9;
-                parameter_vector[j].s10 += step * data_point[i * NUM_FEATURES + j].s10;
-                parameter_vector[j].s11 += step * data_point[i * NUM_FEATURES + j].s11;
-                parameter_vector[j].s12 += step * data_point[i * NUM_FEATURES + j].s12;
-                parameter_vector[j].s13 += step * data_point[i * NUM_FEATURES + j].s13;
-                parameter_vector[j].s14 += step * data_point[i * NUM_FEATURES + j].s14;
-                parameter_vector[j].s15 += step * data_point[i * NUM_FEATURES + j].s15;
+                parameter_vector[j].sa += step * data_point[i * NUM_FEATURES + j].sa;
+                parameter_vector[j].sb += step * data_point[i * NUM_FEATURES + j].sb;
+                parameter_vector[j].sc += step * data_point[i * NUM_FEATURES + j].sc;
+                parameter_vector[j].sd += step * data_point[i * NUM_FEATURES + j].sd;
+                parameter_vector[j].se += step * data_point[i * NUM_FEATURES + j].se;
+                parameter_vector[j].sf += step * data_point[i * NUM_FEATURES + j].sf;
             }
         }
     }
