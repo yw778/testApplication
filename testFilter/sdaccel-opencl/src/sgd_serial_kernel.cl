@@ -150,7 +150,7 @@ __kernel void SgdLR(__global FeatureType * global_data_points,
 
         // Iterate over all training instances (data points)
         // static int read = 0;
-        // LOOP_PIPELINE
+        LOOP_PIPELINE
         for (int i = 0; i < NUM_TRAINING; i++) {
             // Read data point from global memory
             // read = 0;
