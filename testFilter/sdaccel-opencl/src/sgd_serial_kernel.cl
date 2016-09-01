@@ -178,8 +178,8 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
             float step = -(probability_of_positive - global_labels[i]) * STEP_SIZE;
 
             // finishes computation of (gradient * step size) and updates parameter vector
-            // LOOP_UNROLL
-            LOOP_PIPELINE 
+            LOOP_PIPELINE
+            LOOP_UNROLL 
             for (int j = 0; j < NUM_FEATURES; j++){
                 parameter_vector[j].s0 += step * data_point[i * NUM_FEATURES + j].s0;
                 parameter_vector[j].s1 += step * data_point[i * NUM_FEATURES + j].s1;
