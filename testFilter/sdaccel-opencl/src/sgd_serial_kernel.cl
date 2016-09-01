@@ -136,7 +136,7 @@ __kernel void SgdLR(__global FeatureType * global_data_points,
     // event_t results_copy;
     // event_t data_copy;
 
-    __local FeatureType parameter_vector[NUM_FEATURES]; 
+    __local FeatureType parameter_vector[NUM_FEATURES]; __attribute__((xcl_array_partition(complete, 1)));
     __local FeatureType data_point[NUM_FEATURES * NUM_TRAINING]; __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
 
     async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES , 0);
