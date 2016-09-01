@@ -145,12 +145,14 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
     // event_t parameter_copy;
     // event_t results_copy;
     // event_t data_copy;
-
+    //TODO
     __local VectorFeatureType parameter_vector[NUM_FEATURES]; __attribute__((xcl_array_partition(complete, 1)));
     __local VectorFeatureType data_point[NUM_FEATURES * NUM_TRAINING]; __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
-
+    __local FeatureType labels[NUM_TRAINING]; __attribute__((xcl_array_partition(complete, 1)));
+    //TODO
     async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES , 0);
     async_work_group_copy(data_point, global_data_points, NUM_FEATURES * NUM_TRAINING , 0);
+    async_work_group_copy(labels, global_labels, NUM_TRAINING, 0);
     // wait_group_events(1, &data_copy);
     // wait_group_events(1, &parameter_copy);
 
@@ -174,8 +176,8 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
             FeatureType dot = cl_dotProduct(parameter_vector, &data_point[i * NUM_FEATURES], NUM_FEATURES);
 
             float probability_of_positive = cl_hardLogisticFunction(dot);   
-
-            float step = -(probability_of_positive - global_labels[i]) * STEP_SIZE;
+            //TODO
+            float step = -(probability_of_positive - labels[i]) * STEP_SIZE;
 
             // finishes computation of (gradient * step size) and updates parameter vector
             LOOP_PIPELINE
