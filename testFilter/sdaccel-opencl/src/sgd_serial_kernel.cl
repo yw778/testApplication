@@ -1,7 +1,7 @@
 // #include <stdlib.h>
 // #include <stdio.h>
 // #include <math.h>
-#define NUM_FEATURES      1024/4
+#define NUM_FEATURES      1024/16
 #define NUM_SAMPLES       100
 #define NUM_TRAINING      90
 #define NUM_TESTING       10
@@ -12,7 +12,7 @@
 
 typedef float FeatureType;
 typedef float LabelType;
-typedef float4 VectorFeatureType;
+typedef float16 VectorFeatureType;
 // #include "defs.h"
 #define LOOP_PIPELINE __attribute__((xcl_pipeline_loop))
 #define LOOP_UNROLL __attribute__((opencl_unroll_hint))
@@ -26,15 +26,20 @@ typedef float4 VectorFeatureType;
 // dot product between two vectors
 FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureType* b, int size) {
 
-    VectorFeatureType result_vector = (0.0f,0.0f,0.0f,0.0f);
+    VectorFeatureType result_vector = (0.0f,0.0f,0.0f,0.0f,
+                                        0.0f,0.0f,0.0f,0.0f,
+                                        0.0f,0.0f,0.0f,0.0f,
+                                        0.0f,0.0f,0.0f,0.0f);
     FeatureType result = 0;
 
     LOOP_PIPELINE
     for (int j = 0; j < size; j++)
         result_vector += a[j] * b[j];
 
-    result = result_vector.x + result_vector.y
-                + result_vector.z + result_vector.w;
+    result = result_vector.s0 + result_vector.s1 + result_vector.s2 + result_vector.s3
+                + result_vector.s4 + result_vector.s5 + result_vector.s6 + result_vector.s7
+                + result_vector.s8 + result_vector.s9 + result_vector.s10 + result_vector.s11
+                + result_vector.s12 + result_vector.s13 + result_vector.s14 + result_vector.s15;
 
     return result;
 }
@@ -176,10 +181,22 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
             // LOOP_UNROLL
             LOOP_PIPELINE 
             for (int j = 0; j < NUM_FEATURES; j++){
-                parameter_vector[j].x += step * data_point[i * NUM_FEATURES + j].x;
-                parameter_vector[j].y += step * data_point[i * NUM_FEATURES + j].y;
-                parameter_vector[j].z += step * data_point[i * NUM_FEATURES + j].z;
-                parameter_vector[j].w += step * data_point[i * NUM_FEATURES + j].w;
+                parameter_vector[j].s0 += step * data_point[i * NUM_FEATURES + j].s0;
+                parameter_vector[j].s1 += step * data_point[i * NUM_FEATURES + j].s1;
+                parameter_vector[j].s2 += step * data_point[i * NUM_FEATURES + j].s2;
+                parameter_vector[j].s3 += step * data_point[i * NUM_FEATURES + j].s3;
+                parameter_vector[j].s4 += step * data_point[i * NUM_FEATURES + j].s4;
+                parameter_vector[j].s5 += step * data_point[i * NUM_FEATURES + j].s5;
+                parameter_vector[j].s6 += step * data_point[i * NUM_FEATURES + j].s6;
+                parameter_vector[j].s7 += step * data_point[i * NUM_FEATURES + j].s7;
+                parameter_vector[j].s8 += step * data_point[i * NUM_FEATURES + j].s8;
+                parameter_vector[j].s9 += step * data_point[i * NUM_FEATURES + j].s9;
+                parameter_vector[j].s10 += step * data_point[i * NUM_FEATURES + j].s10;
+                parameter_vector[j].s11 += step * data_point[i * NUM_FEATURES + j].s11;
+                parameter_vector[j].s12 += step * data_point[i * NUM_FEATURES + j].s12;
+                parameter_vector[j].s13 += step * data_point[i * NUM_FEATURES + j].s13;
+                parameter_vector[j].s14 += step * data_point[i * NUM_FEATURES + j].s14;
+                parameter_vector[j].s15 += step * data_point[i * NUM_FEATURES + j].s15;
             }
         }
     }
