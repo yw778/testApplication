@@ -179,7 +179,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
 
             // finishes computation of (gradient * step size) and updates parameter vector
             LOOP_PIPELINE
-            LOOP_UNROLL 
+            // LOOP_UNROLL 
             for (int j = 0; j < NUM_FEATURES; j++){
                 parameter_vector[j].s0 += step * data_point[i * NUM_FEATURES + j].s0;
                 parameter_vector[j].s1 += step * data_point[i * NUM_FEATURES + j].s1;
@@ -200,9 +200,9 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
             }
         }
     }
-    barrier(CLK_LOCAL_MEM_FENCE);
+    // barrier(CLK_LOCAL_MEM_FENCE);
     async_work_group_copy(global_parameter_vector, parameter_vector, NUM_FEATURES, 0);
-    barrier(CLK_LOCAL_MEM_FENCE);
+    // barrier(CLK_LOCAL_MEM_FENCE);
     // wait_group_events(1, &results_copy);
 }
 
