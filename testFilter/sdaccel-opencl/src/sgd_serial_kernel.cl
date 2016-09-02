@@ -33,6 +33,7 @@ FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureTyp
     FeatureType result = 0;
 
     LOOP_PIPELINE
+    LOOP_UNROLL 
     for (int j = 0; j < size; j++)
         result_vector += a[j] * b[j];
 
@@ -109,7 +110,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
 
             // finishes computation of (gradient * step size) and updates parameter vector
             LOOP_PIPELINE
-            LOOP_UNROLL 
+            // LOOP_UNROLL 
             for (int j = 0; j < NUM_FEATURES; j++){
                 parameter_vector[j].s0 += step * data_point[i * NUM_FEATURES + j].s0;
                 parameter_vector[j].s1 += step * data_point[i * NUM_FEATURES + j].s1;
