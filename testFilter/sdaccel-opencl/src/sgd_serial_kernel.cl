@@ -35,7 +35,7 @@ FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureTyp
     // LOOP_PIPELINE
     // LOOP_UNROLL
     LOOP_PIPELINE
-    for (int j = 0; j < size; j++)
+ LOOPA:   for (int j = 0; j < size; j++)
         result_vector += a[j] * b[j];
 
     result = result_vector.s0 + result_vector.s1 + result_vector.s2 + result_vector.s3
@@ -81,7 +81,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
     event_t datacopy_evt[3];
     //TODO
     // Read data point from global memory
-    __local VectorFeatureType parameter_vector[NUM_FEATURES]
+    __local VectorFeatureType parameter_vector[NUM_FEATURES];
     // __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
     __local VectorFeatureType data_point[NUM_FEATURES * NUM_TRAINING];
     // __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
@@ -98,12 +98,12 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
 
     // barrier(CLK_LOCAL_MEM_FENCE);
 
-    for (int epoch = 0; epoch < NUM_EPOCHS; epoch++) {
+  LOOPB:  for (int epoch = 0; epoch < NUM_EPOCHS; epoch++) {
 
         // Iterate over all training instances (data points)
         // static int read = 0;
         // LOOP_PIPELINE
-        for (int i = 0; i < NUM_TRAINING; i++) {
+   LOOPC:     for (int i = 0; i < NUM_TRAINING; i++) {
 
             // starts computation of gradient
             FeatureType dot = cl_dotProduct(parameter_vector, &data_point[i * NUM_FEATURES], NUM_FEATURES);
@@ -116,7 +116,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
             // __attribute__((opencl_unroll_hint(16)))
             // LOOP_UNROLL
             LOOP_PIPELINE
-            for (int j = 0; j < NUM_FEATURES; j++){
+     LOOPD:       for (int j = 0; j < NUM_FEATURES; j++){
                 // parameter_vector[j].s0 += step * data_point[i * NUM_FEATURES + j].s0;
                 // parameter_vector[j].s1 += step * data_point[i * NUM_FEATURES + j].s1;
                 // parameter_vector[j].s2 += step * data_point[i * NUM_FEATURES + j].s2;
