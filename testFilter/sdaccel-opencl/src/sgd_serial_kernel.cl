@@ -32,7 +32,8 @@ FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureTyp
                                         0.0f,0.0f,0.0f,0.0f);
     FeatureType result = 0;
 
-    LOOP_PIPELINE
+    // LOOP_PIPELINE
+    LOOP_UNROLL
     for (int j = 0; j < size; j++)
         result_vector += a[j] * b[j];
 
@@ -79,10 +80,8 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
     event_t datacopy_evt[3];
     //TODO
     // Read data point from global memory
-    __local VectorFeatureType parameter_vector[NUM_FEATURES];
-    // __attribute__((xcl_array_partition(cyclic,8,1)));
-    __local VectorFeatureType data_point[NUM_FEATURES * NUM_TRAINING];
-    // __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
+    __local VectorFeatureType parameter_vector[NUM_FEATURES] __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
+    __local VectorFeatureType data_point[NUM_FEATURES * NUM_TRAINING] __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
     __local FeatureType labels[NUM_TRAINING]; 
     // __attribute__((xcl_array_partition(complete, 1)));
 
