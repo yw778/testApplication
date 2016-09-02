@@ -45,15 +45,15 @@ FeatureType cl_dotProduct(__local FeatureType* parameter_vector, __local VectorF
         parameter_vector_16[j].s4 = parameter_vector[j * 16 + 4];
         parameter_vector_16[j].s5 = parameter_vector[j * 16 + 5];
         parameter_vector_16[j].s6 = parameter_vector[j * 16 + 6];
-        parameter_vector_16[j].s7 = parameter_vector[j * 16 + 7]
+        parameter_vector_16[j].s7 = parameter_vector[j * 16 + 7];
         parameter_vector_16[j].s8 = parameter_vector[j * 16 + 8];
         parameter_vector_16[j].s9 = parameter_vector[j * 16 + 9];
-        parameter_vector_16[j].s10 = parameter_vector[j * 16 + 10];
-        parameter_vector_16[j].s11 = parameter_vector[j * 16 + 11];
-        parameter_vector_16[j].s12 = parameter_vector[j * 16 + 12];
-        parameter_vector_16[j].s13 = parameter_vector[j * 16 + 13];
-        parameter_vector_16[j].s14 = parameter_vector[j * 16 + 14];
-        parameter_vector_16[j].s15 = parameter_vector[j * 16 + 15];
+        parameter_vector_16[j].sa = parameter_vector[j * 16 + 10];
+        parameter_vector_16[j].sb = parameter_vector[j * 16 + 11];
+        parameter_vector_16[j].sc = parameter_vector[j * 16 + 12];
+        parameter_vector_16[j].sd = parameter_vector[j * 16 + 13];
+        parameter_vector_16[j].se = parameter_vector[j * 16 + 14];
+        parameter_vector_16[j].sf = parameter_vector[j * 16 + 15];
       }
 
     FeatureType result = 0;
@@ -126,12 +126,12 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
       parameter_vector[i * 16 + 7] = tmp.s7;
       parameter_vector[i * 16 + 8] = tmp.s8;
       parameter_vector[i * 16 + 9] = tmp.s9;
-      parameter_vector[i * 16 + 10] = tmp.s10;
-      parameter_vector[i * 16 + 11] = tmp.s11;
-      parameter_vector[i * 16 + 12] = tmp.s12;
-      parameter_vector[i * 16 + 13] = tmp.s13;
-      parameter_vector[i * 16 + 14] = tmp.s14;
-      parameter_vector[i * 16 + 15] = tmp.s15;
+      parameter_vector[i * 16 + 10] = tmp.sa;
+      parameter_vector[i * 16 + 11] = tmp.sb;
+      parameter_vector[i * 16 + 12] = tmp.sc;
+      parameter_vector[i * 16 + 13] = tmp.sd;
+      parameter_vector[i * 16 + 14] = tmp.se;
+      parameter_vector[i * 16 + 15] = tmp.sf;
     }
 
 
