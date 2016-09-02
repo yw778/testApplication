@@ -15,7 +15,7 @@ typedef float LabelType;
 typedef float16 VectorFeatureType;
 // #include "defs.h"
 #define LOOP_PIPELINE __attribute__((xcl_pipeline_loop))
-#define LOOP_UNROLL __attribute__((opencl_unroll_hint(16)))
+#define LOOP_UNROLL __attribute__((opencl_unroll_hint))
 
 /*
  * Parallel approach to Stochastic Gradient Descent #4 - Sdaccel - Opencl:
@@ -34,7 +34,7 @@ FeatureType cl_dotProduct(__local FeatureType* parameter_vector, __local VectorF
     __local VectorFeatureType parameter_vector_16[NUM_FEATURES];
 
      // LOOP_UNROLL 
-    // LOOP_PIPELINE
+    LOOP_PIPELINE
     LOOP_UNROLL
     for ( int j = 0; j < NUM_FEATURES; j++ ) {
 
@@ -109,14 +109,12 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
     //TODO
     // Read data point from global memory
     __local FeatureType parameter_vector[NUM_FEATURES * 16]  __attribute__((xcl_array_partition(cyclic,16,1)));
-    __local VectorFeatureType data_point[NUM_FEATURES * NUM_TRAINING];
-    // __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
-    __local FeatureType labels[NUM_TRAINING]; 
-    // __attribute__((xcl_array_partition(complete, 1)));
+    __local VectorFeatureType data_point[NUM_FEATURES * NUM_TRAINING] __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
+    __local FeatureType labels[NUM_TRAINING] __attribute__((xcl_array_partition(complete, 1)));
 
     //TODO
     // datacopy_evt[0] = async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES , 0);
-    // LOOP_PIPELINE
+    LOOP_PIPELINE
     LOOP_UNROLL
     for (int i = 0; i < NUM_FEATURES ; i ++ )
     {
@@ -162,7 +160,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
             float step = -(probability_of_positive - labels[i]) * STEP_SIZE;
 
             // finishes computation of (gradient * step size) and updates parameter vector
-            // LOOP_PIPELINE
+            LOOP_PIPELINE
             LOOP_UNROLL 
             for (int j = 0; j < NUM_FEATURES; j++){
                 parameter_vector[j * 16] += step * data_point[i * NUM_FEATURES + j].s0;
@@ -185,7 +183,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
         }
     }
 
-    // LOOP_PIPELINE
+    LOOP_PIPELINE
     LOOP_UNROLL
     for ( int j = 0; j < NUM_FEATURES; j++ ) {
 
