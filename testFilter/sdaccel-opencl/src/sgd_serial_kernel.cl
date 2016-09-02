@@ -15,7 +15,7 @@ typedef float LabelType;
 typedef float16 VectorFeatureType;
 // #include "defs.h"
 #define LOOP_PIPELINE __attribute__((xcl_pipeline_loop))
-#define LOOP_UNROLL __attribute__((opencl_unroll_hint(4)))
+#define LOOP_UNROLL __attribute__((opencl_unroll_hint(2)))
 
 /*
  * Parallel approach to Stochastic Gradient Descent #4 - Sdaccel - Opencl:
@@ -33,7 +33,6 @@ FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureTyp
     FeatureType result = 0;
 
     LOOP_PIPELINE
-    LOOP_UNROLL 
     for (int j = 0; j < size; j++)
         result_vector += a[j] * b[j];
 
