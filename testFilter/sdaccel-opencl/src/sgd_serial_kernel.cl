@@ -107,7 +107,8 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
     event_t datacopy_evt[2];
     //TODO
     // Read data point from global memory
-    __local FeatureType parameter_vector[NUM_FEATURES * 16]; __attribute__((xcl_array_partition(cyclic,16,1)));
+    __local FeatureType parameter_vector[NUM_FEATURES * 16]; 
+    // __attribute__((xcl_array_partition(cyclic,16,1)));
     __local VectorFeatureType data_point[NUM_FEATURES * NUM_TRAINING]; 
     // __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
     __local FeatureType labels[NUM_TRAINING]; 
