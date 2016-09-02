@@ -204,24 +204,25 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
 
             // finishes computation of (gradient * step size) and updates parameter vector
             // LOOP_PIPELINE
-            LOOP_UNROLL 
-        LOOPD:    for (int j = 0; j < NUM_FEATURES; j++){
-                parameter_vector[j * 16] += step * data_point[i * NUM_FEATURES + j].s0;
-                parameter_vector[j * 16 + 1] += step * data_point[i * NUM_FEATURES + j].s1;
-                parameter_vector[j * 16 + 2] += step * data_point[i * NUM_FEATURES + j].s2;
-                parameter_vector[j * 16 + 3] += step * data_point[i * NUM_FEATURES + j].s3;
-                parameter_vector[j * 16 + 4] += step * data_point[i * NUM_FEATURES + j].s4;
-                parameter_vector[j * 16 + 5] += step * data_point[i * NUM_FEATURES + j].s5;
-                parameter_vector[j * 16 + 6] += step * data_point[i * NUM_FEATURES + j].s6;
-                parameter_vector[j * 16 + 7] += step * data_point[i * NUM_FEATURES + j].s7;
-                parameter_vector[j * 16 + 8] += step * data_point[i * NUM_FEATURES + j].s8;
-                parameter_vector[j * 16 + 9] += step * data_point[i * NUM_FEATURES + j].s9;
-                parameter_vector[j * 16 + 10] += step * data_point[i * NUM_FEATURES + j].sa;
-                parameter_vector[j * 16 + 11] += step * data_point[i * NUM_FEATURES + j].sb;
-                parameter_vector[j * 16 + 12] += step * data_point[i * NUM_FEATURES + j].sc;
-                parameter_vector[j * 16 + 13] += step * data_point[i * NUM_FEATURES + j].sd;
-                parameter_vector[j * 16 + 14] += step * data_point[i * NUM_FEATURES + j].se;
-                parameter_vector[j * 16 + 15] += step * data_point[i * NUM_FEATURES + j].sf;
+            LOOP_PIPELINE
+        LOOPD:    for (int j = 0; j < NUM_FEATURES * 16; j++){
+                // parameter_vector[j * 16] += step * data_point[(i * NUM_FEATURES + j) * 16];
+                // parameter_vector[j * 16 + 1] += step * data_point[(i * NUM_FEATURES + j) * 16];
+                // parameter_vector[j * 16 + 2] += step * data_point[(i * NUM_FEATURES + j) * 16].s2;
+                // parameter_vector[j * 16 + 3] += step * data_point[(i * NUM_FEATURES + j) * 16].s3;
+                // parameter_vector[j * 16 + 4] += step * data_point[(i * NUM_FEATURES + j) * 16].s4;
+                // parameter_vector[j * 16 + 5] += step * data_point[(i * NUM_FEATURES + j) * 16].s5;
+                // parameter_vector[j * 16 + 6] += step * data_point[i * NUM_FEATURES + j].s6;
+                // parameter_vector[j * 16 + 7] += step * data_point[i * NUM_FEATURES + j].s7;
+                // parameter_vector[j * 16 + 8] += step * data_point[i * NUM_FEATURES + j].s8;
+                // parameter_vector[j * 16 + 9] += step * data_point[i * NUM_FEATURES + j].s9;
+                // parameter_vector[j * 16 + 10] += step * data_point[i * NUM_FEATURES + j].sa;
+                // parameter_vector[j * 16 + 11] += step * data_point[i * NUM_FEATURES + j].sb;
+                // parameter_vector[j * 16 + 12] += step * data_point[i * NUM_FEATURES + j].sc;
+                // parameter_vector[j * 16 + 13] += step * data_point[i * NUM_FEATURES + j].sd;
+                // parameter_vector[j * 16 + 14] += step * data_point[i * NUM_FEATURES + j].se;
+                // parameter_vector[j * 16 + 15] += step * data_point[i * NUM_FEATURES + j].sf;
+                parameter_vector[j] += step * data_point[i * NUM_FEATURES + j];
             }
         }
     }
