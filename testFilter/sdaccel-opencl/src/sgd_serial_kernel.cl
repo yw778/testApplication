@@ -3,7 +3,7 @@
 // #include <math.h>
 #define NUM_FEATURES      1024/16
 #define NUM_SAMPLES       100
-#define NUM_TRAINING      80/16
+#define NUM_TRAINING      90
 #define NUM_TESTING       10
 #define STEP_SIZE         50 //step size (eta)
 #define NUM_EPOCHS        1
@@ -13,7 +13,6 @@
 typedef float FeatureType;
 typedef float LabelType;
 typedef float16 VectorFeatureType;
-typedef float16 VectorLabelType;
 // #include "defs.h"
 #define LOOP_PIPELINE __attribute__((xcl_pipeline_loop))
 #define LOOP_UNROLL __attribute__((opencl_unroll_hint(2)))
@@ -71,7 +70,7 @@ float cl_logisticFunction(FeatureType exponent) {
 __attribute__ ((reqd_work_group_size(1, 1, 1)))
 //__kernel void DigitRec(__global long long * global_training_set, __global long long * global_test_set, __global long long * global_results) {
 __kernel void SgdLR(__global VectorFeatureType * global_data_points, 
-    __global VectorLabelType * global_labels, 
+    __global LabelType * global_labels, 
     __global VectorFeatureType * global_parameter_vector) {
 
     // event_t parameter_copy;
