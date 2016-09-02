@@ -33,7 +33,8 @@ FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureTyp
     FeatureType result = 0;
 
     // LOOP_PIPELINE
-    LOOP_UNROLL
+    // LOOP_UNROLL
+    LOOP_PIPELINE
     for (int j = 0; j < size; j++)
         result_vector += a[j] * b[j];
 
