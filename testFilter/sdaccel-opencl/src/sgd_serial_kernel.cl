@@ -15,7 +15,7 @@ typedef float LabelType;
 typedef float16 VectorFeatureType;
 // #include "defs.h"
 #define LOOP_PIPELINE __attribute__((xcl_pipeline_loop))
-#define LOOP_UNROLL __attribute__((opencl_unroll_hint(16)))
+#define LOOP_UNROLL __attribute__((opencl_unroll_hint(8)))
 
 /*
  * Parallel approach to Stochastic Gradient Descent #4 - Sdaccel - Opencl:
@@ -79,7 +79,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
     event_t datacopy_evt[3];
     //TODO
     // Read data point from global memory
-    __local VectorFeatureType parameter_vector[NUM_FEATURES] __attribute__((xcl_array_partition(cyclic,16,1)));
+    __local VectorFeatureType parameter_vector[NUM_FEATURES] __attribute__((xcl_array_partition(cyclic,8,1)));
     __local VectorFeatureType data_point[NUM_FEATURES * NUM_TRAINING];
     // __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
     __local FeatureType labels[NUM_TRAINING]; 
