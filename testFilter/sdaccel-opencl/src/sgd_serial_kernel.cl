@@ -107,8 +107,10 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
     //TODO
     // Read data point from global memory
     __local FeatureType parameter_vector[NUM_FEATURES * 16]; __attribute__((xcl_array_partition(cyclic,16,1)));
-    __local VectorFeatureType data_point[NUM_FEATURES * NUM_TRAINING]; __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
-    __local FeatureType labels[NUM_TRAINING]; __attribute__((xcl_array_partition(complete, 1)));
+    __local VectorFeatureType data_point[NUM_FEATURES * NUM_TRAINING]; 
+    // __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
+    __local FeatureType labels[NUM_TRAINING]; 
+    // __attribute__((xcl_array_partition(complete, 1)));
 
     //TODO
     // datacopy_evt[0] = async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES , 0);
@@ -133,8 +135,6 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
       parameter_vector[i * 16 + 14] = tmp.se;
       parameter_vector[i * 16 + 15] = tmp.sf;
     }
-
-
 
     datacopy_evt[0] = async_work_group_copy(data_point, global_data_points, NUM_FEATURES * NUM_TRAINING , 0);
     datacopy_evt[1] = async_work_group_copy(labels, global_labels, NUM_TRAINING, 0);
@@ -181,9 +181,33 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
             }
         }
     }
+    
+
+    for ( int j = 0; j < NUM_FEATURES; j++ ) {
+
+        // Read a new instance from the training set
+        // VectorFeatureType parameter_instance;
+        global_parameter_vector[j].s0 = parameter_vector[j * 16    ];
+        global_parameter_vector[j].s1 = parameter_vector[j * 16 + 1];
+        global_parameter_vector[j].s2 = parameter_vector[j * 16 + 2];
+        global_parameter_vector[j].s3 = parameter_vector[j * 16 + 3];
+        global_parameter_vector[j].s4 = parameter_vector[j * 16 + 4];
+        global_parameter_vector[j].s5 = parameter_vector[j * 16 + 5];
+        global_parameter_vector[j].s6 = parameter_vector[j * 16 + 6];
+        global_parameter_vector[j].s7 = parameter_vector[j * 16 + 7];
+        global_parameter_vector[j].s8 = parameter_vector[j * 16 + 8];
+        global_parameter_vector[j].s9 = parameter_vector[j * 16 + 9];
+        global_parameter_vector[j].sa = parameter_vector[j * 16 + 10];
+        global_parameter_vector[j].sb = parameter_vector[j * 16 + 11];
+        global_parameter_vector[j].sc = parameter_vector[j * 16 + 12];
+        global_parameter_vector[j].sd = parameter_vector[j * 16 + 13];
+        global_parameter_vector[j].se = parameter_vector[j * 16 + 14];
+        global_parameter_vector[j].sf = parameter_vector[j * 16 + 15];
+    }
+
     // barrier(CLK_LOCAL_MEM_FENCE);
-    event_t result_evt = async_work_group_copy(global_parameter_vector, parameter_vector, NUM_FEATURES * 16, 0);
-    wait_group_events(1, &result_evt);
+    // event_t result_evt = async_work_group_copy(global_parameter_vector, parameter_vector, NUM_FEATURES * 16, 0);
+    // wait_group_events(1, &result_evt);
     // barrier(CLK_LOCAL_MEM_FENCE);
     // wait_group_events(1, &results_copy);
 }
