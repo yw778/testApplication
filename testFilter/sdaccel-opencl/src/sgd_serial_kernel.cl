@@ -15,7 +15,7 @@ typedef float LabelType;
 typedef float16 VectorFeatureType;
 // #include "defs.h"
 #define LOOP_PIPELINE __attribute__((xcl_pipeline_loop))
-#define LOOP_UNROLL __attribute__((opencl_unroll_hint(2)))
+#define LOOP_UNROLL __attribute__((opencl_unroll_hint(4)))
 
 /*
  * Parallel approach to Stochastic Gradient Descent #4 - Sdaccel - Opencl:
@@ -108,7 +108,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
             float step = -(probability_of_positive - labels[i]) * STEP_SIZE;
 
             // finishes computation of (gradient * step size) and updates parameter vector
-            // LOOP_PIPELINE
+            LOOP_PIPELINE
             LOOP_UNROLL 
             for (int j = 0; j < NUM_FEATURES; j++){
                 parameter_vector[j].s0 += step * data_point[i * NUM_FEATURES + j].s0;
