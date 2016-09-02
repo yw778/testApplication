@@ -34,7 +34,7 @@ FeatureType cl_dotProduct(__local FeatureType* parameter_vector, __local VectorF
     __local VectorFeatureType parameter_vector_16[NUM_FEATURES];
 
      // LOOP_UNROLL 
-    LOOP_PIPELINE
+    LOOP_UNROLL
     for ( int j = 0; j < NUM_FEATURES; j++ ) {
 
         // Read a new instance from the training set
@@ -116,7 +116,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
 
     //TODO
     // datacopy_evt[0] = async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES , 0);
-    LOOP_PIPELINE
+    LOOP_UNROLL
     for (int i = 0; i < NUM_FEATURES ; i ++ )
     {
       VectorFeatureType tmp = global_parameter_vector[i];
@@ -161,7 +161,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
             float step = -(probability_of_positive - labels[i]) * STEP_SIZE;
 
             // finishes computation of (gradient * step size) and updates parameter vector
-            LOOP_PIPELINE
+            LOOP_UNROLL
             // LOOP_UNROLL 
             for (int j = 0; j < NUM_FEATURES; j++){
                 parameter_vector[j * 16] += step * data_point[i * NUM_FEATURES + j].s0;
@@ -184,7 +184,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
         }
     }
 
-    LOOP_PIPELINE
+    LOOP_UNROLL
     for ( int j = 0; j < NUM_FEATURES; j++ ) {
 
         // Read a new instance from the training set
