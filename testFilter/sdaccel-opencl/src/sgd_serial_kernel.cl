@@ -34,7 +34,7 @@ FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureTyp
 
     LOOP_PIPELINE
     for (int j = 0; j < size; j++)
-        result_vector = a[j] * b[j];
+        result_vector = result_vector + a[j] * b[j];
 
     result = result_vector.s0 + result_vector.s1 + result_vector.s2 + result_vector.s3
                 + result_vector.s4 + result_vector.s5 + result_vector.s6 + result_vector.s7
