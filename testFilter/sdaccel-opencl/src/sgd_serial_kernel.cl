@@ -80,12 +80,13 @@ FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureTyp
         result_vector_p[i] = (0.0f,0.0f,0.0f,0.0f,
                                 0.0f,0.0f,0.0f,0.0f,
                                 0.0f,0.0f,0.0f,0.0f,
-                                0.0f,0.0f,0.0f,0.0f);;
+                                0.0f,0.0f,0.0f,0.0f);
     }
 
-    LOOP_PIPELINE
+    // LOOP_PIPELINE
     LOOPA:for(int i = 0; i < size; i += FADD_LAT){
     // #pragma HLS PIPELINE II=11 rewind
+    LOOP_PIPELINE
     for (int j = 0; j < FADD_LAT; j++)
         result_vector_p[j] += a[j + i] * b[j + i];
     }
