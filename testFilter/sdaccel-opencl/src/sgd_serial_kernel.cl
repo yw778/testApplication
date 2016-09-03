@@ -16,7 +16,7 @@ typedef float16 VectorFeatureType;
 // #include "defs.h"
 #define LOOP_PIPELINE __attribute__((xcl_pipeline_loop))
 #define LOOP_UNROLL __attribute__((opencl_unroll_hint))
-#define FADD_LAT 8
+#define FADD_LAT 16
 
 /*
  * Parallel approach to Stochastic Gradient Descent #4 - Sdaccel - Opencl:
