@@ -12,7 +12,7 @@
 #define NUM_TESTING       400
 #define NUM_VALIDATION    0
 #define LAMBDA            0 //regularization parameter
-#define STEP_SIZE         50 //step size (eta)
+#define STEP_SIZE         60000 //step size (eta)
 #define NUM_EPOCHS        30
 #define MAX_NUM_EPOCHS    100
 #define NUM_RUNS          1
