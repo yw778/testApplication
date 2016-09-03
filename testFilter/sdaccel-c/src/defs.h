@@ -8,8 +8,8 @@
 #define NUM_FEATURES      1024
 #define NUM_SAMPLES       4500
 #define DATA_SET_SIZE     4608000
-#define NUM_TRAINING      4000
-#define NUM_TESTING       500
+#define NUM_TRAINING      4050
+#define NUM_TESTING       450
 #define NUM_VALIDATION    0
 #define LAMBDA            0 //regularization parameter
 #define STEP_SIZE         50 //step size (eta)
