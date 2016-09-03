@@ -2,7 +2,7 @@
 // #include <stdio.h>
 // #include <math.h>
 #define NUM_FEATURES      1024/16
-#define NUM_SAMPLES       100
+#define NUM_SAMPLES       5000
 #define NUM_TRAINING      90
 #define NUM_TESTING       10
 #define STEP_SIZE         50 //step size (eta)
@@ -34,7 +34,7 @@ FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureTyp
 
     LOOP_PIPELINE
     for (int j = 0; j < size; j++)
-        result_vector += a[j] * b[j];
+        result_vector = a[j] * b[j];
 
     result = result_vector.s0 + result_vector.s1 + result_vector.s2 + result_vector.s3
                 + result_vector.s4 + result_vector.s5 + result_vector.s6 + result_vector.s7
@@ -86,7 +86,6 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
     __local FeatureType labels[NUM_TRAINING];
     // __attribute__((xcl_array_partition(complete, 1)));
 
-    //TODO
     datacopy_evt[0] = async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES , 0);
     datacopy_evt[1] = async_work_group_copy(data_point, global_data_points, NUM_FEATURES * NUM_TRAINING , 0);
     datacopy_evt[2] = async_work_group_copy(labels, global_labels, NUM_TRAINING, 0);
@@ -101,7 +100,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
         // Iterate over all training instances (data points)
         // static int read = 0;
         // LOOP_PIPELINE
-        LOOP_UNROLL
+        // LOOP_UNROLL
         for (int i = 0; i < NUM_TRAINING; i++) {
 
             // starts computation of gradient
