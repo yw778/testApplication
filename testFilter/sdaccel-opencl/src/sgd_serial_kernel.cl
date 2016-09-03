@@ -101,6 +101,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
         // Iterate over all training instances (data points)
         // static int read = 0;
         // LOOP_PIPELINE
+        LOOP_UNROLL
         for (int i = 0; i < NUM_TRAINING; i++) {
 
             // starts computation of gradient
@@ -116,8 +117,8 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
                                             step, step, step, step);
 
             // finishes computation of (gradient * step size) and updates parameter vector
-            // LOOP_PIPELINE
-            __attribute__((opencl_unroll_hint(6)))
+            LOOP_PIPELINE
+            // __attribute__((opencl_unroll_hint(6)))
             for (int j = 0; j < NUM_FEATURES; j++){
                 // parameter_vector[j].s0 += step * data_point[i * NUM_FEATURES + j].s0;
                 // parameter_vector[j].s1 += step * data_point[i * NUM_FEATURES + j].s1;
