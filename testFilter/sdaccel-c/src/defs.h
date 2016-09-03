@@ -6,10 +6,10 @@
 
 // constants and default values for some configuration parameters
 #define NUM_FEATURES      1024
-#define NUM_SAMPLES       1000
-#define DATA_SET_SIZE     1024000
-#define NUM_TRAINING      900
-#define NUM_TESTING       100
+#define NUM_SAMPLES       4500
+#define DATA_SET_SIZE     4608000
+#define NUM_TRAINING      4000
+#define NUM_TESTING       500
 #define NUM_VALIDATION    0
 #define LAMBDA            0 //regularization parameter
 #define STEP_SIZE         50 //step size (eta)
