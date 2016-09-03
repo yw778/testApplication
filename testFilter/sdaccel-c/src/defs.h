@@ -7,7 +7,7 @@
 // constants and default values for some configuration parameters
 #define NUM_FEATURES      1024
 #define NUM_SAMPLES       5000
-#define DATA_SET_SIZE     (NUM_SAMPLES * NUM_FEATURES)
+#define DATA_SET_SIZE     5120000
 #define NUM_TRAINING      4500
 #define NUM_TESTING       500
 #define NUM_VALIDATION    0
