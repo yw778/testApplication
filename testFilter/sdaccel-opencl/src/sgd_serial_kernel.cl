@@ -176,7 +176,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
             // starts computation of gradient
             FeatureType dot = cl_dotProduct(parameter_vector, &data_point[i * NUM_FEATURES], NUM_FEATURES);
 
-            float probability_of_positive = cl_hardLogisticFunction(dot);   
+            float probability_of_positive = cl_logisticFunction(dot);   
             //TODO
             float step = -(probability_of_positive - labels[i]) * STEP_SIZE;
 
