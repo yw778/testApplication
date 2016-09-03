@@ -16,7 +16,7 @@ typedef float16 VectorFeatureType;
 // #include "defs.h"
 #define LOOP_PIPELINE __attribute__((xcl_pipeline_loop))
 #define LOOP_UNROLL __attribute__((opencl_unroll_hint))
-#define FADD_LAT 11
+#define FADD_LAT 8
 
 /*
  * Parallel approach to Stochastic Gradient Descent #4 - Sdaccel - Opencl:
@@ -84,9 +84,10 @@ FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureTyp
     }
 
     // LOOP_PIPELINE
+    LOOP_PIPELINE
     LOOPA:for(int i = 0; i < size; i += FADD_LAT){
     // #pragma HLS PIPELINE II=11 rewind
-    LOOP_PIPELINE
+    LOOP_UNROLL
     for (int j = 0; j < FADD_LAT; j++)
         result_vector_p[j] += a[j + i] * b[j + i];
     }
