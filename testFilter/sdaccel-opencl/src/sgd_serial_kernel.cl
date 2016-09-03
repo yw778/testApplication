@@ -74,7 +74,8 @@ FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureTyp
                                         0.0f,0.0f,0.0f,0.0f);
     FeatureType result = 0;
 
-   //to pipeline floating point accumulation
+   // to pipeline floating point accumulation
+   // refer to http://www.xilinx.com/support/answers/62859.html
     LOOP_UNROLL
      LOOP_INIT:for(int i = 0; i < FADD_LAT; i++) {    
         result_vector_p[i] = (0.0f,0.0f,0.0f,0.0f,
