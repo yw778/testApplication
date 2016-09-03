@@ -60,8 +60,8 @@ int main(int argc, char *argv[]) {
     cl_device_type deviceType = CL_DEVICE_TYPE_ACCELERATOR;
     std::string kernelName("");
     std::string kernelFile("");
-    // std::string path_to_data("/work/zhang/users/gaa54/Spam-Filter/data");
-    std::string path_to_data("/data");
+    std::string path_to_data("/work/zhang/users/gaa54/Spam-Filter/data");
+    // std::string path_to_data("/data");
     // Parse arguments to adjust options
     parse_sdaccel_command_line_args(argc, argv, &deviceType, &kernelName,
                                     &kernelFile);
