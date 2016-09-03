@@ -2,12 +2,12 @@
 // #include <stdio.h>
 // #include <math.h>
 #define NUM_FEATURES      1024/16
-#define NUM_SAMPLES       100
-#define NUM_TRAINING      90
-#define NUM_TESTING       10
-#define STEP_SIZE         50 //step size (eta)
-#define NUM_EPOCHS        1
-#define MAX_NUM_EPOCHS    1
+#define NUM_SAMPLES       5000
+#define NUM_TRAINING      4500
+#define NUM_TESTING       500
+#define STEP_SIZE         60000 //step size (eta)
+#define NUM_EPOCHS        30
+#define MAX_NUM_EPOCHS    100
 
 
 typedef float FeatureType;

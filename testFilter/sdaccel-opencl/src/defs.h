@@ -6,16 +6,16 @@
 
 // constants and default values for some configuration parameters
 #define NUM_FEATURES      1024
-#define NUM_SAMPLES       100
+#define NUM_SAMPLES       5000
 #define DATA_SET_SIZE     102400
-#define NUM_TRAINING      90
-#define NUM_TESTING       10
+#define NUM_TRAINING      4500
+#define NUM_TESTING       500
 #define NUM_VALIDATION    0
 #define LAMBDA            0 //regularization parameter
-#define STEP_SIZE         50 //step size (eta)
-#define NUM_EPOCHS        1
-#define MAX_NUM_EPOCHS    1
-#define NUM_RUNS          1
+#define STEP_SIZE         60000 //step size (eta)
+#define NUM_EPOCHS        30
+#define MAX_NUM_EPOCHS    100
+#define NUM_RUNS          30
 #define ERROR_GOAL        0.001
 #define CHARACTERISTIC_TIME (NUM_EPOCHS * NUM_TRAINING / 3)
 
