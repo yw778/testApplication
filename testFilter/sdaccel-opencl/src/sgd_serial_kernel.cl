@@ -15,26 +15,94 @@ typedef float LabelType;
 typedef float16 VectorFeatureType;
 // #include "defs.h"
 #define LOOP_PIPELINE __attribute__((xcl_pipeline_loop))
-#define LOOP_UNROLL __attribute__((opencl_unroll_hint(4)))
+#define LOOP_UNROLL __attribute__((opencl_unroll_hint))
+#define FADD_LAT 11
 
 /*
  * Parallel approach to Stochastic Gradient Descent #4 - Sdaccel - Opencl:
  *
  */
 
+// #define FT float
+// FT ybd(FT din[1024]){
+//     FT sum=0;
+//     LOOP:for(int i=0;i<1024;i++){
+//         #pragma HLS PIPELINE
+//         sum+=din[i];
+//     }
+//     return sum;
+// }
+
+
+// #define FT float
+// #define FADD_LAT 11
+// FT ybd(FT din[1024]){
+
+//     FT sum_p[FADD_LAT];
+//     #pragma HLS ARRAY_PARTITION variable=sum_p complete dim=1
+//     FT sum;
+
+//     loop_init: for(int i=0;i<FADD_LAT;i++) {
+//     #pragma HLS UNROLL
+//     sum_p[i] = 0;
+//     }
+//     sum = 0;
+
+//     LOOP:for(int i=0;i<1024;i+=FADD_LAT){
+//     #pragma HLS PIPELINE II=11 rewind
+//     for (int j=0; j<FADD_LAT; j++)
+//     sum_p[j]+=din[j+i];
+//     }
+
+//     loop_sum_f: for (int k=0; k<FADD_LAT; k++)
+//     {
+//     #pragma HLS UNROLL
+//     sum += sum_p[k];
+//     }
+
+//     return sum;
+// }
+
 
 // dot product between two vectors
 FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureType* b, int size) {
 
+    VectorFeatureType result_vector_p[FADD_LAT] __attribute__((xcl_array_partition(complete, 1)));
     VectorFeatureType result_vector = (0.0f,0.0f,0.0f,0.0f,
                                         0.0f,0.0f,0.0f,0.0f,
                                         0.0f,0.0f,0.0f,0.0f,
                                         0.0f,0.0f,0.0f,0.0f);
     FeatureType result = 0;
 
+    LOOP_INIT:
+    LOOP_UNROLL
+    for(int i = 0; i < FADD_LAT; i++) {    
+        result_vector_p[i] = (0.0f,0.0f,0.0f,0.0f,
+                                0.0f,0.0f,0.0f,0.0f,
+                                0.0f,0.0f,0.0f,0.0f,
+                                0.0f,0.0f,0.0f,0.0f);;
+    }
+
     LOOP_PIPELINE
-    for (int j = 0; j < size; j++)
-        result_vector = result_vector + a[j] * b[j];
+    LOOPA:for(int i = 0; i < size; i += FADD_LAT){
+    // #pragma HLS PIPELINE II=11 rewind
+    for (int j = 0; j < FADD_LAT; j++)
+        result_vector_p[j] += a[j + i] * b[j + i];
+    }
+
+
+    LOOP_SUM_F: 
+    LOOP_UNROLL
+    for (int k = 0; k < FADD_LAT; k++)
+    {
+    // #pragma HLS UNROLL
+        result_vector += result_vector_p[k];
+    }
+
+
+    // LOOP_PIPELINE
+    // for (int j = 0; j < size; j++)
+    //     result_vector += a[j] * b[j];
 
     result = result_vector.s0 + result_vector.s1 + result_vector.s2 + result_vector.s3
                 + result_vector.s4 + result_vector.s5 + result_vector.s6 + result_vector.s7
