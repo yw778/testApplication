@@ -74,9 +74,9 @@ FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureTyp
                                         0.0f,0.0f,0.0f,0.0f);
     FeatureType result = 0;
 
-    LOOP_INIT:
+   
     LOOP_UNROLL
-    for(int i = 0; i < FADD_LAT; i++) {    
+     LOOP_INIT:for(int i = 0; i < FADD_LAT; i++) {    
         result_vector_p[i] = (0.0f,0.0f,0.0f,0.0f,
                                 0.0f,0.0f,0.0f,0.0f,
                                 0.0f,0.0f,0.0f,0.0f,
@@ -91,9 +91,9 @@ FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureTyp
     }
 
 
-    LOOP_SUM_F: 
+    
     LOOP_UNROLL
-    for (int k = 0; k < FADD_LAT; k++)
+    LOOP_SUM_F: for (int k = 0; k < FADD_LAT; k++)
     {
     // #pragma HLS UNROLL
         result_vector += result_vector_p[k];
