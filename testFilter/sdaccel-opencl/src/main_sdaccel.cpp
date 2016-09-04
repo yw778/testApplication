@@ -72,6 +72,8 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
+    printf("maximum local size %d\n",CL_KERNEL_LOCAL_MEM_SIZE);
+
     /****************ALLOCATION AND INITIALIZATION OF DATASET******************/
 
     std::string str_points_filepath(
@@ -83,8 +85,7 @@ int main(int argc, char *argv[]) {
     const char* labels_filepath = str_labels_filepath.c_str();
 
     // Model variables
-    // FeatureType data_points[DATA_SET_SIZE]; // Data points
-    FeatureType* data_points = new FeatureType[DATA_SET_SIZE];
+    FeatureType* data_points = new FeatureType[DATA_SET_SIZE];// Data points
     LabelType labels[NUM_SAMPLES]; // Labels
     FeatureType parameter_vector[NUM_FEATURES]; // Model parameters
 

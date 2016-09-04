@@ -6,8 +6,8 @@
 #define NUM_TRAINING      4500
 #define NUM_TESTING       500
 #define STEP_SIZE         60000 //step size (eta)
-#define NUM_EPOCHS        30
-#define MAX_NUM_EPOCHS    30
+#define NUM_EPOCHS        1
+#define MAX_NUM_EPOCHS    1
 // #define PARTITIAL_BUFFER_SIZE 
 
 
