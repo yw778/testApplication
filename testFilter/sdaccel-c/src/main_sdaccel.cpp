@@ -61,6 +61,7 @@ int main(int argc, char *argv[]) {
     std::string kernelName("");
     std::string kernelFile("");
     std::string path_to_data("/work/zhang/users/yw778/testApplication/testFilter/data");
+    printf("here\n");
     // std::string path_to_data("/data");
     // Parse arguments to adjust options
     parse_sdaccel_command_line_args(argc, argv, &deviceType, &kernelName,
