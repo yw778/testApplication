@@ -40,7 +40,7 @@ int SdaccelSgd::load_data() {
     memobj_array.push_back(CLMemObj(data_points     , sizeof(FeatureType), num_data_points * num_features, CL_MEM_READ_ONLY ));
     memobj_array.push_back(CLMemObj(labels          , sizeof(LabelType)  , num_data_points               , CL_MEM_READ_ONLY ));
     memobj_array.push_back(CLMemObj(parameter_vector, sizeof(FeatureType), num_features                  , CL_MEM_READ_WRITE));
-
+    printf("in loading data\n");
     return EXIT_SUCCESS;
 }
 

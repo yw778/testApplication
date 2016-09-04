@@ -34,7 +34,7 @@ CLKernel::CLKernel(const char *filename, const char* kernel_name, cl_device_type
         printf("Error: Failed to create a compute context!\n");
         exit(EXIT_FAILURE);
     }
-
+    printf("setting up context\n");
     // Create a command commands
     //
     commands = clCreateCommandQueue(context, device_id, 0, &err);
