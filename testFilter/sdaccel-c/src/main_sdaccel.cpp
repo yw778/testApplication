@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
     cl_device_type deviceType = CL_DEVICE_TYPE_ACCELERATOR;
     std::string kernelName("");
     std::string kernelFile("");
-    std::string path_to_data("/work/zhang/users/yw778/testApplication/testFilter");
+    std::string path_to_data("/work/zhang/users/yw778/testApplication/testFilter/data");
     // printf("here\n");
     // std::string path_to_data("/data");
     // Parse arguments to adjust options
