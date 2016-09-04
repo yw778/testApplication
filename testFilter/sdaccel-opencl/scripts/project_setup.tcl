@@ -1,5 +1,5 @@
 # Define the target platform of the application
-add_device -vbnv xilinx:adm-pcie-7v3:1ddr:3.0
+add_device -vbnv xilinx:adm-pcie-7v3:1ddr:2.1
 
 # Host source files
 add_files "src/main_sdaccel.cpp"
