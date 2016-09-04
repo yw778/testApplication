@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
 
     // memset(parameter_vector, 0, NUM_FEATURES * sizeof(FeatureType));
     for (size_t i = 0; i < NUM_FEATURES; i++)
-        parameter_vector[i] = 0.5;
+        parameter_vector[i] = 0;
 
     /**************************HARNESS STUFF***********************************/
     SdaccelSgd spamfilter_kernel (kernelFile.c_str(), kernelName.c_str(),
