@@ -8,7 +8,8 @@
 #define STEP_SIZE         60000 //step size (eta)
 #define NUM_EPOCHS        1
 #define MAX_NUM_EPOCHS    1
-#define DOUBLE_BUFFER     500 
+#define DOUBLE_BUFFER_SIZE     500 
+#define BUFFER_ITERATION  10
 
 
 typedef float FeatureType;
@@ -148,19 +149,24 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
     // event_t parameter_copy;
     // event_t results_copy;
     // event_t data_copy;
-    event_t datacopy_evt[3];
-    //TODO
+    // datacopy event 
+    event_t datacopy_evt[12];
+
     // Read data point from global memory
     __local VectorFeatureType parameter_vector[NUM_FEATURES];
-    // __attribute__((xcl_array_partition(complete, 1)));
-    __local VectorFeatureType data_point[NUM_FEATURES * NUM_TRAINING]; 
-    // __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
+  
+    // __local VectorFeatureType data_point[NUM_FEATURES * NUM_TRAINING]; 
+    __local VectorFeatureType data_point[2][DOUBLE_BUFFER_SIZE * NUM_FEATURES];
+    // __local VectorFeatureType data_point_buffer2[DOUBLE_BUFFER_SIZE * NUM_FEATURES];
+
     __local FeatureType labels[NUM_TRAINING];
     // __attribute__((xcl_array_partition(complete, 1)));
 
     datacopy_evt[0] = async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES , 0);
-    datacopy_evt[1] = async_work_group_copy(data_point, global_data_points, NUM_FEATURES * NUM_TRAINING , 0);
+    datacopy_evt[1] = async_work_group_copy(data_point, global_data_points, NUM_FEATURES * DOUBLE_BUFFER_SIZE , 0);
     datacopy_evt[2] = async_work_group_copy(labels, global_labels, NUM_TRAINING, 0);
+
+    // __local int buffer_iteration = 0
     // wait_group_events(1, &data_copy);
     // wait_group_events(1, &parameter_copy);
     wait_group_events(3, datacopy_evt);
@@ -173,43 +179,61 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
         // static int read = 0;
         // LOOP_PIPELINE
         // LOOP_UNROLL
-        for (int i = 0; i < NUM_TRAINING; i++) {
+        for(int buffer_iteration_number = 0; buffer_iteration_number < BUFFER_ITERATION; i++){
 
-            // starts computation of gradient
-            FeatureType dot = cl_dotProduct(parameter_vector, &data_point[i * NUM_FEATURES], NUM_FEATURES);
+            int buffer_execution_number = buffer_iteration_number % 2;
+            int buffer_copy_number = (buffer_execution_number + 1) % 2;
 
-            float probability_of_positive = cl_hardLogisticFunction(dot);   
-            //TODO
-            float step = -(probability_of_positive - labels[i]) * STEP_SIZE;
+            if(buffer_iteration_number < (BUFFER_ITERATION - 1)){
 
-            VectorFeatureType step16 = (step, step, step, step,
-                                            step, step, step, step,
-                                            step, step, step, step,
-                                            step, step, step, step);
-
-            // finishes computation of (gradient * step size) and updates parameter vector
-            LOOP_PIPELINE
-            // __attribute__((opencl_unroll_hint(6)))
-            for (int j = 0; j < NUM_FEATURES; j++){
-                // two ways same time
-                // parameter_vector[j].s0 += step * data_point[i * NUM_FEATURES + j].s0;
-                // parameter_vector[j].s1 += step * data_point[i * NUM_FEATURES + j].s1;
-                // parameter_vector[j].s2 += step * data_point[i * NUM_FEATURES + j].s2;
-                // parameter_vector[j].s3 += step * data_point[i * NUM_FEATURES + j].s3;
-                // parameter_vector[j].s4 += step * data_point[i * NUM_FEATURES + j].s4;
-                // parameter_vector[j].s5 += step * data_point[i * NUM_FEATURES + j].s5;
-                // parameter_vector[j].s6 += step * data_point[i * NUM_FEATURES + j].s6;
-                // parameter_vector[j].s7 += step * data_point[i * NUM_FEATURES + j].s7;
-                // parameter_vector[j].s8 += step * data_point[i * NUM_FEATURES + j].s8;
-                // parameter_vector[j].s9 += step * data_point[i * NUM_FEATURES + j].s9;
-                // parameter_vector[j].sa += step * data_point[i * NUM_FEATURES + j].sa;
-                // parameter_vector[j].sb += step * data_point[i * NUM_FEATURES + j].sb;
-                // parameter_vector[j].sc += step * data_point[i * NUM_FEATURES + j].sc;
-                // parameter_vector[j].sd += step * data_point[i * NUM_FEATURES + j].sd;
-                // parameter_vector[j].se += step * data_point[i * NUM_FEATURES + j].se;
-                // parameter_vector[j].sf += step * data_point[i * NUM_FEATURES + j].sf;
-                parameter_vector[j] += step16 * data_point[i * NUM_FEATURES + j];
+                datacopy_evt[buffer_iteration_number + 3] =  async_work_group_copy(data_point[buffer_copy_number], 
+                                    &global_data_points[(buffer_iteration_number + 1) * DOUBLE_BUFFER_SIZE],
+                                     NUM_FEATURES * DOUBLE_BUFFER_SIZE , 0);
+                
             }
+
+            for (int i = 0; i < DOUBLE_BUFFER_SIZE; i++) {
+                // starts computation of gradient
+                FeatureType dot = cl_dotProduct(parameter_vector, &data_point[buffer_execution_number][i * NUM_FEATURES], NUM_FEATURES);
+
+                float probability_of_positive = cl_hardLogisticFunction(dot);   
+                //TODO
+                float step = -(probability_of_positive - labels[i]) * STEP_SIZE;
+
+                VectorFeatureType step16 = (step, step, step, step,
+                                                step, step, step, step,
+                                                step, step, step, step,
+                                                step, step, step, step);
+
+                // finishes computation of (gradient * step size) and updates parameter vector
+                LOOP_PIPELINE
+                // __attribute__((opencl_unroll_hint(6)))
+                for (int j = 0; j < NUM_FEATURES; j++){
+                    // two ways same time
+                    // parameter_vector[j].s0 += step * data_point[i * NUM_FEATURES + j].s0;
+                    // parameter_vector[j].s1 += step * data_point[i * NUM_FEATURES + j].s1;
+                    // parameter_vector[j].s2 += step * data_point[i * NUM_FEATURES + j].s2;
+                    // parameter_vector[j].s3 += step * data_point[i * NUM_FEATURES + j].s3;
+                    // parameter_vector[j].s4 += step * data_point[i * NUM_FEATURES + j].s4;
+                    // parameter_vector[j].s5 += step * data_point[i * NUM_FEATURES + j].s5;
+                    // parameter_vector[j].s6 += step * data_point[i * NUM_FEATURES + j].s6;
+                    // parameter_vector[j].s7 += step * data_point[i * NUM_FEATURES + j].s7;
+                    // parameter_vector[j].s8 += step * data_point[i * NUM_FEATURES + j].s8;
+                    // parameter_vector[j].s9 += step * data_point[i * NUM_FEATURES + j].s9;
+                    // parameter_vector[j].sa += step * data_point[i * NUM_FEATURES + j].sa;
+                    // parameter_vector[j].sb += step * data_point[i * NUM_FEATURES + j].sb;
+                    // parameter_vector[j].sc += step * data_point[i * NUM_FEATURES + j].sc;
+                    // parameter_vector[j].sd += step * data_point[i * NUM_FEATURES + j].sd;
+                    // parameter_vector[j].se += step * data_point[i * NUM_FEATURES + j].se;
+                    // parameter_vector[j].sf += step * data_point[i * NUM_FEATURES + j].sf;
+                    parameter_vector[j] += step16 * data_point[buffer_execution_number][i * NUM_FEATURES + j];
+                }
+            }
+
+            if(buffer_iteration_number < (BUFFER_ITERATION - 1)){
+                wait_group_events(1, &datacopy_evt[buffer_iteration_number + 3]);
+            }
+
         }
     }
     // barrier(CLK_LOCAL_MEM_FENCE);
