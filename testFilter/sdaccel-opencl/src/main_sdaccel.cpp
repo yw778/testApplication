@@ -83,7 +83,8 @@ int main(int argc, char *argv[]) {
     const char* labels_filepath = str_labels_filepath.c_str();
 
     // Model variables
-    FeatureType data_points[DATA_SET_SIZE]; // Data points
+    // FeatureType data_points[DATA_SET_SIZE]; // Data points
+    FeatureType* data_points = new FeatureType[DATA_SET_SIZE];
     LabelType labels[NUM_SAMPLES]; // Labels
     FeatureType parameter_vector[NUM_FEATURES]; // Model parameters
 
@@ -115,7 +116,7 @@ int main(int argc, char *argv[]) {
     spamfilter_kernel.finish_and_clean_up();
 
     /************************CLEANUP OF MAIN VARIABLES*************************/
-    // free(data_points);
+    free(data_points);
     // free(labels);
     // free(parameter_vector);
 
