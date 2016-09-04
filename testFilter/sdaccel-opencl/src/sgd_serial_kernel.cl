@@ -2,9 +2,9 @@
 // #include <stdio.h>
 // #include <math.h>
 #define NUM_FEATURES      1024/16
-#define NUM_SAMPLES       5000
-#define NUM_TRAINING      4500
-#define NUM_TESTING       500
+#define NUM_SAMPLES       3000
+#define NUM_TRAINING      2700
+#define NUM_TESTING       300
 #define STEP_SIZE         50 //step size (eta)
 #define NUM_EPOCHS        1
 #define MAX_NUM_EPOCHS    1
