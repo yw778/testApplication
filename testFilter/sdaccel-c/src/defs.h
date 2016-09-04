@@ -5,7 +5,7 @@
 #include <map>
 
 // constants and default values for some configuration parameters
-#define NUM_FEATURES      1024
+#define NUM_FEATURES      700
 // #define NUM_SAMPLES       5000
 #define NUM_SAMPLES       3200
 // #define DATA_SET_SIZE     5120000

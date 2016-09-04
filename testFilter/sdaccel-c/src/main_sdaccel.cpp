@@ -90,13 +90,13 @@ int main(int argc, char *argv[]) {
     FeatureType parameter_vector[NUM_FEATURES]; // Model parameters
 
     // Read data from files and insert into variables
-    // if(readData(NUM_SAMPLES * NUM_FEATURES, points_filepath, data_points)
-    //     != (NUM_SAMPLES * NUM_FEATURES))
-    //         return EXIT_FAILURE;
+    if(readData(NUM_SAMPLES * NUM_FEATURES, points_filepath, data_points)
+        != (NUM_SAMPLES * NUM_FEATURES))
+            return EXIT_FAILURE;
 
-    // if(readData(NUM_SAMPLES, labels_filepath, labels)
-    //     != NUM_SAMPLES)
-    //         return EXIT_FAILURE;
+    if(readData(NUM_SAMPLES, labels_filepath, labels)
+        != NUM_SAMPLES)
+            return EXIT_FAILURE;
 
     // memset(parameter_vector, 0, NUM_FEATURES * sizeof(FeatureType));
     for (size_t i = 0; i < NUM_FEATURES; i++)
