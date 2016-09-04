@@ -163,7 +163,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
     // __attribute__((xcl_array_partition(complete, 1)));
 
     datacopy_evt[0] = async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES , 0);
-    datacopy_evt[1] = async_work_group_copy(data_point, global_data_points, NUM_FEATURES * DOUBLE_BUFFER_SIZE , 0);
+    datacopy_evt[1] = async_work_group_copy(data_point[0], global_data_points, NUM_FEATURES * DOUBLE_BUFFER_SIZE , 0);
     datacopy_evt[2] = async_work_group_copy(labels, global_labels, NUM_TRAINING, 0);
 
     // __local int buffer_iteration = 0
@@ -179,7 +179,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
         // static int read = 0;
         // LOOP_PIPELINE
         // LOOP_UNROLL
-        for(int buffer_iteration_number = 0; buffer_iteration_number < BUFFER_ITERATION; i++){
+        for(int buffer_iteration_number = 0; buffer_iteration_number < BUFFER_ITERATION; buffer_iteration_number++){
 
             int buffer_execution_number = buffer_iteration_number % 2;
             int buffer_copy_number = (buffer_execution_number + 1) % 2;
