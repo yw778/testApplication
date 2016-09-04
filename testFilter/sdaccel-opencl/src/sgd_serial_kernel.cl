@@ -15,26 +15,97 @@ typedef float LabelType;
 typedef float16 VectorFeatureType;
 // #include "defs.h"
 #define LOOP_PIPELINE __attribute__((xcl_pipeline_loop))
-#define LOOP_UNROLL __attribute__((opencl_unroll_hint(4)))
+#define LOOP_UNROLL __attribute__((opencl_unroll_hint))
+#define FADD_LAT 8
 
 /*
  * Parallel approach to Stochastic Gradient Descent #4 - Sdaccel - Opencl:
  *
  */
 
+// #define FT float
+// FT ybd(FT din[1024]){
+//     FT sum=0;
+//     LOOP:for(int i=0;i<1024;i++){
+//         #pragma HLS PIPELINE
+//         sum+=din[i];
+//     }
+//     return sum;
+// }
+
+
+// #define FT float
+// #define FADD_LAT 11
+// FT ybd(FT din[1024]){
+
+//     FT sum_p[FADD_LAT];
+//     #pragma HLS ARRAY_PARTITION variable=sum_p complete dim=1
+//     FT sum;
+
+//     loop_init: for(int i=0;i<FADD_LAT;i++) {
+//     #pragma HLS UNROLL
+//     sum_p[i] = 0;
+//     }
+//     sum = 0;
+
+//     LOOP:for(int i=0;i<1024;i+=FADD_LAT){
+//     #pragma HLS PIPELINE II=11 rewind
+//     for (int j=0; j<FADD_LAT; j++)
+//     sum_p[j]+=din[j+i];
+//     }
+
+//     loop_sum_f: for (int k=0; k<FADD_LAT; k++)
+//     {
+//     #pragma HLS UNROLL
+//     sum += sum_p[k];
+//     }
+
+//     return sum;
+// }
+
 
 // dot product between two vectors
 FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureType* b, int size) {
 
+    VectorFeatureType result_vector_p[FADD_LAT] __attribute__((xcl_array_partition(complete, 1)));
     VectorFeatureType result_vector = (0.0f,0.0f,0.0f,0.0f,
                                         0.0f,0.0f,0.0f,0.0f,
                                         0.0f,0.0f,0.0f,0.0f,
                                         0.0f,0.0f,0.0f,0.0f);
     FeatureType result = 0;
 
+   // to pipeline floating point accumulation
+   // refer to http://www.xilinx.com/support/answers/62859.html
+    LOOP_UNROLL
+     LOOP_INIT:for(int i = 0; i < FADD_LAT; i++) {    
+        result_vector_p[i] = (0.0f,0.0f,0.0f,0.0f,
+                                0.0f,0.0f,0.0f,0.0f,
+                                0.0f,0.0f,0.0f,0.0f,
+                                0.0f,0.0f,0.0f,0.0f);
+    }
+
+    // LOOP_PIPELINE
     LOOP_PIPELINE
-    for (int j = 0; j < size; j++)
-        result_vector += a[j] * b[j];
+    LOOPA:for(int i = 0; i < size; i += FADD_LAT){
+    // #pragma HLS PIPELINE II=11 rewind
+    LOOP_UNROLL
+    for (int j = 0; j < FADD_LAT; j++)
+        result_vector_p[j] += a[j + i] * b[j + i];
+    }
+
+
+    
+    LOOP_UNROLL
+    LOOP_SUM_F: for (int k = 0; k < FADD_LAT; k++)
+    {
+    // #pragma HLS UNROLL
+        result_vector += result_vector_p[k];
+    }
+
+
+    // LOOP_PIPELINE
+    // for (int j = 0; j < size; j++)
+    //     result_vector += a[j] * b[j];
 
     result = result_vector.s0 + result_vector.s1 + result_vector.s2 + result_vector.s3
                 + result_vector.s4 + result_vector.s5 + result_vector.s6 + result_vector.s7
@@ -79,11 +150,13 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
     event_t datacopy_evt[3];
     //TODO
     // Read data point from global memory
-    __local VectorFeatureType parameter_vector[NUM_FEATURES]; __attribute__((xcl_array_partition(complete, 1)));
-    __local VectorFeatureType data_point[NUM_FEATURES * NUM_TRAINING]; __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
-    __local FeatureType labels[NUM_TRAINING]; __attribute__((xcl_array_partition(complete, 1)));
+    __local VectorFeatureType parameter_vector[NUM_FEATURES];
+    // __attribute__((xcl_array_partition(complete, 1)));
+    __local VectorFeatureType data_point[NUM_FEATURES * NUM_TRAINING]; 
+    // __attribute__((xcl_array_partition(cyclic,NUM_FEATURES,1)));
+    __local FeatureType labels[NUM_TRAINING];
+    // __attribute__((xcl_array_partition(complete, 1)));
 
-    //TODO
     datacopy_evt[0] = async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES , 0);
     datacopy_evt[1] = async_work_group_copy(data_point, global_data_points, NUM_FEATURES * NUM_TRAINING , 0);
     datacopy_evt[2] = async_work_group_copy(labels, global_labels, NUM_TRAINING, 0);
@@ -98,6 +171,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
         // Iterate over all training instances (data points)
         // static int read = 0;
         // LOOP_PIPELINE
+        // LOOP_UNROLL
         for (int i = 0; i < NUM_TRAINING; i++) {
 
             // starts computation of gradient
@@ -107,26 +181,33 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
             //TODO
             float step = -(probability_of_positive - labels[i]) * STEP_SIZE;
 
+            VectorFeatureType step16 = (step, step, step, step,
+                                            step, step, step, step,
+                                            step, step, step, step,
+                                            step, step, step, step);
+
             // finishes computation of (gradient * step size) and updates parameter vector
             LOOP_PIPELINE
-            // LOOP_UNROLL 
+            // __attribute__((opencl_unroll_hint(6)))
             for (int j = 0; j < NUM_FEATURES; j++){
-                parameter_vector[j].s0 += step * data_point[i * NUM_FEATURES + j].s0;
-                parameter_vector[j].s1 += step * data_point[i * NUM_FEATURES + j].s1;
-                parameter_vector[j].s2 += step * data_point[i * NUM_FEATURES + j].s2;
-                parameter_vector[j].s3 += step * data_point[i * NUM_FEATURES + j].s3;
-                parameter_vector[j].s4 += step * data_point[i * NUM_FEATURES + j].s4;
-                parameter_vector[j].s5 += step * data_point[i * NUM_FEATURES + j].s5;
-                parameter_vector[j].s6 += step * data_point[i * NUM_FEATURES + j].s6;
-                parameter_vector[j].s7 += step * data_point[i * NUM_FEATURES + j].s7;
-                parameter_vector[j].s8 += step * data_point[i * NUM_FEATURES + j].s8;
-                parameter_vector[j].s9 += step * data_point[i * NUM_FEATURES + j].s9;
-                parameter_vector[j].sa += step * data_point[i * NUM_FEATURES + j].sa;
-                parameter_vector[j].sb += step * data_point[i * NUM_FEATURES + j].sb;
-                parameter_vector[j].sc += step * data_point[i * NUM_FEATURES + j].sc;
-                parameter_vector[j].sd += step * data_point[i * NUM_FEATURES + j].sd;
-                parameter_vector[j].se += step * data_point[i * NUM_FEATURES + j].se;
-                parameter_vector[j].sf += step * data_point[i * NUM_FEATURES + j].sf;
+                // two ways same time
+                // parameter_vector[j].s0 += step * data_point[i * NUM_FEATURES + j].s0;
+                // parameter_vector[j].s1 += step * data_point[i * NUM_FEATURES + j].s1;
+                // parameter_vector[j].s2 += step * data_point[i * NUM_FEATURES + j].s2;
+                // parameter_vector[j].s3 += step * data_point[i * NUM_FEATURES + j].s3;
+                // parameter_vector[j].s4 += step * data_point[i * NUM_FEATURES + j].s4;
+                // parameter_vector[j].s5 += step * data_point[i * NUM_FEATURES + j].s5;
+                // parameter_vector[j].s6 += step * data_point[i * NUM_FEATURES + j].s6;
+                // parameter_vector[j].s7 += step * data_point[i * NUM_FEATURES + j].s7;
+                // parameter_vector[j].s8 += step * data_point[i * NUM_FEATURES + j].s8;
+                // parameter_vector[j].s9 += step * data_point[i * NUM_FEATURES + j].s9;
+                // parameter_vector[j].sa += step * data_point[i * NUM_FEATURES + j].sa;
+                // parameter_vector[j].sb += step * data_point[i * NUM_FEATURES + j].sb;
+                // parameter_vector[j].sc += step * data_point[i * NUM_FEATURES + j].sc;
+                // parameter_vector[j].sd += step * data_point[i * NUM_FEATURES + j].sd;
+                // parameter_vector[j].se += step * data_point[i * NUM_FEATURES + j].se;
+                // parameter_vector[j].sf += step * data_point[i * NUM_FEATURES + j].sf;
+                parameter_vector[j] += step16 * data_point[i * NUM_FEATURES + j];
             }
         }
     }

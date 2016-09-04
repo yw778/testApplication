@@ -13,7 +13,7 @@
 #define NUM_VALIDATION    0
 #define LAMBDA            0 //regularization parameter
 #define STEP_SIZE         50 //step size (eta)
-#define NUM_EPOCHS        30
+#define NUM_EPOCHS        1
 #define MAX_NUM_EPOCHS    1
 #define NUM_RUNS          1
 #define ERROR_GOAL        0.001
