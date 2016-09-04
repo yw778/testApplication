@@ -98,6 +98,8 @@ int main(int argc, char *argv[]) {
         != NUM_SAMPLES)
             return EXIT_FAILURE;
 
+    printf("maximum size is %i\n",CL_DEVICE_MAX_MEM_ALLOC_SIZE);
+
     // memset(parameter_vector, 0, NUM_FEATURES * sizeof(FeatureType));
     for (size_t i = 0; i < NUM_FEATURES; i++)
         parameter_vector[i] = 0;
