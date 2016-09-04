@@ -150,7 +150,8 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
     // event_t results_copy;
     // event_t data_copy;
     // datacopy event 
-    event_t datacopy_evt[11];
+    event_t datacopy_evt[3];
+    event_t databuffer_copy[BUFFER_ITERATION - 1];
 
     // Read data point from global memory
     __local VectorFeatureType parameter_vector[NUM_FEATURES];
@@ -186,7 +187,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
 
             if(buffer_iteration_number < (BUFFER_ITERATION - 1)){
 
-                datacopy_evt[buffer_iteration_number + 3] =  async_work_group_copy(data_point[buffer_copy_number], 
+                datacopy_evt[buffer_iteration_number] =  async_work_group_copy(data_point[buffer_copy_number], 
                                     &global_data_points[(buffer_iteration_number + 1) * DOUBLE_BUFFER_SIZE],
                                      NUM_FEATURES * DOUBLE_BUFFER_SIZE , 0);
 
@@ -231,7 +232,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
             }
 
             if(buffer_iteration_number < (BUFFER_ITERATION - 1)){
-                wait_group_events(1, &datacopy_evt[buffer_iteration_number + 3]);
+                wait_group_events(1, &datacopy_evt[buffer_iteration_number]);
             }
 
         }

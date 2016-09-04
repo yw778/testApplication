@@ -72,8 +72,6 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    printf("maximum local size %d\n",CL_KERNEL_LOCAL_MEM_SIZE);
-
     /****************ALLOCATION AND INITIALIZATION OF DATASET******************/
 
     std::string str_points_filepath(
