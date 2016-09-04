@@ -56,7 +56,7 @@ static int parse_sdaccel_command_line_args(
 int main(int argc, char *argv[]) {
     fflush(stdout);
     printf("Entered main\n");
-
+    fflush(stdout);
     // Initialize options to default values
     cl_device_type deviceType = CL_DEVICE_TYPE_ACCELERATOR;
     std::string kernelName("");
