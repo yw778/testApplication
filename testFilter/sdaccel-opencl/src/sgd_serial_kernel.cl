@@ -8,7 +8,7 @@
 #define STEP_SIZE         60000 //step size (eta)
 #define NUM_EPOCHS        1
 #define MAX_NUM_EPOCHS    1
-// #define PARTITIAL_BUFFER_SIZE 
+#define DOUBLE_BUFFER     500 
 
 
 typedef float FeatureType;
