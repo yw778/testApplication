@@ -199,7 +199,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
 
                 float probability_of_positive = cl_hardLogisticFunction(dot);   
                 //TODO
-                float step = -(probability_of_positive - labels[i]) * STEP_SIZE;
+                float step = -(probability_of_positive - labels[i + buffer_iteration_number * DOUBLE_BUFFER_SIZE]) * STEP_SIZE;
 
                 VectorFeatureType step16 = (step, step, step, step,
                                                 step, step, step, step,
