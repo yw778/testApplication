@@ -54,6 +54,7 @@ static int parse_sdaccel_command_line_args(
 }
 
 int main(int argc, char *argv[]) {
+    fflush(stdout);
     printf("Entered main\n");
 
     // Initialize options to default values
