@@ -11,7 +11,7 @@
 // #define DATA_SET_SIZE     5120000
 #define DATA_SET_SIZE     3072000
 // #define NUM_TRAINING      4500
-#define NUM_SAMPLES       2700
+#define NUM_TRAINING       2700
 // #define NUM_TESTING       500
 #define NUM_TESTING       300
 #define NUM_VALIDATION    0
