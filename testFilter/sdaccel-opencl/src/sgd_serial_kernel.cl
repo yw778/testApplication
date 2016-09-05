@@ -197,44 +197,44 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
             wait_group_events(1, &databuffer_copy[buffer_iteration_number]);
           
             // LOOP_PIPELINE
-            // for (int i = 0; i < SINGLE_BUFFER_SIZE; i++) {
-            //     // starts computation of gradient
-            //     FeatureType dot = cl_dotProduct(parameter_vector, &data_point[i * NUM_FEATURES], NUM_FEATURES);
-            //     // FeatureType dot =dot(parameter_vector, &data_point[i * NUM_FEATURES]);
+            for (int i = 0; i < SINGLE_BUFFER_SIZE; i++) {
+                // starts computation of gradient
+                FeatureType dot = cl_dotProduct(parameter_vector, &data_point[i * NUM_FEATURES], NUM_FEATURES);
+                // FeatureType dot =dot(parameter_vector, &data_point[i * NUM_FEATURES]);
                 
-            //     float probability_of_positive = cl_hardLogisticFunction(dot);   
-            //     //TODO
-            //     float step = -(probability_of_positive - labels[i + buffer_iteration_number * SINGLE_BUFFER_SIZE]) * STEP_SIZE;
+                float probability_of_positive = cl_hardLogisticFunction(dot);   
+                //TODO
+                float step = -(probability_of_positive - labels[i + buffer_iteration_number * SINGLE_BUFFER_SIZE]) * STEP_SIZE;
 
-            //     VectorFeatureType step16 = (step, step, step, step,
-            //                                     step, step, step, step,
-            //                                     step, step, step, step,
-            //                                     step, step, step, step);
+                VectorFeatureType step16 = (step, step, step, step,
+                                                step, step, step, step,
+                                                step, step, step, step,
+                                                step, step, step, step);
 
-            //     // finishes computation of (gradient * step size) and updates parameter vector
-            //     LOOP_PIPELINE
-            //     // __attribute__((opencl_unroll_hint(6)))
-            //     for (int j = 0; j < NUM_FEATURES; j++){
-            //         // two ways same time
-            //         // parameter_vector[j].s0 += step * data_point[i * NUM_FEATURES + j].s0;
-            //         // parameter_vector[j].s1 += step * data_point[i * NUM_FEATURES + j].s1;
-            //         // parameter_vector[j].s2 += step * data_point[i * NUM_FEATURES + j].s2;
-            //         // parameter_vector[j].s3 += step * data_point[i * NUM_FEATURES + j].s3;
-            //         // parameter_vector[j].s4 += step * data_point[i * NUM_FEATURES + j].s4;
-            //         // parameter_vector[j].s5 += step * data_point[i * NUM_FEATURES + j].s5;
-            //         // parameter_vector[j].s6 += step * data_point[i * NUM_FEATURES + j].s6;
-            //         // parameter_vector[j].s7 += step * data_point[i * NUM_FEATURES + j].s7;
-            //         // parameter_vector[j].s8 += step * data_point[i * NUM_FEATURES + j].s8;
-            //         // parameter_vector[j].s9 += step * data_point[i * NUM_FEATURES + j].s9;
-            //         // parameter_vector[j].sa += step * data_point[i * NUM_FEATURES + j].sa;
-            //         // parameter_vector[j].sb += step * data_point[i * NUM_FEATURES + j].sb;
-            //         // parameter_vector[j].sc += step * data_point[i * NUM_FEATURES + j].sc;
-            //         // parameter_vector[j].sd += step * data_point[i * NUM_FEATURES + j].sd;
-            //         // parameter_vector[j].se += step * data_point[i * NUM_FEATURES + j].se;
-            //         // parameter_vector[j].sf += step * data_point[i * NUM_FEATURES + j].sf;
-            //         parameter_vector[j] += step16 * data_point[i * NUM_FEATURES + j];
-            //     }
-            // }
+                // finishes computation of (gradient * step size) and updates parameter vector
+                LOOP_PIPELINE
+                // __attribute__((opencl_unroll_hint(6)))
+                for (int j = 0; j < NUM_FEATURES; j++){
+                    // two ways same time
+                    // parameter_vector[j].s0 += step * data_point[i * NUM_FEATURES + j].s0;
+                    // parameter_vector[j].s1 += step * data_point[i * NUM_FEATURES + j].s1;
+                    // parameter_vector[j].s2 += step * data_point[i * NUM_FEATURES + j].s2;
+                    // parameter_vector[j].s3 += step * data_point[i * NUM_FEATURES + j].s3;
+                    // parameter_vector[j].s4 += step * data_point[i * NUM_FEATURES + j].s4;
+                    // parameter_vector[j].s5 += step * data_point[i * NUM_FEATURES + j].s5;
+                    // parameter_vector[j].s6 += step * data_point[i * NUM_FEATURES + j].s6;
+                    // parameter_vector[j].s7 += step * data_point[i * NUM_FEATURES + j].s7;
+                    // parameter_vector[j].s8 += step * data_point[i * NUM_FEATURES + j].s8;
+                    // parameter_vector[j].s9 += step * data_point[i * NUM_FEATURES + j].s9;
+                    // parameter_vector[j].sa += step * data_point[i * NUM_FEATURES + j].sa;
+                    // parameter_vector[j].sb += step * data_point[i * NUM_FEATURES + j].sb;
+                    // parameter_vector[j].sc += step * data_point[i * NUM_FEATURES + j].sc;
+                    // parameter_vector[j].sd += step * data_point[i * NUM_FEATURES + j].sd;
+                    // parameter_vector[j].se += step * data_point[i * NUM_FEATURES + j].se;
+                    // parameter_vector[j].sf += step * data_point[i * NUM_FEATURES + j].sf;
+                    parameter_vector[j] += step16 * data_point[i * NUM_FEATURES + j];
+                }
+            }
 
         }
     }
