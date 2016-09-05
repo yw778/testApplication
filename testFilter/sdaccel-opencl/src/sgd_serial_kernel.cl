@@ -229,10 +229,6 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
                 }
             }
 
-            if(buffer_iteration_number < (BUFFER_ITERATION - 1)){
-                
-            }
-
         }
     }
     // barrier(CLK_LOCAL_MEM_FENCE);
