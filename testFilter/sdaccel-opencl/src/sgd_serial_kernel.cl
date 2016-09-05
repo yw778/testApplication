@@ -8,7 +8,7 @@
 #define STEP_SIZE         60000 //step size (eta)
 #define NUM_EPOCHS        1
 #define MAX_NUM_EPOCHS    1
-#define DOUBLE_BUFFER_SIZE     500 
+#define SINGLE_BUFFER_SIZE     500 
 #define BUFFER_ITERATION  9
 
 
@@ -157,14 +157,14 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
     __local VectorFeatureType parameter_vector[NUM_FEATURES];
   
     // __local VectorFeatureType data_point[NUM_FEATURES * NUM_TRAINING]; 
-    __local VectorFeatureType data_point[2][DOUBLE_BUFFER_SIZE * NUM_FEATURES];
+    __local VectorFeatureType data_point[SINGLE_BUFFER_SIZE * NUM_FEATURES];
     // __local VectorFeatureType data_point_buffer2[DOUBLE_BUFFER_SIZE * NUM_FEATURES];
 
     __local FeatureType labels[NUM_TRAINING];
     // __attribute__((xcl_array_partition(complete, 1)));
 
     datacopy_evt[0] = async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES , 0);
-    datacopy_evt[1] = async_work_group_copy(data_point[0], global_data_points, NUM_FEATURES * DOUBLE_BUFFER_SIZE , 0);
+    datacopy_evt[1] = async_work_group_copy(data_point, global_data_points, NUM_FEATURES * SINGLE_BUFFER_SIZE , 0);
     datacopy_evt[2] = async_work_group_copy(labels, global_labels, NUM_TRAINING, 0);
 
     // __local int buffer_iteration = 0
@@ -180,27 +180,24 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
         // static int read = 0;
         // LOOP_PIPELINE
         // LOOP_UNROLL
-        LOOP_PIPELINE
         for(int buffer_iteration_number = 0; buffer_iteration_number < BUFFER_ITERATION; buffer_iteration_number++){
 
-            int buffer_execution_number = buffer_iteration_number % 2;
-            int buffer_copy_number = (buffer_execution_number + 1) % 2;
+            // int buffer_execution_number = buffer_iteration_number % 2;
+            // int buffer_copy_number = (buffer_execution_number + 1) % 2;
 
-            if(buffer_iteration_number < (BUFFER_ITERATION - 1)){
+            databuffer_copy[buffer_iteration_number] =  async_work_group_copy(data_point, 
+                &global_data_points[(buffer_iteration_number + 1) * SINGLE_BUFFER_SIZE * NUM_FEATURES],
+                                     NUM_FEATURES * SINGLE_BUFFER_SIZE , 0);
 
-                databuffer_copy[buffer_iteration_number] =  async_work_group_copy(data_point[buffer_copy_number], 
-                                    &global_data_points[(buffer_iteration_number + 1) * DOUBLE_BUFFER_SIZE * NUM_FEATURES],
-                                     NUM_FEATURES * DOUBLE_BUFFER_SIZE , 0);
-
-            }
-
-            for (int i = 0; i < DOUBLE_BUFFER_SIZE; i++) {
+            wait_group_events(1, &databuffer_copy[buffer_iteration_number]);
+          
+            for (int i = 0; i < SINGLE_BUFFER_SIZE; i++) {
                 // starts computation of gradient
-                FeatureType dot = cl_dotProduct(parameter_vector, &data_point[buffer_execution_number][i * NUM_FEATURES], NUM_FEATURES);
+                FeatureType dot = cl_dotProduct(parameter_vector, &data_point[i * NUM_FEATURES], NUM_FEATURES);
 
                 float probability_of_positive = cl_hardLogisticFunction(dot);   
                 //TODO
-                float step = -(probability_of_positive - labels[i + buffer_iteration_number * DOUBLE_BUFFER_SIZE]) * STEP_SIZE;
+                float step = -(probability_of_positive - labels[i + buffer_iteration_number * SINGLE_BUFFER_SIZE]) * STEP_SIZE;
 
                 VectorFeatureType step16 = (step, step, step, step,
                                                 step, step, step, step,
@@ -228,12 +225,12 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
                     // parameter_vector[j].sd += step * data_point[i * NUM_FEATURES + j].sd;
                     // parameter_vector[j].se += step * data_point[i * NUM_FEATURES + j].se;
                     // parameter_vector[j].sf += step * data_point[i * NUM_FEATURES + j].sf;
-                    parameter_vector[j] += step16 * data_point[buffer_execution_number][i * NUM_FEATURES + j];
+                    parameter_vector[j] += step16 * data_point[i * NUM_FEATURES + j];
                 }
             }
 
             if(buffer_iteration_number < (BUFFER_ITERATION - 1)){
-                wait_group_events(1, &databuffer_copy[buffer_iteration_number]);
+                
             }
 
         }
