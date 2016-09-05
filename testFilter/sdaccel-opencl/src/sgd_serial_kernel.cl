@@ -117,6 +117,11 @@ FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureTyp
     return result;
 }
 
+
+
+
+
+
 // hard logistic function
 int cl_hardLogisticFunction(FeatureType exponent) {
     return (exponent >= 0) ? 1 : 0;
@@ -194,8 +199,8 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
             // LOOP_PIPELINE
             for (int i = 0; i < SINGLE_BUFFER_SIZE; i++) {
                 // starts computation of gradient
-                // FeatureType dot = cl_dotProduct(parameter_vector, &data_point[i * NUM_FEATURES], NUM_FEATURES);
-                FeatureType dot =dot(parameter_vector, &data_point[i * NUM_FEATURES]);
+                FeatureType dot = cl_dotProduct(parameter_vector, &data_point[i * NUM_FEATURES], NUM_FEATURES);
+                // FeatureType dot =dot(parameter_vector, &data_point[i * NUM_FEATURES]);
                 
                 float probability_of_positive = cl_hardLogisticFunction(dot);   
                 //TODO
