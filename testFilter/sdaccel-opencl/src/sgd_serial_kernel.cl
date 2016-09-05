@@ -163,7 +163,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
     __local FeatureType labels[NUM_TRAINING];
     // __attribute__((xcl_array_partition(complete, 1)));
 
-    datacopy_evt[0] = async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES , 0);
+    datacopy_evt[0] = async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES, 0);
     datacopy_evt[1] = async_work_group_copy(data_point, global_data_points, NUM_FEATURES * SINGLE_BUFFER_SIZE , 0);
     datacopy_evt[2] = async_work_group_copy(labels, global_labels, NUM_TRAINING, 0);
 
