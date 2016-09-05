@@ -179,7 +179,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
         // Iterate over all training instances (data points)
         // static int read = 0;      
         // LOOP_UNROLL
-        LOOP_PIPELINE
+        // LOOP_PIPELINE
         for(int buffer_iteration_number = 0; buffer_iteration_number < BUFFER_ITERATION; buffer_iteration_number++){
 
             // int buffer_execution_number = buffer_iteration_number % 2;
@@ -191,11 +191,12 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
 
             wait_group_events(1, &databuffer_copy[buffer_iteration_number]);
           
-            LOOP_PIPELINE
+            // LOOP_PIPELINE
             for (int i = 0; i < SINGLE_BUFFER_SIZE; i++) {
                 // starts computation of gradient
-                FeatureType dot = cl_dotProduct(parameter_vector, &data_point[i * NUM_FEATURES], NUM_FEATURES);
-
+                // FeatureType dot = cl_dotProduct(parameter_vector, &data_point[i * NUM_FEATURES], NUM_FEATURES);
+                FeatureType dot =dot(parameter_vector, &data_point[i * NUM_FEATURES]);
+                
                 float probability_of_positive = cl_hardLogisticFunction(dot);   
                 //TODO
                 float step = -(probability_of_positive - labels[i + buffer_iteration_number * SINGLE_BUFFER_SIZE]) * STEP_SIZE;
