@@ -180,6 +180,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
         // static int read = 0;
         // LOOP_PIPELINE
         // LOOP_UNROLL
+        LOOP_PIPELINE
         for(int buffer_iteration_number = 0; buffer_iteration_number < BUFFER_ITERATION; buffer_iteration_number++){
 
             int buffer_execution_number = buffer_iteration_number % 2;
@@ -188,7 +189,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
             if(buffer_iteration_number < (BUFFER_ITERATION - 1)){
 
                 databuffer_copy[buffer_iteration_number] =  async_work_group_copy(data_point[buffer_copy_number], 
-                                    &global_data_points[(buffer_iteration_number + 1) * DOUBLE_BUFFER_SIZE * ],
+                                    &global_data_points[(buffer_iteration_number + 1) * DOUBLE_BUFFER_SIZE * NUM_FEATURES],
                                      NUM_FEATURES * DOUBLE_BUFFER_SIZE , 0);
 
             }
