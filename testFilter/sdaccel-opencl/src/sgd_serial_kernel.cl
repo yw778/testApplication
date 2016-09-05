@@ -196,7 +196,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
 
             wait_group_events(1, &databuffer_copy[buffer_iteration_number]);
           
-            // LOOP_PIPELINE
+            LOOP_PIPELINE
             for (int i = 0; i < SINGLE_BUFFER_SIZE; i++) {
                 // starts computation of gradient
                 FeatureType dot = cl_dotProduct(parameter_vector, &data_point[i * NUM_FEATURES], NUM_FEATURES);
