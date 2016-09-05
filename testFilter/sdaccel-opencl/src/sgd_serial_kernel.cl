@@ -1,6 +1,3 @@
-// #include <stdlib.h>
-// #include <stdio.h>
-// #include <math.h>
 #define NUM_FEATURES      1024/16
 #define NUM_SAMPLES       5000
 #define NUM_TRAINING      4500
@@ -10,6 +7,7 @@
 #define MAX_NUM_EPOCHS    1
 #define SINGLE_BUFFER_SIZE     500 
 #define BUFFER_ITERATION  9
+// #define BUFFER_ITERATION  NUM_TRAINING/SINGLE_BUFFER_SIZE
 
 
 typedef float FeatureType;
@@ -21,55 +19,23 @@ typedef float16 VectorFeatureType;
 #define FADD_LAT 8
 
 /*
- * Parallel approach to Stochastic Gradient Descent #4 - Sdaccel - Opencl:
+ * Parallel approach to Stochastic Gradient Descent #4.1 - Sdaccel - Opencl:
+ * with singe buffer to cache data point...
+ * fatest version with single float
+ * default version in project_setup.tcl
  *
  */
 
-// #define FT float
-// FT ybd(FT din[1024]){
-//     FT sum=0;
-//     LOOP:for(int i=0;i<1024;i++){
-//         #pragma HLS PIPELINE
-//         sum+=din[i];
-//     }
-//     return sum;
-// }
-
-
-// #define FT float
-// #define FADD_LAT 11
-// FT ybd(FT din[1024]){
-
-//     FT sum_p[FADD_LAT];
-//     #pragma HLS ARRAY_PARTITION variable=sum_p complete dim=1
-//     FT sum;
-
-//     loop_init: for(int i=0;i<FADD_LAT;i++) {
-//     #pragma HLS UNROLL
-//     sum_p[i] = 0;
-//     }
-//     sum = 0;
-
-//     LOOP:for(int i=0;i<1024;i+=FADD_LAT){
-//     #pragma HLS PIPELINE II=11 rewind
-//     for (int j=0; j<FADD_LAT; j++)
-//     sum_p[j]+=din[j+i];
-//     }
-
-//     loop_sum_f: for (int k=0; k<FADD_LAT; k++)
-//     {
-//     #pragma HLS UNROLL
-//     sum += sum_p[k];
-//     }
-
-//     return sum;
-// }
-
-
 // dot product between two vectors
+// use some techs to pipeine floating 
+// point accumulation 
+// please refer to http://www.xilinx.com/support/answers/62859.html
 FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureType* b, int size) {
 
+    // result of partitial sum
     VectorFeatureType result_vector_p[FADD_LAT] __attribute__((xcl_array_partition(complete, 1)));
+
+    // result vector
     VectorFeatureType result_vector = (0.0f,0.0f,0.0f,0.0f,
                                         0.0f,0.0f,0.0f,0.0f,
                                         0.0f,0.0f,0.0f,0.0f,
@@ -77,7 +43,6 @@ FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureTyp
     FeatureType result = 0;
 
    // to pipeline floating point accumulation
-   // refer to http://www.xilinx.com/support/answers/62859.html
     LOOP_UNROLL
      LOOP_INIT:for(int i = 0; i < FADD_LAT; i++) {    
         result_vector_p[i] = (0.0f,0.0f,0.0f,0.0f,
@@ -89,7 +54,6 @@ FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureTyp
     // LOOP_PIPELINE
     LOOP_PIPELINE
     LOOPA:for(int i = 0; i < size; i += FADD_LAT){
-    // #pragma HLS PIPELINE II=11 rewind
     LOOP_UNROLL
     for (int j = 0; j < FADD_LAT; j++)
         result_vector_p[j] += a[j + i] * b[j + i];
@@ -100,15 +64,12 @@ FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureTyp
     LOOP_UNROLL
     LOOP_SUM_F: for (int k = 0; k < FADD_LAT; k++)
     {
-    // #pragma HLS UNROLL
         result_vector += result_vector_p[k];
     }
 
 
-    // LOOP_PIPELINE
-    // for (int j = 0; j < size; j++)
-    //     result_vector += a[j] * b[j];
-
+ 
+    // result sum
     result = result_vector.s0 + result_vector.s1 + result_vector.s2 + result_vector.s3
                 + result_vector.s4 + result_vector.s5 + result_vector.s6 + result_vector.s7
                 + result_vector.s8 + result_vector.s9 + result_vector.sa + result_vector.sb
@@ -116,8 +77,6 @@ FeatureType cl_dotProduct(__local VectorFeatureType* a, __local VectorFeatureTyp
 
     return result;
 }
-
-
 
 
 
@@ -145,67 +104,59 @@ float cl_logisticFunction(FeatureType exponent) {
 //     return 1.0 / (1.0 + e);
 // }
 
+/*
+* OpenCL kernal with single buffer caching
+* input : datapoints labels and parameter
+* output : parameter
+*/
 __attribute__ ((reqd_work_group_size(1, 1, 1)))
-//__kernel void DigitRec(__global long long * global_training_set, __global long long * global_test_set, __global long long * global_results) {
 __kernel void SgdLR(__global VectorFeatureType * global_data_points, 
     __global LabelType * global_labels, 
     __global VectorFeatureType * global_parameter_vector) {
 
-    // event_t parameter_copy;
-    // event_t results_copy;
-    // event_t data_copy;
-    // datacopy event 
+    //copy event 
     event_t datacopy_evt[2];
     event_t databuffer_copy[BUFFER_ITERATION];
 
-    // Read data point from global memory
+    // Declaration of parameter, datapoint and labels as 
+    // local variable
     __local VectorFeatureType parameter_vector[NUM_FEATURES];
   
-    // __local VectorFeatureType data_point[NUM_FEATURES * NUM_TRAINING]; 
     __local VectorFeatureType data_point[SINGLE_BUFFER_SIZE * NUM_FEATURES];
-    // __local VectorFeatureType data_point_buffer2[DOUBLE_BUFFER_SIZE * NUM_FEATURES];
 
     __local FeatureType labels[NUM_TRAINING];
     // __attribute__((xcl_array_partition(complete, 1)));
 
+    // Copy parameter and labels
     datacopy_evt[0] = async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES, 0);
-    // datacopy_evt[1] = async_work_group_copy(data_point, global_data_points, NUM_FEATURES * SINGLE_BUFFER_SIZE , 0);
     datacopy_evt[1] = async_work_group_copy(labels, global_labels, NUM_TRAINING, 0);
 
-    // __local int buffer_iteration = 0
-    // wait_group_events(1, &data_copy);
-    // wait_group_events(1, &parameter_copy);
     wait_group_events(2, datacopy_evt);
 
-    // barrier(CLK_LOCAL_MEM_FENCE);
 
     for (int epoch = 0; epoch < NUM_EPOCHS; epoch++) {
 
-        // Iterate over all training instances (data points)
-        // static int read = 0;      
-        // LOOP_UNROLL
-        // LOOP_PIPELINE
+        // Iterate over all training instance
+        // first iteration of all buffers
         for(int buffer_iteration_number = 0; buffer_iteration_number < BUFFER_ITERATION; buffer_iteration_number++){
 
-            // int buffer_execution_number = buffer_iteration_number % 2;
-            // int buffer_copy_number = (buffer_execution_number + 1) % 2;
-
+            // buffer data points
             databuffer_copy[buffer_iteration_number] =  async_work_group_copy(data_point, 
                 &global_data_points[(buffer_iteration_number) * SINGLE_BUFFER_SIZE * NUM_FEATURES],
                                      NUM_FEATURES * SINGLE_BUFFER_SIZE , 0);
 
             wait_group_events(1, &databuffer_copy[buffer_iteration_number]);
           
-            LOOP_PIPELINE
+            // LOOP_PIPELINE
             for (int i = 0; i < SINGLE_BUFFER_SIZE; i++) {
-                // starts computation of gradient
+                // calculate dot product
                 FeatureType dot = cl_dotProduct(parameter_vector, &data_point[i * NUM_FEATURES], NUM_FEATURES);
                 // FeatureType dot =dot(parameter_vector, &data_point[i * NUM_FEATURES]);
-                
+                // calculate probability
                 float probability_of_positive = cl_hardLogisticFunction(dot);   
-                //TODO
+                //  calculate gradient
                 float step = -(probability_of_positive - labels[i + buffer_iteration_number * SINGLE_BUFFER_SIZE]) * STEP_SIZE;
-
+                // fit into vector 16 data type
                 VectorFeatureType step16 = (step, step, step, step,
                                                 step, step, step, step,
                                                 step, step, step, step,

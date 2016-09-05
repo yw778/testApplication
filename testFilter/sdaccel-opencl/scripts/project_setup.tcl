@@ -25,7 +25,9 @@ set_property file_type "c header files" [get_files "src/utils.hpp"]
 
 # Kernel definition
 create_kernel SgdLR -type clc
+# need to change files names here to test other versions of Opencl Kernal
 add_files -kernel [get_kernels SgdLR] "src/sgd_serial_kernel.cl"
+
 set_property max_memory_ports true [get_kernels SgdLR]
 set_property memory_port_data_width 512 [get_kernels SgdLR]
 
