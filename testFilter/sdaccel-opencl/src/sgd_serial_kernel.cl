@@ -8,8 +8,8 @@
 #define STEP_SIZE         60000 //step size (eta)
 #define NUM_EPOCHS        1
 #define MAX_NUM_EPOCHS    1
-#define SINGLE_BUFFER_SIZE     1500 
-#define BUFFER_ITERATION  3
+#define SINGLE_BUFFER_SIZE     500 
+#define BUFFER_ITERATION  9
 
 
 typedef float FeatureType;
@@ -177,9 +177,9 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
     for (int epoch = 0; epoch < NUM_EPOCHS; epoch++) {
 
         // Iterate over all training instances (data points)
-        // static int read = 0;
-        // LOOP_PIPELINE
+        // static int read = 0;      
         // LOOP_UNROLL
+        LOOP_PIPELINE
         for(int buffer_iteration_number = 0; buffer_iteration_number < BUFFER_ITERATION; buffer_iteration_number++){
 
             // int buffer_execution_number = buffer_iteration_number % 2;
@@ -191,6 +191,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
 
             wait_group_events(1, &databuffer_copy[buffer_iteration_number]);
           
+            LOOP_PIPELINE
             for (int i = 0; i < SINGLE_BUFFER_SIZE; i++) {
                 // starts computation of gradient
                 FeatureType dot = cl_dotProduct(parameter_vector, &data_point[i * NUM_FEATURES], NUM_FEATURES);
