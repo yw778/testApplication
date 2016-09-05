@@ -150,8 +150,8 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
     // event_t results_copy;
     // event_t data_copy;
     // datacopy event 
-    event_t datacopy_evt[3];
-    event_t databuffer_copy[BUFFER_ITERATION - 1];
+    event_t datacopy_evt[2];
+    event_t databuffer_copy[BUFFER_ITERATION];
 
     // Read data point from global memory
     __local VectorFeatureType parameter_vector[NUM_FEATURES];
@@ -164,13 +164,13 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
     // __attribute__((xcl_array_partition(complete, 1)));
 
     datacopy_evt[0] = async_work_group_copy(parameter_vector, global_parameter_vector, NUM_FEATURES, 0);
-    datacopy_evt[1] = async_work_group_copy(data_point, global_data_points, NUM_FEATURES * SINGLE_BUFFER_SIZE , 0);
-    datacopy_evt[2] = async_work_group_copy(labels, global_labels, NUM_TRAINING, 0);
+    // datacopy_evt[1] = async_work_group_copy(data_point, global_data_points, NUM_FEATURES * SINGLE_BUFFER_SIZE , 0);
+    datacopy_evt[1] = async_work_group_copy(labels, global_labels, NUM_TRAINING, 0);
 
     // __local int buffer_iteration = 0
     // wait_group_events(1, &data_copy);
     // wait_group_events(1, &parameter_copy);
-    wait_group_events(3, datacopy_evt);
+    wait_group_events(2, datacopy_evt);
 
     // barrier(CLK_LOCAL_MEM_FENCE);
 
@@ -186,7 +186,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
             // int buffer_copy_number = (buffer_execution_number + 1) % 2;
 
             databuffer_copy[buffer_iteration_number] =  async_work_group_copy(data_point, 
-                &global_data_points[(buffer_iteration_number + 1) * SINGLE_BUFFER_SIZE * NUM_FEATURES],
+                &global_data_points[(buffer_iteration_number) * SINGLE_BUFFER_SIZE * NUM_FEATURES],
                                      NUM_FEATURES * SINGLE_BUFFER_SIZE , 0);
 
             wait_group_events(1, &databuffer_copy[buffer_iteration_number]);
