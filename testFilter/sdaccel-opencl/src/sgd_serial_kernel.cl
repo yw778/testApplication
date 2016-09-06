@@ -3,10 +3,13 @@
 #define NUM_TRAINING      4500
 #define NUM_TESTING       500
 #define STEP_SIZE         60000 //step size (eta)
-#define NUM_EPOCHS        1
-#define MAX_NUM_EPOCHS    1
+#define NUM_EPOCHS        21
+#define MAX_NUM_EPOCHS    100
 #define SINGLE_BUFFER_SIZE     500 
 #define BUFFER_ITERATION  9
+#define CHARACTERISTIC_TIME 150000
+// #define CHARACTERISTIC_TIME (MAX_NUM_EPOCHS * NUM_TRAINING / 3)
+
 // #define BUFFER_ITERATION  NUM_TRAINING/SINGLE_BUFFER_SIZE
 
 
@@ -136,6 +139,10 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
 
     for (int epoch = 0; epoch < NUM_EPOCHS; epoch++) {
 
+        float anealedStepSize = STEP_SIZE / (1.0
+                                + (epoch
+                                   * NUM_TRAINING
+                                   / characteristic_time));
         // Iterate over all training instance
         // first iteration of all buffers
         for(int buffer_iteration_number = 0; buffer_iteration_number < BUFFER_ITERATION; buffer_iteration_number++){
