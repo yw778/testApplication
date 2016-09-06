@@ -3,8 +3,8 @@
 #define NUM_TRAINING      4500
 #define NUM_TESTING       500
 #define STEP_SIZE         60000 //step size (eta)
-#define NUM_EPOCHS        21
-#define MAX_NUM_EPOCHS    100
+#define NUM_EPOCHS        1
+#define MAX_NUM_EPOCHS    1
 #define SINGLE_BUFFER_SIZE     500 
 #define BUFFER_ITERATION  9
 // #define CHARACTERISTIC_TIME 150000
