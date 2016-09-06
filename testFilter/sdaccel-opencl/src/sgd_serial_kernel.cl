@@ -142,7 +142,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
         float anealedStepSize = STEP_SIZE / (1.0
                                 + (epoch
                                    * NUM_TRAINING
-                                   / characteristic_time));
+                                   / CHARACTERISTIC_TIME));
         // Iterate over all training instance
         // first iteration of all buffers
         for(int buffer_iteration_number = 0; buffer_iteration_number < BUFFER_ITERATION; buffer_iteration_number++){
