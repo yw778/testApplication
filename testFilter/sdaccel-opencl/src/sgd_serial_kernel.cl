@@ -162,7 +162,7 @@ __kernel void SgdLR(__global VectorFeatureType * global_data_points,
                 // calculate probability
                 float probability_of_positive = cl_hardLogisticFunction(dot);   
                 //  calculate gradient
-                float step = -(probability_of_positive - labels[i + buffer_iteration_number * SINGLE_BUFFER_SIZE]) * STEP_SIZE;
+                float step = -(probability_of_positive - labels[i + buffer_iteration_number * SINGLE_BUFFER_SIZE]) * anealedStepSize;
                 // fit into vector 16 data type
                 VectorFeatureType step16 = (step, step, step, step,
                                                 step, step, step, step,
